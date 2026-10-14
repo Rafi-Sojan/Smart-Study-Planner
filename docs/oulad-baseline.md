@@ -124,16 +124,22 @@ The result also does not estimate an optimal study duration or schedule.
 
 ## Notebook and visualizations
 
-`notebooks/02_oulad_baseline_comparison.ipynb` provides an interactive view
+`notebooks/03_oulad_baseline_comparison.ipynb` provides an interactive view
 of the same reusable pipeline. It loads the local OULAD tables, runs the
 cleaning and feature functions from `src/`, and compares the four baseline
 models. It does not contain a separate copy of the modeling logic.
 
 The preceding
-`notebooks/01_oulad_processing_and_features.ipynb` focuses on the data layer:
+`notebooks/02_oulad_processing_and_features.ipynb` focuses on the data layer:
 raw table sizes and schemas, cleaning reconciliation, score quality,
 missingness, outcome balance, enrollment-level feature extraction, and feature
 distributions. Use it first when reviewing how the modeling table was built.
+
+The descriptive analysis is in `notebooks/01_oulad_data_exploration.ipynb`.
+It covers outcome composition, course-presentation risk rates, demographic
+and enrollment attributes, assessment-score distributions, and registration
+timing. Its plots are descriptive and retain the distinction between
+enrollments, assessment records, and activity records.
 
 The notebook includes these visualizations:
 
@@ -160,7 +166,7 @@ To open it after installing the dependencies, start Jupyter from the project
 root and run the cells in order:
 
 ```powershell
-jupyter notebook notebooks/02_oulad_baseline_comparison.ipynb
+jupyter notebook notebooks/03_oulad_baseline_comparison.ipynb
 ```
 
 The notebook intentionally contains no saved results until it is executed with

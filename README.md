@@ -5,9 +5,11 @@ vertical slice. The other planner, API, simulation, monitoring, and MLOps
 areas remain scaffolds. Detailed processing rules and the verified four-model
 comparison are documented in [docs/oulad-baseline.md](docs/oulad-baseline.md).
 The interactive analysis is in
-[notebooks/02_oulad_baseline_comparison.ipynb](<notebooks/02_oulad_baseline_comparison.ipynb>).
+[notebooks/03_oulad_baseline_comparison.ipynb](<notebooks/03_oulad_baseline_comparison.ipynb>).
 The data-processing and feature-extraction walkthrough is in
-[notebooks/01_oulad_processing_and_features.ipynb](<notebooks/01_oulad_processing_and_features.ipynb>).
+[notebooks/02_oulad_processing_and_features.ipynb](<notebooks/02_oulad_processing_and_features.ipynb>).
+The descriptive data analysis is in
+[notebooks/01_oulad_data_exploration.ipynb](<notebooks/01_oulad_data_exploration.ipynb>).
 
 ## Setup
 
