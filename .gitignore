@@ -49,7 +49,7 @@ htmlcov/
 
 # Raw and processed datasets
 /data/raw/oulad/
-data/processed/*
+/data/processed/oulad/
 data/simulated/*
 
 # Keep directory structure
