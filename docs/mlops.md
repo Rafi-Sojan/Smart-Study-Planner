@@ -59,6 +59,9 @@ runs the stages in `dvc.yaml`:
 1. `clean` creates `data/processed/oulad/` from the raw tables.
 2. `train` compares the four baselines and writes the selected model and
    metrics.
+3. `early_warning` evaluates the same four baselines at course-relative days
+   30, 60, and 90 using the time-aware presentation holdout, and writes
+   `models/metrics/early_warning_metrics.json`.
 
 Push the data cache only after the DagsHub remote credentials are configured:
 
@@ -69,7 +72,7 @@ dvc push -r origin
 Then commit and push the pointer/configuration files through Git:
 
 ```powershell
-git add .dvc .gitignore dvc.yaml dvc.lock data/raw/oulad.dvc models/metrics/metrics.json
+git add .dvc .gitignore dvc.yaml dvc.lock data/raw/oulad.dvc models/metrics/metrics.json models/metrics/early_warning_metrics.json
 git commit -m "Set up DVC data pipeline"
 git push origin main
 ```

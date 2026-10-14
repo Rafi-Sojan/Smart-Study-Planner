@@ -8,7 +8,9 @@ the verified four-model comparison are documented in
 [docs/oulad-baseline.md](docs/oulad-baseline.md).
 The interactive analysis is in
 [notebooks/03_oulad_baseline_comparison.ipynb](<notebooks/03_oulad_baseline_comparison.ipynb>).
-The data-processing and feature-extraction walkthrough is in
+The leakage-safe early-warning evaluation is in
+[notebooks/04_oulad_early_warning_evaluation.ipynb](<notebooks/04_oulad_early_warning_evaluation.ipynb>).
+The data-cleaning, validation, and feature-extraction walkthrough is in
 [notebooks/02_oulad_processing_and_features.ipynb](<notebooks/02_oulad_processing_and_features.ipynb>).
 The descriptive data analysis is in
 [notebooks/01_oulad_data_exploration.ipynb](<notebooks/01_oulad_data_exploration.ipynb>).
@@ -72,6 +74,21 @@ python -m pipeline.training_pipeline `
   --experiment-name smart-study-planner-oulad
 ```
 
+Evaluate the same four models using only observations available by course day
+30, 60, and 90, with the latest course presentation held out:
+
+```powershell
+python -m pipeline.early_warning_pipeline `
+  --data-dir data/processed/oulad `
+  --metrics-output models/metrics/early_warning_metrics.json `
+  --cutoffs-days 30 60 90
+```
+
+The early-warning metrics are versioned in
+`models/metrics/early_warning_metrics.json`. The `early_warning` stage is also
+included in `dvc.yaml`, so `dvc repro early_warning` reruns the same command
+when its data or code dependencies change.
+
 Run the same checks used by CI:
 
 ```powershell
@@ -87,9 +104,10 @@ repository.
 
 ## Limitations and next work
 
-The baseline is not a causal model and does not infer an optimal study
-schedule. It needs a prediction-time definition to avoid using information
-that would only be known after the course. Next steps are leakage-aware time
-splits, a data-dependent pipeline workflow, API/Docker implementation, and
-evaluation on a locally supplied OULAD release.
+The full-course baseline is not a causal model and is a retrospective
+benchmark. The early-warning evaluation now defines 30/60/90-day observation
+cutoffs and a course-presentation holdout, but it still uses final outcome
+labels. Next steps are prospective validation, calibration and intervention
+thresholds, API/Docker implementation, and evaluation on additional locally
+supplied OULAD releases.
 

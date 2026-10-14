@@ -1,0 +1,198 @@
+{
+  "cutoffs_days": [
+    30,
+    60,
+    90
+  ],
+  "evaluation": "time-aware course-presentation holdout",
+  "evaluations": {
+    "30": {
+      "best_model": "random_forest",
+      "cutoff_days": 30,
+      "models": {
+        "extra_trees": {
+          "accuracy": 0.7230905861456484,
+          "balanced_accuracy": 0.7216433804167756,
+          "f1": 0.7410299003322259,
+          "n_samples": 32593,
+          "n_test": 11260,
+          "n_train": 21333,
+          "precision": 0.7152477152477152,
+          "random_state": 42,
+          "recall": 0.7687403067378942,
+          "roc_auc": 0.8038248274519214
+        },
+        "hist_gradient_boosting": {
+          "accuracy": 0.7410301953818828,
+          "balanced_accuracy": 0.7411623928287931,
+          "f1": 0.7457272410184862,
+          "n_samples": 32593,
+          "n_test": 11260,
+          "n_train": 21333,
+          "precision": 0.754810238305384,
+          "random_state": 42,
+          "recall": 0.7368602447010167,
+          "roc_auc": 0.8067768148712423
+        },
+        "logistic_regression": {
+          "accuracy": 0.7251332149200711,
+          "balanced_accuracy": 0.7254115494658456,
+          "f1": 0.7287229380313788,
+          "n_samples": 32593,
+          "n_test": 11260,
+          "n_train": 21333,
+          "precision": 0.741526935426329,
+          "random_state": 42,
+          "recall": 0.7163536102016198,
+          "roc_auc": 0.7724506079220523
+        },
+        "random_forest": {
+          "accuracy": 0.7326820603907638,
+          "balanced_accuracy": 0.7323201514915967,
+          "f1": 0.74154216039842,
+          "n_samples": 32593,
+          "n_test": 11260,
+          "n_train": 21333,
+          "precision": 0.7390039363340749,
+          "random_state": 42,
+          "recall": 0.7440978804066862,
+          "roc_auc": 0.8152453071687848
+        }
+      },
+      "test_presentations": [
+        "2014J"
+      ],
+      "train_presentations": [
+        "2013B",
+        "2013J",
+        "2014B"
+      ]
+    },
+    "60": {
+      "best_model": "random_forest",
+      "cutoff_days": 60,
+      "models": {
+        "extra_trees": {
+          "accuracy": 0.7613676731793961,
+          "balanced_accuracy": 0.759478622063348,
+          "f1": 0.7800245599672534,
+          "n_samples": 32593,
+          "n_test": 11260,
+          "n_train": 21333,
+          "precision": 0.7429819089207735,
+          "random_state": 42,
+          "recall": 0.8209546786145098,
+          "roc_auc": 0.8528798191655275
+        },
+        "hist_gradient_boosting": {
+          "accuracy": 0.7598579040852576,
+          "balanced_accuracy": 0.7582870177258191,
+          "f1": 0.7764919821458093,
+          "n_samples": 32593,
+          "n_test": 11260,
+          "n_train": 21333,
+          "precision": 0.7461477362986497,
+          "random_state": 42,
+          "recall": 0.8094089264173703,
+          "roc_auc": 0.8465321485910352
+        },
+        "logistic_regression": {
+          "accuracy": 0.7449378330373002,
+          "balanced_accuracy": 0.7427901456062849,
+          "f1": 0.7665799739921977,
+          "n_samples": 32593,
+          "n_test": 11260,
+          "n_train": 21333,
+          "precision": 0.7254268574065529,
+          "random_state": 42,
+          "recall": 0.8126830949508874,
+          "roc_auc": 0.8144854144717535
+        },
+        "random_forest": {
+          "accuracy": 0.7673179396092362,
+          "balanced_accuracy": 0.7659835542843678,
+          "f1": 0.7819210920592642,
+          "n_samples": 32593,
+          "n_test": 11260,
+          "n_train": 21333,
+          "precision": 0.756238930928997,
+          "random_state": 42,
+          "recall": 0.8094089264173703,
+          "roc_auc": 0.8555796669027802
+        }
+      },
+      "test_presentations": [
+        "2014J"
+      ],
+      "train_presentations": [
+        "2013B",
+        "2013J",
+        "2014B"
+      ]
+    },
+    "90": {
+      "best_model": "random_forest",
+      "cutoff_days": 90,
+      "models": {
+        "extra_trees": {
+          "accuracy": 0.7791296625222025,
+          "balanced_accuracy": 0.7767001618184448,
+          "f1": 0.7997423303003462,
+          "n_samples": 32593,
+          "n_test": 11260,
+          "n_train": 21333,
+          "precision": 0.7506045949214026,
+          "random_state": 42,
+          "recall": 0.8557642598655868,
+          "roc_auc": 0.8749971697640422
+        },
+        "hist_gradient_boosting": {
+          "accuracy": 0.7631438721136767,
+          "balanced_accuracy": 0.7608358405987108,
+          "f1": 0.7843803056027164,
+          "n_samples": 32593,
+          "n_test": 11260,
+          "n_train": 21333,
+          "precision": 0.7388059701492538,
+          "random_state": 42,
+          "recall": 0.8359469240048251,
+          "roc_auc": 0.8635922267399683
+        },
+        "logistic_regression": {
+          "accuracy": 0.7304618117229129,
+          "balanced_accuracy": 0.7278388103491173,
+          "f1": 0.7566744167401588,
+          "n_samples": 32593,
+          "n_test": 11260,
+          "n_train": 21333,
+          "precision": 0.707496251874063,
+          "random_state": 42,
+          "recall": 0.8132000689298639,
+          "roc_auc": 0.8098195435237555
+        },
+        "random_forest": {
+          "accuracy": 0.7829484902309058,
+          "balanced_accuracy": 0.7816070251872211,
+          "f1": 0.7967060389286308,
+          "n_samples": 32593,
+          "n_test": 11260,
+          "n_train": 21333,
+          "precision": 0.7700594950956745,
+          "random_state": 42,
+          "recall": 0.8252627951059797,
+          "roc_auc": 0.8777777325150549
+        }
+      },
+      "test_presentations": [
+        "2014J"
+      ],
+      "train_presentations": [
+        "2013B",
+        "2013J",
+        "2014B"
+      ]
+    }
+  },
+  "target": "Fail/Withdrawn = 1; Pass/Distinction = 0",
+  "task": "early_warning_enrollment_risk_classification"
+}

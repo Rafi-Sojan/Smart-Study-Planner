@@ -1,8 +1,7 @@
 schema: '2.0'
 stages:
   clean:
-    cmd: python -m src.data.cleaner --input-dir data/raw/oulad --output-dir 
-      data/processed/oulad
+    cmd: python -m src.data.cleaner --input-dir data/raw/oulad --output-dir data/processed/oulad
     deps:
     - path: data/raw/oulad
       hash: md5
@@ -24,9 +23,8 @@ stages:
       size: 334016008
       nfiles: 8
   train:
-    cmd: python -m pipeline.training_pipeline --data-dir data/processed/oulad 
-      --metrics-output models/metrics/metrics.json --model-output 
-      models/baseline.pkl
+    cmd: python -m pipeline.training_pipeline --data-dir data/processed/oulad --metrics-output
+      models/metrics/metrics.json --model-output models/baseline.pkl
     deps:
     - path: data/processed/oulad
       hash: md5
@@ -39,12 +37,12 @@ stages:
       size: 3273
     - path: src/features/feature_engineering.py
       hash: md5
-      md5: ed8c985bf4cc22c353b75db2b50f68a5
-      size: 3636
+      md5: d21dcc5b3ec5825f470bd448d5bf0476
+      size: 4798
     - path: src/models/baseline.py
       hash: md5
-      md5: baca58a5f08065b8214b3c2ea377ef6e
-      size: 8319
+      md5: e91e51729b737cbe5017126b32415c7c
+      size: 11624
     - path: src/models/evaluate.py
       hash: md5
       md5: a0773b56808ba96ebf706435de091ac7
@@ -54,3 +52,29 @@ stages:
       hash: md5
       md5: 98e9a956813430d22ea64e3a2083cc1b
       size: 560877
+  early_warning:
+    cmd: python -m pipeline.early_warning_pipeline --data-dir data/processed/oulad
+      --metrics-output models/metrics/early_warning_metrics.json --cutoffs-days 30
+      60 90
+    deps:
+    - path: data/processed/oulad
+      hash: md5
+      md5: 6ca7ed713177da595e0e3a6e534e8d4a.dir
+      size: 334016008
+      nfiles: 8
+    - path: pipeline/early_warning_pipeline.py
+      hash: md5
+      md5: 86e06f6f30596ea75ef69fc93662f70d
+      size: 3399
+    - path: src/features/feature_engineering.py
+      hash: md5
+      md5: d21dcc5b3ec5825f470bd448d5bf0476
+      size: 4798
+    - path: src/models/baseline.py
+      hash: md5
+      md5: e91e51729b737cbe5017126b32415c7c
+      size: 11624
+    - path: src/models/evaluate.py
+      hash: md5
+      md5: a0773b56808ba96ebf706435de091ac7
+      size: 1066
