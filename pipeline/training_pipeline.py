@@ -4,18 +4,23 @@ import argparse
 import json
 import pickle
 from pathlib import Path
+from typing import Any
 
 from src.data.cleaner import clean_oulad_tables
 from src.data.loader import load_oulad_tables
 from src.features.feature_engineering import build_oulad_features
 from src.models.baseline import train_baselines
+from src.tracking.mlflow_tracking import log_training_run
 
 
 def run_training(
     data_dir: str | Path,
     metrics_output: str | Path | None = None,
     model_output: str | Path | None = None,
-) -> dict[str, float | int | None]:
+    mlflow_enabled: bool = False,
+    experiment_name: str = "smart-study-planner-oulad",
+    run_name: str | None = None,
+) -> dict[str, Any]:
     raw_tables = load_oulad_tables(data_dir)
     cleaned_tables = clean_oulad_tables(raw_tables)
     features = build_oulad_features(cleaned_tables, clean=False)
@@ -42,6 +47,15 @@ def run_training(
         path.parent.mkdir(parents=True, exist_ok=True)
         with path.open("wb") as handle:
             pickle.dump(best_model, handle)
+    if mlflow_enabled:
+        run_id = log_training_run(
+            metrics,
+            metrics_path=metrics_output,
+            model_path=model_output,
+            experiment_name=experiment_name,
+            run_name=run_name,
+        )
+        metrics["mlflow_run_id"] = run_id
     return metrics
 
 
@@ -50,8 +64,26 @@ def main() -> None:
     parser.add_argument("--data-dir", type=Path, default=Path("data/raw/oulad"))
     parser.add_argument("--metrics-output", type=Path, default=Path("models/metrics/metrics.json"))
     parser.add_argument("--model-output", type=Path, default=Path("models/baseline.pkl"))
+    parser.add_argument(
+        "--mlflow",
+        action="store_true",
+        help="Log metrics and model artifacts to MLflow/DagsHub",
+    )
+    parser.add_argument(
+        "--experiment-name",
+        default="smart-study-planner-oulad",
+        help="MLflow experiment name when --mlflow is enabled",
+    )
+    parser.add_argument("--run-name", default=None, help="Optional MLflow run name")
     args = parser.parse_args()
-    metrics = run_training(args.data_dir, args.metrics_output, args.model_output)
+    metrics = run_training(
+        args.data_dir,
+        args.metrics_output,
+        args.model_output,
+        mlflow_enabled=args.mlflow,
+        experiment_name=args.experiment_name,
+        run_name=args.run_name,
+    )
     print(json.dumps(metrics, indent=2, sort_keys=True))
 
 

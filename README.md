@@ -1,9 +1,11 @@
 # Smart Study Planner
 
 This repository currently contains a reproducible OULAD data-to-baseline-model
-vertical slice. The other planner, API, simulation, monitoring, and MLOps
-areas remain scaffolds. Detailed processing rules and the verified four-model
-comparison are documented in [docs/oulad-baseline.md](docs/oulad-baseline.md).
+vertical slice. The planner, API, simulation, and monitoring areas remain
+scaffolds. DVC data versioning and optional DagsHub MLflow tracking are
+documented in [docs/mlops.md](docs/mlops.md). Detailed processing rules and
+the verified four-model comparison are documented in
+[docs/oulad-baseline.md](docs/oulad-baseline.md).
 The interactive analysis is in
 [notebooks/03_oulad_baseline_comparison.ipynb](<notebooks/03_oulad_baseline_comparison.ipynb>).
 The data-processing and feature-extraction walkthrough is in
@@ -52,6 +54,23 @@ histogram gradient boosting. The selected model is recorded in
 `models/metrics/metrics.json`.
 The notebook also displays confusion matrices so the error types behind the
 aggregate metrics are visible.
+
+Reproduce the data-to-model stages with DVC after configuring the DagsHub
+remote:
+
+```powershell
+dvc repro
+```
+
+Log a completed baseline run to DagsHub MLflow only when tracking credentials
+are configured in the current shell:
+
+```powershell
+python -m pipeline.training_pipeline `
+  --data-dir data/processed/oulad `
+  --mlflow `
+  --experiment-name smart-study-planner-oulad
+```
 
 Run the same checks used by CI:
 

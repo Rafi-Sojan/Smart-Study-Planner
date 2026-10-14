@@ -1,0 +1,56 @@
+schema: '2.0'
+stages:
+  clean:
+    cmd: python -m src.data.cleaner --input-dir data/raw/oulad --output-dir 
+      data/processed/oulad
+    deps:
+    - path: data/raw/oulad
+      hash: md5
+      md5: 64169e6a53da1c7f07a45e84e9fd6103.dir
+      size: 464367129
+      nfiles: 7
+    - path: src/data/cleaner.py
+      hash: md5
+      md5: ee208d908e6600ee12e905d8a91ddac2
+      size: 5561
+    - path: src/data/loader.py
+      hash: md5
+      md5: deff0077ae6bf81278961f51d856d33e
+      size: 2465
+    outs:
+    - path: data/processed/oulad
+      hash: md5
+      md5: 6ca7ed713177da595e0e3a6e534e8d4a.dir
+      size: 334016008
+      nfiles: 8
+  train:
+    cmd: python -m pipeline.training_pipeline --data-dir data/processed/oulad 
+      --metrics-output models/metrics/metrics.json --model-output 
+      models/baseline.pkl
+    deps:
+    - path: data/processed/oulad
+      hash: md5
+      md5: 6ca7ed713177da595e0e3a6e534e8d4a.dir
+      size: 334016008
+      nfiles: 8
+    - path: pipeline/training_pipeline.py
+      hash: md5
+      md5: 8fc69c5ff97a08dfa8208047f50aab7b
+      size: 3273
+    - path: src/features/feature_engineering.py
+      hash: md5
+      md5: ed8c985bf4cc22c353b75db2b50f68a5
+      size: 3636
+    - path: src/models/baseline.py
+      hash: md5
+      md5: baca58a5f08065b8214b3c2ea377ef6e
+      size: 8319
+    - path: src/models/evaluate.py
+      hash: md5
+      md5: a0773b56808ba96ebf706435de091ac7
+      size: 1066
+    outs:
+    - path: models/baseline.pkl
+      hash: md5
+      md5: 98e9a956813430d22ea64e3a2083cc1b
+      size: 560877

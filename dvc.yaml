@@ -1,0 +1,19 @@
+stages:
+  clean:
+    cmd: python -m src.data.cleaner --input-dir data/raw/oulad --output-dir data/processed/oulad
+    deps:
+      - data/raw/oulad
+      - src/data/cleaner.py
+      - src/data/loader.py
+    outs:
+      - data/processed/oulad
+  train:
+    cmd: python -m pipeline.training_pipeline --data-dir data/processed/oulad --metrics-output models/metrics/metrics.json --model-output models/baseline.pkl
+    deps:
+      - data/processed/oulad
+      - pipeline/training_pipeline.py
+      - src/features/feature_engineering.py
+      - src/models/baseline.py
+      - src/models/evaluate.py
+    outs:
+      - models/baseline.pkl
