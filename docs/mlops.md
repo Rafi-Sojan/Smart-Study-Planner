@@ -105,12 +105,31 @@ python -m pipeline.training_pipeline `
   --metrics-output models/metrics/metrics.json `
   --model-output models/baseline.pkl `
   --mlflow `
-  --experiment-name smart-study-planner-oulad
+  --experiment-name smart-study-planner-oulad `
+  --register-models
 ```
 
 The run logs the selected model, split metadata, metrics for all four
 classifiers, `metrics.json`, and the trained model artifact. Without
 `--mlflow`, the pipeline remains fully local and does not require credentials.
+With `--register-models`, all four full-course model artifacts are saved in
+MLflow format and registered as versioned models.
+
+For the leakage-safe early-warning pipeline, use:
+
+```powershell
+python -m pipeline.early_warning_pipeline `
+  --data-dir data/processed/oulad `
+  --metrics-output models/metrics/early_warning_metrics.json `
+  --cutoffs-days 30 60 90 `
+  --mlflow `
+  --register-models
+```
+
+This logs all four model comparisons at each cutoff and registers the selected
+model as a separate versioned MLflow model for days 30, 60, and 90. The
+registration path uses uploaded MLflow-format artifacts and a `runs:/` model
+URI, which is compatible with the connected DagsHub MLflow server.
 
 The code also supports the DagsHub client configuration. Instead of setting
 `MLFLOW_TRACKING_URI`, set `DAGSHUB_REPO_OWNER` and `DAGSHUB_REPO_NAME`; the

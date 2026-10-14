@@ -10,7 +10,7 @@ from src.data.cleaner import clean_oulad_tables
 from src.data.loader import load_oulad_tables
 from src.features.feature_engineering import build_oulad_features
 from src.models.baseline import train_baselines
-from src.tracking.mlflow_tracking import log_training_run
+from src.tracking.mlflow_tracking import log_baseline_models_run, log_training_run
 
 
 def run_training(
@@ -20,6 +20,7 @@ def run_training(
     mlflow_enabled: bool = False,
     experiment_name: str = "smart-study-planner-oulad",
     run_name: str | None = None,
+    register_models: bool = False,
 ) -> dict[str, Any]:
     raw_tables = load_oulad_tables(data_dir)
     cleaned_tables = clean_oulad_tables(raw_tables)
@@ -47,7 +48,18 @@ def run_training(
         path.parent.mkdir(parents=True, exist_ok=True)
         with path.open("wb") as handle:
             pickle.dump(best_model, handle)
-    if mlflow_enabled:
+    if register_models:
+        run_id, registered = log_baseline_models_run(
+            metrics,
+            models,
+            metrics_path=metrics_output,
+            model_path=model_output,
+            experiment_name=experiment_name,
+            run_name=run_name,
+        )
+        metrics["mlflow_run_id"] = run_id
+        metrics["registered_models"] = registered
+    elif mlflow_enabled:
         run_id = log_training_run(
             metrics,
             metrics_path=metrics_output,
@@ -75,6 +87,11 @@ def main() -> None:
         help="MLflow experiment name when --mlflow is enabled",
     )
     parser.add_argument("--run-name", default=None, help="Optional MLflow run name")
+    parser.add_argument(
+        "--register-models",
+        action="store_true",
+        help="Register all four full-course baseline models in MLflow",
+    )
     args = parser.parse_args()
     metrics = run_training(
         args.data_dir,
@@ -83,6 +100,7 @@ def main() -> None:
         mlflow_enabled=args.mlflow,
         experiment_name=args.experiment_name,
         run_name=args.run_name,
+        register_models=args.register_models,
     )
     print(json.dumps(metrics, indent=2, sort_keys=True))
 

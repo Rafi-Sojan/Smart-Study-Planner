@@ -74,6 +74,10 @@ python -m pipeline.training_pipeline `
   --experiment-name smart-study-planner-oulad
 ```
 
+Add `--register-models` to register all four full-course baseline model
+artifacts in MLflow. The selected full-course model remains
+`hist_gradient_boosting` based on the measured comparison.
+
 Evaluate the same four models using only observations available by course day
 30, 60, and 90, with the latest course presentation held out:
 
@@ -88,6 +92,9 @@ The early-warning metrics are versioned in
 `models/metrics/early_warning_metrics.json`. The `early_warning` stage is also
 included in `dvc.yaml`, so `dvc repro early_warning` reruns the same command
 when its data or code dependencies change.
+
+With DagsHub MLflow credentials configured, add `--mlflow --register-models`
+to log the run and register the selected model separately for each cutoff.
 
 Run the same checks used by CI:
 

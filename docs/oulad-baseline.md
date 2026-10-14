@@ -122,6 +122,26 @@ saved in `models/metrics/metrics.json`.
 balanced accuracy, accuracy, and F1 in this fixed comparison. The trained
 artifact is written to `models/baseline.pkl`, which is ignored by Git.
 
+The full-course baseline models were also registered in DagsHub MLflow from
+run `a996aaf686ad4075a6c20a7d820e010f`. Each model is version 1:
+
+- `smart-study-planner-oulad-baseline-logistic_regression`
+- `smart-study-planner-oulad-baseline-random_forest`
+- `smart-study-planner-oulad-baseline-extra_trees`
+- `smart-study-planner-oulad-baseline-hist_gradient_boosting`
+
+To repeat the registration after configuring DagsHub MLflow credentials:
+
+```powershell
+python -m pipeline.training_pipeline `
+  --data-dir data/processed/oulad `
+  --metrics-output models/metrics/metrics.json `
+  --model-output models/baseline.pkl `
+  --mlflow `
+  --register-models `
+  --run-name oulad-full-course-baseline-registered-models
+```
+
 ## Leakage-safe early-warning evaluation
 
 The full-course comparison above is intentionally retained as a retrospective
@@ -159,6 +179,33 @@ benchmark because the observation window and presentation split differ. They
 also remain retrospective discrimination measurements: the final outcome is
 used as the label. Prospective validation, calibration, threshold selection,
 and intervention-aware evaluation are still required before deployment.
+
+### DagsHub model registration
+
+The verified DagsHub MLflow run is
+`c0a0421bdc964e06adc7113ff808cae7`. It finished successfully and registered
+the selected random-forest artifact as version 1 of each cutoff-specific model:
+
+- `smart-study-planner-oulad-early-warning-day-30`
+- `smart-study-planner-oulad-early-warning-day-60`
+- `smart-study-planner-oulad-early-warning-day-90`
+
+Future runs can repeat this workflow after configuring the DagsHub MLflow
+environment variables:
+
+```powershell
+python -m pipeline.early_warning_pipeline `
+  --data-dir data/processed/oulad `
+  --metrics-output models/metrics/early_warning_metrics.json `
+  --cutoffs-days 30 60 90 `
+  --mlflow `
+  --register-models `
+  --run-name oulad-early-warning-registered-models
+```
+
+The pipeline saves each selected sklearn model in MLflow format, uploads it
+under the corresponding cutoff, and creates a registry version from the
+`runs:/` artifact URI.
 
 ## Interpretation limits
 
