@@ -1,6 +1,7 @@
 """Deterministic scikit-learn baseline for OULAD enrollment risk."""
 
-from typing import Any
+import re
+from typing import Any, Iterable
 
 import pandas as pd
 from sklearn.compose import ColumnTransformer
@@ -103,6 +104,41 @@ def split_baseline_data(
         random_state=random_state,
         stratify=stratify,
     )
+
+
+def _presentation_sort_key(value: object) -> tuple[int, str]:
+    match = re.fullmatch(r"(\d{4})([A-Za-z])", str(value))
+    if match is None:
+        return (0, str(value))
+    return (int(match.group(1)), match.group(2).upper())
+
+
+def split_time_aware_data(
+    frame: pd.DataFrame,
+    test_presentations: Iterable[str] | None = None,
+) -> tuple[pd.DataFrame, pd.DataFrame, pd.Series, pd.Series]:
+    """Split by course presentation so later presentations are never in train."""
+
+    if "code_presentation" not in frame:
+        raise ValueError("Time-aware splitting requires 'code_presentation'")
+    labeled = frame.dropna(subset=[TARGET, "code_presentation"]).copy()
+    ordered = sorted(labeled["code_presentation"].astype(str).unique(), key=_presentation_sort_key)
+    if len(ordered) < 2:
+        raise ValueError("Time-aware splitting requires at least two presentations")
+    selected_test = {str(value) for value in (test_presentations or [ordered[-1]])}
+    unknown = selected_test.difference(ordered)
+    if unknown:
+        raise ValueError(f"Unknown test presentation(s): {sorted(unknown)}")
+    train_mask = ~labeled["code_presentation"].astype(str).isin(selected_test)
+    if not train_mask.any() or train_mask.all():
+        raise ValueError("Time-aware split must contain both train and test presentations")
+    train_frame = labeled.loc[train_mask]
+    test_frame = labeled.loc[~train_mask]
+    train_features, train_target = _split_features(train_frame)
+    test_features, test_target = _split_features(test_frame)
+    if train_target.nunique() < 2 or test_target.nunique() < 2:
+        raise ValueError("Time-aware split requires both risk classes in train and test")
+    return train_features, test_features, train_target, test_target
 
 
 def _make_model(name: str, random_state: int) -> Any:
@@ -219,6 +255,44 @@ def train_baselines(
         metrics.update(
             {
                 "n_samples": int(len(frame)),
+                "n_train": int(len(train_features)),
+                "n_test": int(len(test_features)),
+                "random_state": random_state,
+            }
+        )
+        fitted[model_name] = model
+        results[model_name] = metrics
+
+    def ranking(item: tuple[str, dict[str, float | int | None]]) -> tuple[float, float, float]:
+        metrics = item[1]
+        return tuple(
+            float(metrics[key]) if metrics[key] is not None else float("-inf")
+            for key in ("roc_auc", "balanced_accuracy", "f1")
+        )
+
+    best_name = max(results.items(), key=ranking)[0]
+    return best_name, fitted, results
+
+
+def train_time_aware_baselines(
+    frame: pd.DataFrame,
+    test_presentations: Iterable[str] | None = None,
+    random_state: int = 42,
+) -> tuple[str, dict[str, Pipeline], dict[str, dict[str, float | int | None]]]:
+    """Compare the same baselines on a presentation-ordered holdout."""
+
+    train_features, test_features, train_target, test_target = split_time_aware_data(
+        frame, test_presentations=test_presentations
+    )
+    fitted: dict[str, Pipeline] = {}
+    results: dict[str, dict[str, float | int | None]] = {}
+    for model_name in MODEL_NAMES:
+        model = _make_comparison_pipeline(train_features, model_name, random_state)
+        model.fit(train_features, train_target)
+        metrics = evaluate_classifier(model, test_features, test_target)
+        metrics.update(
+            {
+                "n_samples": int(len(train_features) + len(test_features)),
                 "n_train": int(len(train_features)),
                 "n_test": int(len(test_features)),
                 "random_state": random_state,

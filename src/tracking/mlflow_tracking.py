@@ -8,24 +8,12 @@ not require DagsHub credentials.
 from __future__ import annotations
 
 import os
+from tempfile import TemporaryDirectory
 from pathlib import Path
 from typing import Any
 
 
-def log_training_run(
-    metrics: dict[str, Any],
-    metrics_path: str | Path | None = None,
-    model_path: str | Path | None = None,
-    experiment_name: str = "smart-study-planner-oulad",
-    run_name: str | None = None,
-) -> str:
-    """Log a completed baseline run and its artifacts to MLflow.
-
-    Set ``MLFLOW_TRACKING_URI`` for a manual MLflow/DagsHub configuration. If
-    it is unset, ``DAGSHUB_REPO_OWNER`` and ``DAGSHUB_REPO_NAME`` are used with
-    ``dagshub.init`` to configure the hosted DagsHub MLflow server.
-    """
-
+def _configure_tracking() -> Any:
     try:
         import mlflow
     except ModuleNotFoundError as error:  # pragma: no cover - optional path
@@ -58,7 +46,24 @@ def log_training_run(
             mlflow=True,
             dvc=False,
         )
+    return mlflow
 
+
+def log_training_run(
+    metrics: dict[str, Any],
+    metrics_path: str | Path | None = None,
+    model_path: str | Path | None = None,
+    experiment_name: str = "smart-study-planner-oulad",
+    run_name: str | None = None,
+) -> str:
+    """Log a completed baseline run and its artifacts to MLflow.
+
+    Set ``MLFLOW_TRACKING_URI`` for a manual MLflow/DagsHub configuration. If
+    it is unset, ``DAGSHUB_REPO_OWNER`` and ``DAGSHUB_REPO_NAME`` are used with
+    ``dagshub.init`` to configure the hosted DagsHub MLflow server.
+    """
+
+    mlflow = _configure_tracking()
     mlflow.set_experiment(experiment_name)
     with mlflow.start_run(run_name=run_name) as active_run:
         mlflow.log_params(
@@ -85,3 +90,117 @@ def log_training_run(
                 mlflow.log_artifact(str(artifact))
 
         return active_run.info.run_id
+
+
+def log_baseline_models_run(
+    metrics: dict[str, Any],
+    fitted_models: dict[str, Any],
+    metrics_path: str | Path | None = None,
+    model_path: str | Path | None = None,
+    experiment_name: str = "smart-study-planner-oulad",
+    run_name: str | None = None,
+    registered_model_prefix: str = "smart-study-planner-oulad-baseline",
+) -> tuple[str, dict[str, str]]:
+    """Log and register every fitted full-course baseline model."""
+
+    mlflow = _configure_tracking()
+    mlflow.set_experiment(experiment_name)
+    registered: dict[str, str] = {}
+    with mlflow.start_run(run_name=run_name) as active_run:
+        mlflow.log_params(
+            {
+                "task": metrics["task"],
+                "target": metrics["target"],
+                "best_model": metrics["best_model"],
+                "random_state": metrics["random_state"],
+                "n_samples": metrics["n_samples"],
+                "n_train": metrics["n_train"],
+                "n_test": metrics["n_test"],
+            }
+        )
+        for model_name, model_metrics in metrics["models"].items():
+            numeric_metrics = {
+                f"{model_name}.{key}": float(value)
+                for key, value in model_metrics.items()
+                if isinstance(value, (int, float))
+                and key not in {"n_samples", "n_train", "n_test"}
+            }
+            mlflow.log_metrics(numeric_metrics)
+
+        for artifact in (metrics_path, model_path):
+            if artifact is not None and Path(artifact).exists():
+                mlflow.log_artifact(str(artifact))
+
+        for model_name, model in fitted_models.items():
+            artifact_path = f"models/{model_name}"
+            registered_name = f"{registered_model_prefix}-{model_name}"
+            with TemporaryDirectory(prefix="mlflow-model-") as temp_dir:
+                model_dir = Path(temp_dir) / "model"
+                mlflow.sklearn.save_model(
+                    model,
+                    path=str(model_dir),
+                    serialization_format="pickle",
+                )
+                mlflow.log_artifacts(str(model_dir), artifact_path=artifact_path)
+            model_uri = f"runs:/{active_run.info.run_id}/{artifact_path}"
+            mlflow.register_model(model_uri, registered_name)
+            registered[model_name] = registered_name
+
+        return active_run.info.run_id, registered
+
+
+def log_early_warning_run(
+    metrics: dict[str, Any],
+    fitted_models: dict[int, dict[str, Any]],
+    metrics_path: str | Path | None = None,
+    experiment_name: str = "smart-study-planner-oulad-early-warning",
+    run_name: str | None = None,
+    register_models: bool = False,
+    registered_model_prefix: str = "smart-study-planner-oulad-early-warning",
+) -> tuple[str, dict[int, str]]:
+    """Log cutoff metrics and optionally register the selected model per cutoff."""
+
+    mlflow = _configure_tracking()
+    mlflow.set_experiment(experiment_name)
+    registered: dict[int, str] = {}
+    with mlflow.start_run(run_name=run_name) as active_run:
+        mlflow.log_params(
+            {
+                "task": metrics["task"],
+                "target": metrics["target"],
+                "evaluation": metrics["evaluation"],
+                "cutoffs_days": ",".join(str(value) for value in metrics["cutoffs_days"]),
+            }
+        )
+        for cutoff_text, evaluation in metrics["evaluations"].items():
+            cutoff = int(cutoff_text)
+            best_name = evaluation["best_model"]
+            mlflow.log_param(f"cutoff_{cutoff}_best_model", best_name)
+            for model_name, model_metrics in evaluation["models"].items():
+                numeric_metrics = {
+                    f"day_{cutoff}.{model_name}.{key}": float(value)
+                    for key, value in model_metrics.items()
+                    if isinstance(value, (int, float))
+                    and key not in {"n_samples", "n_train", "n_test"}
+                }
+                mlflow.log_metrics(numeric_metrics)
+
+            selected_model = fitted_models[cutoff][best_name]
+            artifact_path = f"models/day_{cutoff}/{best_name}"
+            registered_name = f"{registered_model_prefix}-day-{cutoff}"
+            with TemporaryDirectory(prefix="mlflow-model-") as temp_dir:
+                model_dir = Path(temp_dir) / "model"
+                mlflow.sklearn.save_model(
+                    selected_model,
+                    path=str(model_dir),
+                    serialization_format="pickle",
+                )
+                mlflow.log_artifacts(str(model_dir), artifact_path=artifact_path)
+            if register_models:
+                model_uri = f"runs:/{active_run.info.run_id}/{artifact_path}"
+                mlflow.register_model(model_uri, registered_name)
+                registered[cutoff] = registered_name
+
+        if metrics_path is not None and Path(metrics_path).exists():
+            mlflow.log_artifact(str(metrics_path))
+        return active_run.info.run_id, registered

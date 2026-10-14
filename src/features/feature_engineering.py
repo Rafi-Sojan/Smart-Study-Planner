@@ -8,11 +8,17 @@ from src.data.cleaner import clean_oulad_tables
 def _assessment_features(
     student_assessment: pd.DataFrame,
     assessments: pd.DataFrame,
+    cutoff_days: int | None = None,
 ) -> pd.DataFrame:
     assessment_map = assessments[
         ["id_assessment", "code_module", "code_presentation"]
     ].drop_duplicates("id_assessment")
     joined = student_assessment.merge(assessment_map, on="id_assessment", how="inner")
+    if cutoff_days is not None:
+        joined = joined.loc[
+            joined["date_submitted"].notna()
+            & (joined["date_submitted"] <= cutoff_days)
+        ]
     if joined.empty:
         return pd.DataFrame(
             columns=["id_student", "code_presentation", "assessment_count"]
@@ -32,9 +38,15 @@ def _assessment_features(
     return result
 
 
-def _registration_features(registration: pd.DataFrame) -> pd.DataFrame:
+def _registration_features(
+    registration: pd.DataFrame,
+    cutoff_days: int | None = None,
+) -> pd.DataFrame:
     columns = ["id_student", "code_presentation"]
-    available = [column for column in ("date_registration", "date_unregistration") if column in registration]
+    registration_fields = ("date_registration", "date_unregistration")
+    if cutoff_days is not None:
+        registration_fields = ("date_registration",)
+    available = [column for column in registration_fields if column in registration]
     if not available:
         return registration[columns].drop_duplicates()
     return registration.groupby(columns, as_index=False)[available].mean()
@@ -43,12 +55,15 @@ def _registration_features(registration: pd.DataFrame) -> pd.DataFrame:
 def _activity_features(
     student_vle: pd.DataFrame,
     vle: pd.DataFrame,
+    cutoff_days: int | None = None,
 ) -> pd.DataFrame:
     if {"code_module", "code_presentation"}.issubset(student_vle.columns):
         joined = student_vle
     else:
         site_map = vle[["id_site", "code_module", "code_presentation"]].drop_duplicates("id_site")
         joined = student_vle.merge(site_map, on="id_site", how="inner")
+    if cutoff_days is not None:
+        joined = joined.loc[joined["date"].notna() & (joined["date"] <= cutoff_days)]
     if joined.empty:
         return pd.DataFrame(columns=["id_student", "code_presentation", "vle_clicks"])
     return joined.groupby(
@@ -64,13 +79,21 @@ def _activity_features(
 def build_oulad_features(
     tables: dict[str, pd.DataFrame],
     clean: bool = True,
+    cutoff_days: int | None = None,
 ) -> pd.DataFrame:
     """Build one labeled row per student-course presentation enrollment.
 
     ``target_risk`` is 1 for Fail/Withdrawn and 0 for Pass/Distinction. The
     final result is retained as metadata but is excluded by the model helper.
-    VLE clicks are activity counts, not study-duration measurements.
+    VLE clicks are activity counts, not study-duration measurements. When
+    ``cutoff_days`` is supplied, only assessment submissions and VLE activity
+    observed on or before that course-relative day are aggregated, and
+    ``date_unregistration`` is excluded because a future withdrawal is not
+    available to an early-warning planner.
     """
+
+    if cutoff_days is not None and cutoff_days < 0:
+        raise ValueError("cutoff_days must be non-negative")
 
     cleaned = clean_oulad_tables(tables) if clean else tables
     info = cleaned["studentInfo"].copy()
@@ -79,15 +102,26 @@ def build_oulad_features(
 
     key = ["id_student", "code_presentation"]
     if "studentAssessment" in cleaned and "assessments" in cleaned:
-        scores = _assessment_features(cleaned["studentAssessment"], cleaned["assessments"])
+        scores = _assessment_features(
+            cleaned["studentAssessment"],
+            cleaned["assessments"],
+            cutoff_days=cutoff_days,
+        )
         info = info.merge(scores, on=key + ["code_module"], how="left")
 
     if "studentRegistration" in cleaned:
-        registration = _registration_features(cleaned["studentRegistration"])
+        registration = _registration_features(
+            cleaned["studentRegistration"],
+            cutoff_days=cutoff_days,
+        )
         info = info.merge(registration, on=key, how="left")
 
     if "studentVle" in cleaned and "vle" in cleaned:
-        activity = _activity_features(cleaned["studentVle"], cleaned["vle"])
+        activity = _activity_features(
+            cleaned["studentVle"],
+            cleaned["vle"],
+            cutoff_days=cutoff_days,
+        )
         info = info.merge(activity, on=key + ["code_module"], how="left")
 
     return info.reset_index(drop=True)

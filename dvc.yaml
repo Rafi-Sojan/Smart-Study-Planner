@@ -17,3 +17,11 @@ stages:
       - src/models/evaluate.py
     outs:
       - models/baseline.pkl
+  early_warning:
+    cmd: python -m pipeline.early_warning_pipeline --data-dir data/processed/oulad --metrics-output models/metrics/early_warning_metrics.json --cutoffs-days 30 60 90
+    deps:
+      - data/processed/oulad
+      - pipeline/early_warning_pipeline.py
+      - src/features/feature_engineering.py
+      - src/models/baseline.py
+      - src/models/evaluate.py

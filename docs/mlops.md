@@ -59,6 +59,9 @@ runs the stages in `dvc.yaml`:
 1. `clean` creates `data/processed/oulad/` from the raw tables.
 2. `train` compares the four baselines and writes the selected model and
    metrics.
+3. `early_warning` evaluates the same four baselines at course-relative days
+   30, 60, and 90 using the time-aware presentation holdout, and writes
+   `models/metrics/early_warning_metrics.json`.
 
 Push the data cache only after the DagsHub remote credentials are configured:
 
@@ -69,7 +72,7 @@ dvc push -r origin
 Then commit and push the pointer/configuration files through Git:
 
 ```powershell
-git add .dvc .gitignore dvc.yaml dvc.lock data/raw/oulad.dvc models/metrics/metrics.json
+git add .dvc .gitignore dvc.yaml dvc.lock data/raw/oulad.dvc models/metrics/metrics.json models/metrics/early_warning_metrics.json
 git commit -m "Set up DVC data pipeline"
 git push origin main
 ```
@@ -102,12 +105,31 @@ python -m pipeline.training_pipeline `
   --metrics-output models/metrics/metrics.json `
   --model-output models/baseline.pkl `
   --mlflow `
-  --experiment-name smart-study-planner-oulad
+  --experiment-name smart-study-planner-oulad `
+  --register-models
 ```
 
 The run logs the selected model, split metadata, metrics for all four
 classifiers, `metrics.json`, and the trained model artifact. Without
 `--mlflow`, the pipeline remains fully local and does not require credentials.
+With `--register-models`, all four full-course model artifacts are saved in
+MLflow format and registered as versioned models.
+
+For the leakage-safe early-warning pipeline, use:
+
+```powershell
+python -m pipeline.early_warning_pipeline `
+  --data-dir data/processed/oulad `
+  --metrics-output models/metrics/early_warning_metrics.json `
+  --cutoffs-days 30 60 90 `
+  --mlflow `
+  --register-models
+```
+
+This logs all four model comparisons at each cutoff and registers the selected
+model as a separate versioned MLflow model for days 30, 60, and 90. The
+registration path uses uploaded MLflow-format artifacts and a `runs:/` model
+URI, which is compatible with the connected DagsHub MLflow server.
 
 The code also supports the DagsHub client configuration. Instead of setting
 `MLFLOW_TRACKING_URI`, set `DAGSHUB_REPO_OWNER` and `DAGSHUB_REPO_NAME`; the

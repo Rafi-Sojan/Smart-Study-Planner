@@ -7,6 +7,7 @@ from pipeline.training_pipeline import run_training
 from src.data.cleaner import clean_student_assessment, write_clean_tables
 from src.data.loader import load_clean_table, load_oulad_tables
 from src.features.feature_engineering import build_oulad_features
+from src.models.baseline import split_time_aware_data
 
 
 def make_tables() -> dict[str, pd.DataFrame]:
@@ -123,6 +124,33 @@ def test_feature_builder_handles_oulad_activity_columns() -> None:
 
     assert features.loc[0, "vle_clicks"] == 7
     assert features.loc[0, "vle_active_days"] == 2
+
+
+def test_early_warning_features_exclude_future_observations() -> None:
+    tables = make_tables()
+    early = build_oulad_features(tables, cutoff_days=30)
+
+    assert early.loc[0, "assessment_count"] == 1
+    assert early.loc[0, "assessment_score_mean"] == 80
+    assert "date_unregistration" not in early.columns
+
+
+def test_time_aware_split_holds_out_latest_presentation() -> None:
+    frame = pd.DataFrame(
+        {
+            "id_student": range(8),
+            "code_presentation": ["2013B"] * 2 + ["2013J"] * 2 + ["2014B"] * 2 + ["2014J"] * 2,
+            "target_risk": [0, 1] * 4,
+            "signal": range(8),
+        }
+    )
+
+    train_features, test_features, train_target, test_target = split_time_aware_data(frame)
+
+    assert set(test_features["code_presentation"]) == {"2014J"}
+    assert set(train_features["code_presentation"]) == {"2013B", "2013J", "2014B"}
+    assert train_target.nunique() == 2
+    assert test_target.nunique() == 2
 
 
 def test_clean_table_round_trip_writes_manifest(tmp_path: Path) -> None:
