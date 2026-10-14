@@ -1,0 +1,59 @@
+{
+  "best_model": "hist_gradient_boosting",
+  "models": {
+    "extra_trees": {
+      "accuracy": 0.9301754816541907,
+      "balanced_accuracy": 0.9316410524505623,
+      "f1": 0.9319296566574949,
+      "n_samples": 32593,
+      "n_test": 8149,
+      "n_train": 24444,
+      "precision": 0.960069016514666,
+      "random_state": 42,
+      "recall": 0.905392840539284,
+      "roc_auc": 0.9807513918300131
+    },
+    "hist_gradient_boosting": {
+      "accuracy": 0.9331206282979506,
+      "balanced_accuracy": 0.9345816630708514,
+      "f1": 0.9348164095203922,
+      "n_samples": 32593,
+      "n_test": 8149,
+      "n_train": 24444,
+      "precision": 0.9627987188962799,
+      "random_state": 42,
+      "recall": 0.9084146908414691,
+      "roc_auc": 0.9830182176285699
+    },
+    "logistic_regression": {
+      "accuracy": 0.8571603877776415,
+      "balanced_accuracy": 0.8580745778467092,
+      "f1": 0.8615274803711634,
+      "n_samples": 32593,
+      "n_test": 8149,
+      "n_train": 24444,
+      "precision": 0.8823099415204678,
+      "random_state": 42,
+      "recall": 0.8417015341701534,
+      "roc_auc": 0.9361490541815808
+    },
+    "random_forest": {
+      "accuracy": 0.9304209105411707,
+      "balanced_accuracy": 0.9317222921324579,
+      "f1": 0.9323631158296553,
+      "n_samples": 32593,
+      "n_test": 8149,
+      "n_train": 24444,
+      "precision": 0.9576084293065426,
+      "random_state": 42,
+      "recall": 0.9084146908414691,
+      "roc_auc": 0.9814066567837642
+    }
+  },
+  "n_samples": 32593,
+  "n_test": 8149,
+  "n_train": 24444,
+  "random_state": 42,
+  "target": "Fail/Withdrawn = 1; Pass/Distinction = 0",
+  "task": "enrollment_risk_classification"
+}

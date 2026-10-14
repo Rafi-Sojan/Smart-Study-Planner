@@ -9,6 +9,7 @@ on:
   pull_request:
     branches:
       - main
+      - develop
 
 jobs:
   test:
@@ -32,4 +33,5 @@ jobs:
 
       - name: Run PyTest
         run: |
+          ruff check src pipeline tests
           pytest -v

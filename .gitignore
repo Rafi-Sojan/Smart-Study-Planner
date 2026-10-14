@@ -57,6 +57,11 @@ data/simulated/*
 !data/processed/.gitkeep
 !data/simulated/.gitkeep
 
+# Track DVC pointer files, not the datasets themselves
+!data/raw/*.dvc
+!data/processed/*.dvc
+!models/**/*.dvc
+
 *.csv
 *.tsv
 *.parquet
@@ -85,6 +90,9 @@ logs/*
 *.log
 
 !logs/.gitkeep
+
+# Local MLflow tracking store
+mlruns/
 
 dashboard/exports/*
 !dashboard/exports/.gitkeep
@@ -128,5 +136,4 @@ ehthumbs_vista.db
 config.local.*
 configs/local.*
 
-!data/raw/*.dvc
 !data/raw/.gitignore
