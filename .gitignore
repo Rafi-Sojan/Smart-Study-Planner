@@ -48,7 +48,7 @@ htmlcov/
 *.key
 
 # Raw and processed datasets
-data/raw/*
+/data/raw/oulad/
 data/processed/*
 data/simulated/*
 
@@ -127,3 +127,6 @@ ehthumbs_vista.db
 
 config.local.*
 configs/local.*
+
+!data/raw/*.dvc
+!data/raw/.gitignore
