@@ -11,8 +11,12 @@ future implementation areas.
 
 The processing methodology, feature definitions, measured results, and
 limitations are documented in [docs/oulad-baseline.md](docs/oulad-baseline.md).
+The complete raw-table column dictionary and derived-feature map are documented
+in [docs/oulad-data-dictionary.md](docs/oulad-data-dictionary.md).
 Data versioning and experiment tracking procedures are documented in
 [docs/mlops.md](docs/mlops.md).
+The EdNet exploratory analysis, scope, feature rationale, and limitations are
+documented in [docs/ednet.md](docs/ednet.md).
 
 ## Analysis notebooks
 
@@ -20,11 +24,16 @@ Data versioning and experiment tracking procedures are documented in
 - [02 — OULAD processing and feature extraction](notebooks/02_oulad_processing_and_features.ipynb)
 - [03 — Full-course baseline comparison](notebooks/03_oulad_baseline_comparison.ipynb)
 - [04 — Leakage-safe early-warning evaluation](notebooks/04_oulad_early_warning_evaluation.ipynb)
+- [05 — EdNet exploratory analysis](notebooks/05_ednet_eda.ipynb)
 
-All notebooks contain executed outputs, including tables, metric plots, and
-confusion matrices. The full-course notebook reports the retrospective
+The OULAD notebooks contain executed outputs, including tables, metric plots,
+and confusion matrices. The full-course notebook reports the retrospective
 benchmark before cutoff application. The early-warning notebook reports
 separate confusion matrices for the 30-, 60-, and 90-day observation cutoffs.
+Notebook 05 contains the existing EdNet exploratory outputs and formal
+interpretation of the activity, exposure, content, and metadata analyses. EdNet
+is documented as a TOEIC-specific complementary dataset rather than as a
+replacement for the OULAD academic-risk task.
 
 ## Installation and data requirements
 

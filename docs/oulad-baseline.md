@@ -29,6 +29,10 @@ The archive contained all seven standard OULAD tables. The raw archive was
 extracted locally to `data/raw/oulad/`, and cleaned CSVs were written to
 `data/processed/oulad/`. Both data directories are ignored by Git.
 
+The field-by-field raw schema and the mapping from raw columns to derived model
+features are documented in
+[`docs/oulad-data-dictionary.md`](oulad-data-dictionary.md).
+
 | Table | Raw rows | Clean rows |
 |---|---:|---:|
 | `studentInfo` | 32,593 | 32,593 |
@@ -195,6 +199,48 @@ saved in `models/metrics/metrics.json`.
 | Random forest | 0.930421 | 0.931722 | 0.957608 | 0.908415 | 0.932363 | 0.981407 |
 | Extra trees | 0.930175 | 0.931641 | 0.960069 | 0.905393 | 0.931930 | 0.980751 |
 | Histogram gradient boosting | 0.933121 | 0.934582 | 0.962799 | 0.908415 | 0.934816 | 0.983018 |
+
+### Formal rationale for the baseline model set
+
+The four classifiers were selected because OULAD is a moderate-sized,
+enrollment-level tabular dataset containing both numerical and categorical
+features. The extracted matrix has approximately 32,593 enrollment rows and
+24 columns, including learner attributes, course and presentation fields,
+assessment-score aggregates, registration variables, and recorded VLE activity
+aggregates. This structure supports classical supervised-learning baselines
+without requiring the computational cost or opacity of a deep neural network.
+
+The models were chosen to represent complementary modeling assumptions:
+
+- **Logistic regression** is the transparent linear reference. It measures how
+  much predictive performance can be obtained from additive relationships and
+  provides an interpretable sanity-check baseline.
+- **Random forest** represents bagged nonlinear decision trees. It can capture
+  interactions between assessment performance, registration information, and
+  online activity without requiring those interactions to be specified
+  manually.
+- **Extra trees** provides a second randomized tree ensemble. Its additional
+  split randomization tests whether greater partition diversity improves
+  generalization beyond random forest.
+- **Histogram gradient boosting** represents sequential tree boosting. It can
+  learn threshold-based and nonlinear tabular patterns efficiently and tests a
+  different ensemble strategy from the two bagging methods.
+
+This set answers four ordered baseline questions: how strong is a simple
+interpretable model; do nonlinear trees help; does additional tree
+randomization help; and does sequential boosting improve on bagging? Deep
+learning, extensive hyperparameter search, and more specialized methods were
+not used as the initial comparison because they would add complexity before a
+reproducible reference point had been established and would not be justified
+solely by the size or structure of this dataset.
+
+All four models receive the same feature matrix, preprocessing, training
+partition, test partition, and random seed. Consequently, the comparison is
+intended to measure differences between model families rather than differences
+in data preparation. The result is a baseline comparison, not evidence that
+any one classifier is universally optimal. Time-aware validation, grouped
+validation by learner, calibration, and prospective intervention evaluation
+remain necessary before deployment.
 
 ### Selected baseline
 
