@@ -49,6 +49,76 @@ construction. VLE clicks represent recorded activity counts and must not be
 interpreted as direct measurements of study duration. Raw and processed data
 are excluded from Git and must be supplied locally.
 
+## Statistical interpretation and methodological rationale
+
+The unit of analysis is an enrollment: one student registered on one course
+presentation. It is not a unique-student unit. Consequently, row counts,
+percentages, outcome rates, and model metrics are interpreted at the enrollment
+level, and every rate must be read with its corresponding enrollment
+denominator. A student appearing in multiple presentations may contribute more
+than one enrollment.
+
+The four OULAD outcome categories are retained during exploration. For binary
+risk classification, `Fail` and `Withdrawn` are encoded as 1, while `Pass` and
+`Distinction` are encoded as 0. This grouping supports a defined risk-
+screening task while preserving the original labels for descriptive analysis.
+It does not imply that all unsuccessful outcomes have identical causes or
+intervention requirements.
+
+Descriptive counts and proportions summarize the supplied dataset; they are
+not population estimates and do not establish statistical significance or
+causality. Assessment means, medians, ranges, and activity totals describe
+observed records only. Missing scores remain unknown rather than being treated
+as zero, because absence of a score does not establish absence of performance.
+VLE click totals are activity counts and are not estimates of study duration.
+
+The baseline metrics have the following interpretations:
+
+- accuracy is the proportion of correctly classified enrollments;
+- precision is the proportion of predicted-risk enrollments that are actually
+  in the risk class;
+- recall is the proportion of risk enrollments identified by the model;
+- F1 is the harmonic mean of precision and recall;
+- balanced accuracy is the mean of sensitivity and specificity, giving equal
+  weight to both classes; and
+- ROC-AUC measures ranking quality across classification thresholds.
+
+Confusion matrices report actual classes by predicted classes. They make false
+positives and false negatives visible and are therefore necessary for judging
+whether a model is appropriate for a support-screening workflow. The model
+selection rule prioritizes ROC-AUC, then balanced accuracy, then F1, while the
+confusion matrices provide the operational context for that ranking.
+
+Imputation and categorical encoding are fitted within each model pipeline
+after the train/test split. This prevents information from the holdout set
+from influencing preprocessing. The full-course benchmark uses a stratified
+holdout to preserve the observed class proportions. The early-warning
+evaluation additionally removes observations after days 30, 60, and 90 and
+holds out the latest course presentation, because a deployment-time model
+could not use future activity or later-course presentation information.
+
+The selected feature families are tied to the planner's intended decision
+context. Demographic and enrollment attributes provide baseline context for
+stratification and fairness review; assessment aggregates summarize observed
+academic progress and incomplete participation; registration fields describe
+the timing of enrollment; and VLE aggregates provide measurable indicators of
+online engagement. These variables are targeted because they are available in
+OULAD and can support prioritization of learners for attention. They are not
+treated as direct measures of motivation, ability, study hours, or causal
+effect. Identifiers are excluded because they identify records rather than
+generalizable learning signals.
+
+The 30-, 60-, and 90-day cutoffs are introduced to represent staged decision
+points during a course. Day 30 provides an early opportunity for support, day
+60 tests whether additional mid-course evidence improves discrimination, and
+day 90 evaluates performance when a later but still actionable observation
+window is available. These checkpoints are a sensitivity analysis of
+information availability, not a claim that they are universally optimal. The
+comparison shows the trade-off between earlier intervention and the amount of
+evidence available to the model. Any production cutoff should ultimately be
+selected using prospective validation, calibration, intervention capacity, and
+the relative cost of missed and unnecessary support.
+
 ## Reproducible commands
 
 Clean the available OULAD tables:

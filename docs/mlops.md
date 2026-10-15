@@ -13,6 +13,20 @@ The configured repository target is inferred from the current Git remote:
 `Rafi-Sojan/Smart-Study-Planner`. If the DagsHub repository has a different
 owner or name, replace those values in the commands below.
 
+## Reproducibility rationale
+
+The separation between Git, DVC, and MLflow reflects the different types of
+state in the project. Git records the code and configuration that define a
+transformation; DVC records the data and generated artifacts used by that
+transformation; and MLflow records run parameters, metrics, artifacts, and
+registered model versions. This separation permits a reported metric to be
+traced to both the implementation and the data version that produced it.
+
+The metrics JSON files are retained as small, reviewable reports. They contain
+measured outputs rather than assumptions about model quality. A new experiment
+should therefore create a new run and should not overwrite a previous result
+without recording the changed data, code, parameters, and evaluation split.
+
 ## 1. Install the pinned dependencies
 
 From the project root:
