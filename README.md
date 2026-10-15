@@ -177,6 +177,18 @@ when its data or code dependencies change.
 With DagsHub MLflow credentials configured, add `--mlflow --register-models`
 to log the run and register the selected model separately for each cutoff.
 
+Random forest is selected for the early-warning evaluation at all three
+cutoffs because it has the highest measured ROC-AUC at days 30, 60, and 90
+under the declared ranking rule: ROC-AUC first, balanced accuracy second, and
+F1 third. This choice is not based on accuracy alone. At day 30, histogram
+gradient boosting has higher accuracy, balanced accuracy, and F1, but random
+forest has the strongest ROC-AUC and recall. At days 60 and 90, random forest
+has the strongest ROC-AUC and balanced accuracy; at day 90, extra trees has a
+slightly higher F1, illustrating why the selection rule and confusion matrices
+must be documented together. The full-course benchmark has a different result:
+histogram gradient boosting is selected when complete-course information is
+available.
+
 Run the same checks used by CI:
 
 ```powershell
