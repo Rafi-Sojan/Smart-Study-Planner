@@ -184,6 +184,39 @@ ruff check src pipeline tests
 pytest -v
 ```
 
+## Grafana monitoring
+
+The repository includes an optional Grafana stack for visualizing completed
+training and early-warning runs. It uses Prometheus as the Grafana data source
+and Pushgateway as the intermediary for the short-lived batch pipelines.
+
+Start the stack with Docker Desktop running:
+
+```powershell
+docker compose up -d
+```
+
+Open Grafana at `http://localhost:3000`. The Prometheus data source and the
+`Smart Study Planner — OULAD Monitoring` dashboard are provisioned
+automatically. To publish a completed pipeline run, pass the Pushgateway URL:
+
+```powershell
+python -m pipeline.training_pipeline `
+  --data-dir data/processed/oulad `
+  --pushgateway-url http://localhost:9091
+
+python -m pipeline.early_warning_pipeline `
+  --data-dir data/processed/oulad `
+  --cutoffs-days 30 60 90 `
+  --pushgateway-url http://localhost:9091
+```
+
+The exporter is opt-in. Existing local, DVC, and MLflow runs do not contact
+Pushgateway unless `--pushgateway-url` is supplied or
+`PROMETHEUS_PUSHGATEWAY_URL` is set. Grafana is used for operational metric
+visualization; DVC remains responsible for data and artifact versioning, and
+MLflow remains responsible for experiment tracking and model registration.
+
 The model target is enrollment-level risk: `Fail` or `Withdrawn` is encoded as
 1, while `Pass` or `Distinction` is encoded as 0. Metrics are generated from
 the supplied dataset at execution time; no dataset, metric, or test result is

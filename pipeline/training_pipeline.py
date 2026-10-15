@@ -10,6 +10,7 @@ from src.data.cleaner import clean_oulad_tables
 from src.data.loader import load_oulad_tables
 from src.features.feature_engineering import build_oulad_features
 from src.models.baseline import train_baselines
+from src.monitoring.prometheus_exporter import push_training_metrics
 from src.tracking.mlflow_tracking import log_baseline_models_run, log_training_run
 
 
@@ -21,6 +22,7 @@ def run_training(
     experiment_name: str = "smart-study-planner-oulad",
     run_name: str | None = None,
     register_models: bool = False,
+    pushgateway_url: str | None = None,
 ) -> dict[str, Any]:
     raw_tables = load_oulad_tables(data_dir)
     cleaned_tables = clean_oulad_tables(raw_tables)
@@ -68,6 +70,7 @@ def run_training(
             run_name=run_name,
         )
         metrics["mlflow_run_id"] = run_id
+    push_training_metrics(metrics, pushgateway_url=pushgateway_url)
     return metrics
 
 
@@ -92,6 +95,11 @@ def main() -> None:
         action="store_true",
         help="Register all four full-course baseline models in MLflow",
     )
+    parser.add_argument(
+        "--pushgateway-url",
+        default=None,
+        help="Push completed metrics to this Prometheus Pushgateway URL",
+    )
     args = parser.parse_args()
     metrics = run_training(
         args.data_dir,
@@ -101,6 +109,7 @@ def main() -> None:
         experiment_name=args.experiment_name,
         run_name=args.run_name,
         register_models=args.register_models,
+        pushgateway_url=args.pushgateway_url,
     )
     print(json.dumps(metrics, indent=2, sort_keys=True))
 

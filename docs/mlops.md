@@ -154,7 +154,54 @@ The code also supports the DagsHub client configuration. Instead of setting
 `MLFLOW_TRACKING_URI`, set `DAGSHUB_REPO_OWNER` and `DAGSHUB_REPO_NAME`; the
 tracking helper then calls `dagshub.init` when `--mlflow` is used.
 
-## 5. Initial setup sequence
+## 5. Configure Grafana monitoring
+
+Grafana is an operational monitoring layer and is intentionally separate from
+DVC and MLflow. DVC versions data and generated artifacts; MLflow records
+experiments and registered models; Prometheus stores time-series monitoring
+values; and Grafana visualizes those values.
+
+The repository provisions Grafana, Prometheus, and Pushgateway through
+`docker-compose.yaml`. Start the stack from the project root:
+
+```powershell
+docker compose up -d
+```
+
+The services are available at:
+
+```text
+Grafana:     http://localhost:3000
+Prometheus:  http://localhost:9090
+Pushgateway: http://localhost:9091
+```
+
+The Prometheus data source and the starter dashboard are provisioned from
+`monitoring/grafana/provisioning/` and
+`monitoring/grafana/dashboards/smart-study-planner.json`.
+
+The training and early-warning pipelines are short-lived batch jobs. They
+publish metrics to Pushgateway only when a URL is explicitly supplied or the
+`PROMETHEUS_PUSHGATEWAY_URL` environment variable is set:
+
+```powershell
+python -m pipeline.training_pipeline `
+  --data-dir data/processed/oulad `
+  --pushgateway-url http://localhost:9091
+
+python -m pipeline.early_warning_pipeline `
+  --data-dir data/processed/oulad `
+  --cutoffs-days 30 60 90 `
+  --pushgateway-url http://localhost:9091
+```
+
+The exporter reports sample counts, last-success timestamps, full-course model
+metrics, and cutoff-specific early-warning metrics. The integration is
+opt-in so that ordinary local and DVC runs remain independent of Docker.
+Pushgateway retains pushed series until they are removed, so stale batch-job
+series must be managed if the monitoring stack is used continuously.
+
+## 6. Initial setup sequence
 
 ```powershell
 python -m pip install -r requirements.txt
