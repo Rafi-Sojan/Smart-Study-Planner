@@ -1,10 +1,18 @@
-# OULAD processing and baseline model comparison
+# OULAD processing, feature engineering, and model evaluation
+
+## Document status
+
+This document records the reproducible OULAD processing and model-evaluation
+workflow implemented in the repository. Reported values correspond to the
+locally supplied OULAD release and the commands described below. They should
+be regenerated when the input data, dependency versions, or pipeline logic
+changes.
 
 ## Scope
 
-This document records the reproducible OULAD pipeline run performed from the
-user-supplied `oulad-dataset.zip`. It covers ingestion, cleaning, feature
-extraction, four baseline classifiers, evaluation, and the selected model.
+The workflow was executed from the supplied `oulad-dataset.zip`. It covers
+data ingestion, cleaning, feature extraction, evaluation of four baseline
+classifiers, and selection of the reference model.
 
 The task is enrollment-level risk classification:
 
@@ -238,8 +246,8 @@ enrollments, assessment records, and activity records.
 The early-warning notebook is in
 `notebooks/04_oulad_early_warning_evaluation.ipynb`. It documents the
 observation-availability audit, runs the four cutoff-specific models, plots
-colorful metric curves for days 30/60/90, and displays confusion matrices at
-the 60-day cutoff. It calls the same feature and model functions as the
+metric curves for days 30, 60, and 90, and displays separate confusion-matrix
+figures for each cutoff. It calls the same feature and model functions as the
 scripted pipeline rather than maintaining a second implementation.
 
 The notebook includes these visualizations:
@@ -254,22 +262,25 @@ The notebook includes these visualizations:
   same holdout split. These metrics compare classifiers; they do not establish
   causal effects.
 - **Confusion matrices:** actual labels by predicted labels for each baseline.
-  Rows are the actual class and columns are the predicted class: 0 is
-  Pass/Distinction and 1 is Fail/Withdrawn. False negatives are risky
-  enrollments the model missed; false positives are lower-risk enrollments
-  flagged for attention. The appropriate trade-off depends on the future
-  intervention cost.
+  The full-course notebook reports matrices before cutoff application. The
+  early-warning notebook reports separate matrices for the 30-, 60-, and
+  90-day cutoffs. Rows are the actual class and columns are the predicted
+  class: 0 is Pass/Distinction and 1 is Fail/Withdrawn. False negatives are
+  risky enrollments the model missed; false positives are lower-risk
+  enrollments flagged for attention. The appropriate trade-off depends on the
+  future intervention cost.
 - **Mean assessment score by risk group:** descriptive group means for the
   binary target. The chart shows association in this dataset and does not show
   that assessment scores caused the final outcome.
 
-To open it after installing the dependencies, start Jupyter from the project
-root and run the cells in order:
+To inspect or refresh a notebook after installing the dependencies, start
+Jupyter from the project root:
 
 ```powershell
 jupyter notebook notebooks/03_oulad_baseline_comparison.ipynb
 ```
 
-The notebook intentionally contains no saved results until it is executed with
-the local dataset. This avoids presenting stale or unverifiable charts as
-current results.
+The notebooks currently contain executed outputs generated from the local
+dataset. These outputs are retained for review and must be regenerated when
+the input data, dependencies, or implementation changes. They are not a
+substitute for the scripted pipeline artifacts or versioned metrics files.

@@ -1,15 +1,19 @@
-# DVC, DagsHub, and MLflow setup
+# MLOps and experiment-management procedures
 
-This repository uses Git for code and configuration, DVC for the OULAD data
-and generated model artifact, and DagsHub-hosted MLflow for experiment
-tracking. The raw CSV files and trained binary are never committed directly
-to Git.
+## Purpose and responsibilities
+
+This document defines the repository procedures for data versioning,
+pipeline reproduction, experiment tracking, and model registration. Git is
+used for source code and configuration, DVC is used for the OULAD data and
+generated model artifact, and DagsHub-hosted MLflow is used for experiment
+tracking and model registration. Raw CSV files and trained binary artifacts
+are not committed directly to Git.
 
 The configured repository target is inferred from the current Git remote:
-`Rafi-Sojan/Smart-Study-Planner`. If your DagsHub repository has a different
+`Rafi-Sojan/Smart-Study-Planner`. If the DagsHub repository has a different
 owner or name, replace those values in the commands below.
 
-## 1. Install the pinned MLOps dependencies
+## 1. Install the pinned dependencies
 
 From the project root:
 
@@ -19,9 +23,9 @@ python -m pip install -r requirements.txt
 
 The pinned additions are `dvc[s3]`, `dagshub`, and `mlflow`.
 
-## 2. Initialize DVC
+## 2. Configure DVC
 
-Run this once in the Git repository:
+Run the following commands once from the Git repository root:
 
 ```powershell
 dvc init
@@ -37,10 +41,10 @@ dvc remote modify --local origin access_key_id <DAGSHUB_TOKEN>
 dvc remote modify --local origin secret_access_key <DAGSHUB_TOKEN>
 ```
 
-The DagsHub Data/DVC panel provides equivalent commands if the repository
+The DagsHub Data/DVC panel provides equivalent commands when the repository
 owner or name differs.
 
-## 3. Version the OULAD data
+## 3. Version the OULAD data and pipeline outputs
 
 The supplied archive must already be extracted to `data/raw/oulad/`:
 
@@ -63,13 +67,14 @@ runs the stages in `dvc.yaml`:
    30, 60, and 90 using the time-aware presentation holdout, and writes
    `models/metrics/early_warning_metrics.json`.
 
-Push the data cache only after the DagsHub remote credentials are configured:
+Push the DVC cache only after the DagsHub remote credentials have been
+configured:
 
 ```powershell
 dvc push -r origin
 ```
 
-Then commit and push the pointer/configuration files through Git:
+Commit and push the pointer and configuration files through Git:
 
 ```powershell
 git add .dvc .gitignore dvc.yaml dvc.lock data/raw/oulad.dvc models/metrics/metrics.json models/metrics/early_warning_metrics.json
@@ -80,7 +85,7 @@ git push origin main
 Do not use `git add data/raw/oulad` or `git add data/processed/oulad`; those
 directories are intentionally ignored.
 
-## 4. Configure DagsHub MLflow
+## 4. Configure DagsHub MLflow tracking
 
 DagsHub provides an MLflow tracking endpoint at:
 
@@ -111,9 +116,9 @@ python -m pipeline.training_pipeline `
 
 The run logs the selected model, split metadata, metrics for all four
 classifiers, `metrics.json`, and the trained model artifact. Without
-`--mlflow`, the pipeline remains fully local and does not require credentials.
-With `--register-models`, all four full-course model artifacts are saved in
-MLflow format and registered as versioned models.
+`--mlflow`, the pipeline remains fully local and does not require tracking
+credentials. With `--register-models`, all four full-course model artifacts
+are saved in MLflow-compatible format and registered as versioned models.
 
 For the leakage-safe early-warning pipeline, use:
 
@@ -135,7 +140,7 @@ The code also supports the DagsHub client configuration. Instead of setting
 `MLFLOW_TRACKING_URI`, set `DAGSHUB_REPO_OWNER` and `DAGSHUB_REPO_NAME`; the
 tracking helper then calls `dagshub.init` when `--mlflow` is used.
 
-## 5. Recommended order for the first setup
+## 5. Initial setup sequence
 
 ```powershell
 python -m pip install -r requirements.txt
