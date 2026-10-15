@@ -9,6 +9,7 @@ from src.data.cleaner import clean_oulad_tables
 from src.data.loader import load_oulad_tables
 from src.features.feature_engineering import build_oulad_features
 from src.models.baseline import split_time_aware_data, train_time_aware_baselines
+from src.monitoring.prometheus_exporter import push_early_warning_metrics
 from src.tracking.mlflow_tracking import log_early_warning_run
 
 
@@ -28,6 +29,7 @@ def run_early_warning(
     experiment_name: str = "smart-study-planner-oulad-early-warning",
     run_name: str | None = None,
     register_models: bool = False,
+    pushgateway_url: str | None = None,
 ) -> dict[str, Any]:
     """Evaluate full-course labels using only observations before each cutoff."""
 
@@ -85,6 +87,7 @@ def run_early_warning(
         metrics["mlflow_run_id"] = run_id
         if registered:
             metrics["registered_models"] = {str(key): value for key, value in registered.items()}
+    push_early_warning_metrics(metrics, pushgateway_url=pushgateway_url)
     return metrics
 
 
@@ -106,6 +109,11 @@ def main() -> None:
         action="store_true",
         help="Register the selected model at each cutoff in MLflow",
     )
+    parser.add_argument(
+        "--pushgateway-url",
+        default=None,
+        help="Push completed metrics to this Prometheus Pushgateway URL",
+    )
     args = parser.parse_args()
     metrics = run_early_warning(
         args.data_dir,
@@ -116,6 +124,7 @@ def main() -> None:
         experiment_name=args.experiment_name,
         run_name=args.run_name,
         register_models=args.register_models,
+        pushgateway_url=args.pushgateway_url,
     )
     print(json.dumps(metrics, indent=2, sort_keys=True))
 

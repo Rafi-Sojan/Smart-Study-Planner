@@ -1,10 +1,18 @@
-# OULAD processing and baseline model comparison
+# OULAD processing, feature engineering, and model evaluation
+
+## Document status
+
+This document records the reproducible OULAD processing and model-evaluation
+workflow implemented in the repository. Reported values correspond to the
+locally supplied OULAD release and the commands described below. They should
+be regenerated when the input data, dependency versions, or pipeline logic
+changes.
 
 ## Scope
 
-This document records the reproducible OULAD pipeline run performed from the
-user-supplied `oulad-dataset.zip`. It covers ingestion, cleaning, feature
-extraction, four baseline classifiers, evaluation, and the selected model.
+The workflow was executed from the supplied `oulad-dataset.zip`. It covers
+data ingestion, cleaning, feature extraction, evaluation of four baseline
+classifiers, and selection of the reference model.
 
 The task is enrollment-level risk classification:
 
@@ -98,9 +106,81 @@ Features include:
 - optional VLE total clicks, active days, and distinct resources from
   `studentVle` and `vle`.
 
+These feature families were selected because they correspond to information
+that a study planner could plausibly use when prioritizing support. Enrollment
+and demographic attributes provide baseline context and enable subgroup
+audits. Assessment aggregates represent observed academic progress and
+assessment completeness. Registration fields represent enrollment timing.
+VLE clicks, active days, and distinct resources represent recorded online
+engagement and breadth of resource interaction. They are proxy variables, not
+direct measurements of ability, motivation, study duration, or causal impact.
+The planner should use them to prioritize review and support, not to assign
+fixed judgments to learners. Record identifiers are excluded because they do
+not represent transferable learning characteristics.
+
 Numeric values are median-imputed inside each model pipeline. Categorical
 values are most-frequent-imputed and one-hot encoded. No values are imputed
 from the target or from the full dataset before splitting.
+
+## Statistical interpretation and methodological rationale
+
+All reported counts, rates, and metrics use the enrollment as the analysis
+unit. An enrollment represents one student-course-presentation combination;
+it is not equivalent to a unique student. This distinction is necessary
+because a student may enroll in more than one course presentation. Outcome
+rates are therefore calculated with enrollment counts as denominators.
+
+The binary target is an operational risk grouping rather than a claim that
+the four original outcomes are statistically identical. `Fail` and
+`Withdrawn` are grouped as the risk class because both indicate an enrollment
+that did not reach a successful completion outcome for the screening task.
+`Pass` and `Distinction` form the reference class. The original four labels
+remain available for descriptive analysis.
+
+The exploratory statistics are descriptive summaries of the supplied OULAD
+release. Counts and proportions describe composition; means and medians
+describe central tendency; standard deviations and ranges describe observed
+dispersion. These summaries do not constitute inferential tests, population
+estimates, or evidence of causality. In particular, a relationship between
+click activity, assessment scores, and outcome cannot be interpreted as proof
+that activity or scores caused the outcome.
+
+Missingness is treated as an observed data property. A missing assessment score
+is not recoded as zero because an unrecorded result does not establish a zero
+performance value. Where model preprocessing requires complete numerical input,
+median imputation is learned from the training partition within the pipeline.
+Categorical imputation and one-hot encoding are handled by the same fitted
+pipeline, preventing holdout information from influencing preprocessing.
+
+The evaluation metrics are interpreted as follows:
+
+- accuracy measures the proportion of all correctly classified enrollments;
+- precision measures the proportion of predicted-risk enrollments that belong
+  to the risk class;
+- recall, or sensitivity, measures the proportion of risk enrollments detected;
+- specificity measures the proportion of reference-class enrollments not
+  incorrectly flagged;
+- F1 is the harmonic mean of precision and recall;
+- balanced accuracy is the mean of sensitivity and specificity; and
+- ROC-AUC measures the probability that a randomly selected risk enrollment is
+  ranked above a randomly selected reference-class enrollment, aggregated
+  over decision thresholds.
+
+Confusion matrices are reported because aggregate metrics alone do not show
+the direction of errors. Rows represent actual classes and columns represent
+predicted classes. False negatives are risk enrollments that were not flagged;
+false positives are reference-class enrollments that were flagged. The
+appropriate balance depends on the cost of missed support opportunities and
+unnecessary interventions.
+
+The full-course benchmark uses a stratified 75/25 holdout so that both
+partitions retain approximately the observed class proportions. It is a
+retrospective benchmark because full-course assessment and activity aggregates
+may include information unavailable at an earlier point in the course. The
+early-warning analysis addresses this limitation by filtering observations at
+days 30, 60, and 90, excluding future unregistration information, and holding
+out the latest course presentation. These controls reduce the specified forms
+of temporal leakage; they do not replace prospective validation.
 
 ## Model comparison
 
@@ -154,8 +234,20 @@ registration date but excludes `date_unregistration`, because a future
 withdrawal date would not be available to a planner at prediction time.
 
 The split is time-aware: `2014J` is the test presentation and `2013B`, `2013J`,
-and `2014B` are the training presentations. This split is applied separately
-at days 30, 60, and 90, and the same four models are compared at every cutoff.
+and `2014B` are the training presentations. This prevents later course
+presentations from contributing training information to an earlier evaluation.
+The split is applied separately at days 30, 60, and 90, and the same four
+models are compared at every cutoff.
+
+The cutoff days are formal observation checkpoints rather than arbitrary
+subsets of the data. Day 30 represents an early-warning opportunity, day 60
+represents a mid-course evidence point, and day 90 represents a later
+observation point at which more evidence may be available while support may
+still be possible. Evaluating all three points quantifies the trade-off between
+intervention lead time and predictive information. The analysis does not claim
+that these checkpoints are optimal for every course or intervention policy;
+that decision requires prospective validation, calibration, operational
+capacity, and a cost-sensitive threshold analysis.
 The measured results from the supplied OULAD release are:
 
 | Cutoff | Selected model | Accuracy | Balanced accuracy | F1 | ROC-AUC |
@@ -238,8 +330,8 @@ enrollments, assessment records, and activity records.
 The early-warning notebook is in
 `notebooks/04_oulad_early_warning_evaluation.ipynb`. It documents the
 observation-availability audit, runs the four cutoff-specific models, plots
-colorful metric curves for days 30/60/90, and displays confusion matrices at
-the 60-day cutoff. It calls the same feature and model functions as the
+metric curves for days 30, 60, and 90, and displays separate confusion-matrix
+figures for each cutoff. It calls the same feature and model functions as the
 scripted pipeline rather than maintaining a second implementation.
 
 The notebook includes these visualizations:
@@ -254,22 +346,25 @@ The notebook includes these visualizations:
   same holdout split. These metrics compare classifiers; they do not establish
   causal effects.
 - **Confusion matrices:** actual labels by predicted labels for each baseline.
-  Rows are the actual class and columns are the predicted class: 0 is
-  Pass/Distinction and 1 is Fail/Withdrawn. False negatives are risky
-  enrollments the model missed; false positives are lower-risk enrollments
-  flagged for attention. The appropriate trade-off depends on the future
-  intervention cost.
+  The full-course notebook reports matrices before cutoff application. The
+  early-warning notebook reports separate matrices for the 30-, 60-, and
+  90-day cutoffs. Rows are the actual class and columns are the predicted
+  class: 0 is Pass/Distinction and 1 is Fail/Withdrawn. False negatives are
+  risky enrollments the model missed; false positives are lower-risk
+  enrollments flagged for attention. The appropriate trade-off depends on the
+  future intervention cost.
 - **Mean assessment score by risk group:** descriptive group means for the
   binary target. The chart shows association in this dataset and does not show
   that assessment scores caused the final outcome.
 
-To open it after installing the dependencies, start Jupyter from the project
-root and run the cells in order:
+To inspect or refresh a notebook after installing the dependencies, start
+Jupyter from the project root:
 
 ```powershell
 jupyter notebook notebooks/03_oulad_baseline_comparison.ipynb
 ```
 
-The notebook intentionally contains no saved results until it is executed with
-the local dataset. This avoids presenting stale or unverifiable charts as
-current results.
+The notebooks currently contain executed outputs generated from the local
+dataset. These outputs are retained for review and must be regenerated when
+the input data, dependencies, or implementation changes. They are not a
+substitute for the scripted pipeline artifacts or versioned metrics files.
