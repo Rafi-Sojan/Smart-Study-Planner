@@ -31,6 +31,8 @@ The evidence classification, calibration diagnostics, intervention-policy
 thresholds, synthetic validity checks, and Git/DVC release sequence are
 documented in
 [docs/evaluation-and-release-policy.md](docs/evaluation-and-release-policy.md).
+The authorised real-world external evaluation is documented in
+[docs/kuleuven-external-validation.md](docs/kuleuven-external-validation.md).
 
 ## Analysis notebooks
 
@@ -42,6 +44,7 @@ documented in
 - [06 — Synthetic data exploration](notebooks/06_synthetic_data_exploration.ipynb)
 - [07 — Synthetic processing and feature extraction](notebooks/07_synthetic_processing_and_features.ipynb)
 - [08 — Synthetic baseline testing](notebooks/08_synthetic_baseline_testing.ipynb)
+- [09 — KU Leuven external validation](notebooks/09_kuleuven_external_validation.ipynb)
 
 The OULAD notebooks contain executed outputs, including tables, metric plots,
 and confusion matrices. The full-course notebook reports the retrospective
@@ -54,6 +57,18 @@ replacement for the OULAD academic-risk task. Notebooks 06–08 document the
 synthetic planner track: relational EDA, leakage-aware cutoff processing, and
 student-disjoint baseline model testing with confusion matrices. Synthetic
 metrics are development benchmarks only and are not real student evidence.
+
+The KU Leuven external-validation track is kept separate from the synthetic
+planner track. It tests early LMS activity against a later real academic-year
+outcome and does not validate synthetic sleep, break, screen-time, wellbeing,
+CGPA, or Indian-university attributes.
+
+The controlled cross-dataset transfer stress test is documented in
+[docs/cross-dataset-transfer.md](docs/cross-dataset-transfer.md) and in
+[notebooks/10_cross_dataset_transfer.ipynb](notebooks/10_cross_dataset_transfer.ipynb).
+It trains on KU Leuven and applies the selected model unchanged to synthetic
+enrollments using only a six-feature early-engagement contract. Its results
+are a schema/measurement-shift diagnostic, not real-world validation.
 
 ## Installation and data requirements
 
@@ -183,6 +198,35 @@ comparison shows the trade-off between earlier intervention and the amount of
 evidence available to the model. Any production cutoff should ultimately be
 selected using prospective validation, calibration, intervention capacity, and
 the relative cost of missed and unnecessary support.
+
+## External real-world validation
+
+The repository includes a separate DVC-versioned external validation track
+using the authorised KU Leuven **Open Data, Private Learners** release. It
+uses LMS activity counts from 1819 for training, 1920 for validation, and a
+locked 2021 release for testing. Final outcomes remain labels only. The formal
+data dictionary, licence provenance, feature contract, confusion matrices, and
+limitations are documented in
+[docs/kuleuven-external-validation.md](docs/kuleuven-external-validation.md).
+
+Run it with:
+
+```powershell
+python -m pipeline.kuleuven_external_validation `
+  --data-path data/raw/external/kuleuven/dataset.zip `
+  --metrics-output models/metrics/kuleuven_external_metrics.json `
+  --cutoffs-days 30 60 90
+```
+
+Run the controlled transfer stress test:
+
+```powershell
+python -m pipeline.cross_dataset_transfer `
+  --kuleuven-path data/raw/external/kuleuven/dataset.zip `
+  --synthetic-path data/raw/synthetic `
+  --metrics-output models/metrics/cross_dataset_transfer_metrics.json `
+  --cutoffs-days 30 60 90
+```
 
 ## Reproducible commands
 

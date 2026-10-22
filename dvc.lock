@@ -173,3 +173,85 @@ stages:
       hash: md5
       md5: f8d4bba40152da41f86d2788c113f7be
       size: 10569
+  kuleuven_external_validation:
+    cmd: python -m pipeline.kuleuven_external_validation --data-path
+      data/raw/external/kuleuven/dataset.zip --metrics-output
+      models/metrics/kuleuven_external_metrics.json --cutoffs-days 30 60 90
+    deps:
+    - path: data/raw/external/kuleuven/dataset.zip
+      hash: md5
+      md5: 9f559e96d91f6a4c447ba41a783ff277
+      size: 78409206
+    - path: pipeline/kuleuven_external_validation.py
+      hash: md5
+      md5: 5b8c88b35a4eab13ef2d0a785cf6e21a
+      size: 8651
+    - path: src/data/kuleuven.py
+      hash: md5
+      md5: 3125bda76d2b0fc136fde9ef0e5c0102
+      size: 7432
+    - path: src/models/baseline.py
+      hash: md5
+      md5: 6ca8f5ef29bbafc8231965259902fc4d
+      size: 23861
+    - path: src/models/evaluate.py
+      hash: md5
+      md5: 1dca1026d7e440e8040c6614ab8c72ab
+      size: 6291
+    - path: src/models/policy.py
+      hash: md5
+      md5: a00d90f1f5785f8c7204510fa1d023b1
+      size: 4099
+    outs:
+    - path: models/metrics/kuleuven_external_metrics.json
+      hash: md5
+      md5: dcd2f082b905cab5d5c6bb642622bf8b
+      size: 134290
+  cross_dataset_transfer:
+    cmd: python -m pipeline.cross_dataset_transfer --kuleuven-path
+      data/raw/external/kuleuven/dataset.zip --synthetic-path data/raw/synthetic
+      --metrics-output models/metrics/cross_dataset_transfer_metrics.json
+      --cutoffs-days 30 60 90
+    deps:
+    - path: data/raw/external/kuleuven/dataset.zip
+      hash: md5
+      md5: 9f559e96d91f6a4c447ba41a783ff277
+      size: 78409206
+    - path: data/raw/synthetic
+      hash: md5
+      md5: 72ef90109863794bc50e6d421cf6d123.dir
+      size: 173772971
+      nfiles: 37
+    - path: pipeline/cross_dataset_transfer.py
+      hash: md5
+      md5: 7f703f5809c4d404c7c60d9a47dfc4f5
+      size: 4152
+    - path: pipeline/kuleuven_external_validation.py
+      hash: md5
+      md5: 5b8c88b35a4eab13ef2d0a785cf6e21a
+      size: 8651
+    - path: src/data/kuleuven.py
+      hash: md5
+      md5: 3125bda76d2b0fc136fde9ef0e5c0102
+      size: 7432
+    - path: src/data/transfer.py
+      hash: md5
+      md5: 6e0bb9d4471b91491c728898d6759e0f
+      size: 3648
+    - path: src/models/baseline.py
+      hash: md5
+      md5: 6ca8f5ef29bbafc8231965259902fc4d
+      size: 23861
+    - path: src/models/evaluate.py
+      hash: md5
+      md5: 1dca1026d7e440e8040c6614ab8c72ab
+      size: 6291
+    - path: src/models/policy.py
+      hash: md5
+      md5: a00d90f1f5785f8c7204510fa1d023b1
+      size: 4099
+    outs:
+    - path: models/metrics/cross_dataset_transfer_metrics.json
+      hash: md5
+      md5: 43e18aa216901dd218cf5891a317e59d
+      size: 19497

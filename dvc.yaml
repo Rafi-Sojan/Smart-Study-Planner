@@ -42,6 +42,31 @@ stages:
       - src/models/baseline.py
       - src/models/evaluate.py
       - src/models/policy.py
+  kuleuven_external_validation:
+    cmd: python -m pipeline.kuleuven_external_validation --data-path data/raw/external/kuleuven/dataset.zip --metrics-output models/metrics/kuleuven_external_metrics.json --cutoffs-days 30 60 90
+    deps:
+      - data/raw/external/kuleuven/dataset.zip
+      - pipeline/kuleuven_external_validation.py
+      - src/data/kuleuven.py
+      - src/models/baseline.py
+      - src/models/evaluate.py
+      - src/models/policy.py
+    outs:
+      - models/metrics/kuleuven_external_metrics.json
+  cross_dataset_transfer:
+    cmd: python -m pipeline.cross_dataset_transfer --kuleuven-path data/raw/external/kuleuven/dataset.zip --synthetic-path data/raw/synthetic --metrics-output models/metrics/cross_dataset_transfer_metrics.json --cutoffs-days 30 60 90
+    deps:
+      - data/raw/external/kuleuven/dataset.zip
+      - data/raw/synthetic
+      - pipeline/cross_dataset_transfer.py
+      - pipeline/kuleuven_external_validation.py
+      - src/data/kuleuven.py
+      - src/data/transfer.py
+      - src/models/baseline.py
+      - src/models/evaluate.py
+      - src/models/policy.py
+    outs:
+      - models/metrics/cross_dataset_transfer_metrics.json
   synthetic_baseline:
     cmd: python -m pipeline.synthetic_baseline_pipeline --data-dir data/raw/synthetic --metrics-output models/metrics/synthetic_baseline_metrics.json --model-dir models/synthetic_baseline --cutoffs-days 30 60 90
     deps:
