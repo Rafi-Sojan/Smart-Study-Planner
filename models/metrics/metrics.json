@@ -2,6 +2,7 @@
   "best_model": "hist_gradient_boosting",
   "deployment_claim": "not_prospective_or_causal_evidence",
   "evidence_type": "retrospective_historical_benchmark",
+  "mlflow_run_id": "338a6e6621954befb74fb90bfae00c13",
   "models": {
     "extra_trees": {
       "accuracy": 0.9346069066862601,
@@ -1826,12 +1827,18 @@
   "provenance": {
     "data_sha256": "fc91eccbb94eb5e0a3865711d5200256aa7e766e2742c9aaae2f55e79e083af8",
     "feature_schema_version": "oulad-enrollment-v2-grouped-evaluation",
-    "git_commit": "aa7151ef6e8a555b3e8d630346e0beecc27ee62f",
+    "git_commit": "5ea087ac9465e802259b0bc21835d791399320e7",
     "platform": "win32",
     "python_version": "3.12.14",
     "scikit_learn_version": "1.5.2"
   },
   "random_state": 42,
+  "registered_models": {
+    "extra_trees": "smart-study-planner-oulad-baseline-extra_trees",
+    "hist_gradient_boosting": "smart-study-planner-oulad-baseline-hist_gradient_boosting",
+    "logistic_regression": "smart-study-planner-oulad-baseline-logistic_regression",
+    "random_forest": "smart-study-planner-oulad-baseline-random_forest"
+  },
   "target": "Fail/Withdrawn = 1; Pass/Distinction = 0",
   "task": "enrollment_risk_classification"
 }

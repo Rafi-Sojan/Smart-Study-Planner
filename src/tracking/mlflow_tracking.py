@@ -8,12 +8,21 @@ not require DagsHub credentials.
 from __future__ import annotations
 
 import os
+import sys
 from tempfile import TemporaryDirectory
 from pathlib import Path
 from typing import Any
 
 
+def _configure_console() -> None:
+    """Prevent MLflow's Unicode completion message from breaking Windows runs."""
+
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+
+
 def _configure_tracking() -> Any:
+    _configure_console()
     try:
         import mlflow
     except ModuleNotFoundError as error:  # pragma: no cover - optional path

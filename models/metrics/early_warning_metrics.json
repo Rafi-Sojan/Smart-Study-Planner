@@ -5499,13 +5499,19 @@
     }
   },
   "evidence_type": "retrospective_historical_early_warning_benchmark",
+  "mlflow_run_id": "c5e74d4b4d3d48d3bd5103c742061466",
   "provenance": {
     "data_sha256": "fc91eccbb94eb5e0a3865711d5200256aa7e766e2742c9aaae2f55e79e083af8",
     "feature_schema_version": "oulad-early-warning-v2-grouped-validation",
-    "git_commit": "aa7151ef6e8a555b3e8d630346e0beecc27ee62f",
+    "git_commit": "5ea087ac9465e802259b0bc21835d791399320e7",
     "platform": "win32",
     "python_version": "3.12.14",
     "scikit_learn_version": "1.5.2"
+  },
+  "registered_models": {
+    "30": "smart-study-planner-oulad-early-warning-day-30",
+    "60": "smart-study-planner-oulad-early-warning-day-60",
+    "90": "smart-study-planner-oulad-early-warning-day-90"
   },
   "target": "Fail/Withdrawn = 1; Pass/Distinction = 0",
   "task": "early_warning_enrollment_risk_classification"
