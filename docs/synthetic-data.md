@@ -358,7 +358,7 @@ capacity, and an explicit cost for false negatives and false positives.
 
 ## 9. Current generated snapshot
 
-The current configured output contains 34 CSV tables and the following key
+The current configured output contains 36 CSV tables and the following key
 row counts. Counts are generated from the local synthetic output and are not
 population statistics.
 
@@ -376,21 +376,21 @@ population statistics.
 | Study sessions | 96,000 |
 | Planner recommendations | 96,000 |
 | Topic-state snapshots | 144,000 |
-| Total CSV data rows | 1,768,665 |
+| Total CSV data rows | 1,780,456 |
 
 Selected descriptive values from the current seeded snapshot are included to
 demonstrate the required reporting format:
 
 | Table and variable | Mean | Median | Standard deviation | IQR (`Q1–Q3`) | Range |
 |---|---:|---:|---:|---:|---:|
-| `academic_performance.semester_gpa` | 6.71 | 6.60 | 1.46 | 5.51–7.91 | 4.00–10.00 |
-| `attendance_records.attendance_percentage` | 80.11 | 83.33 | 20.64 | 66.67–100.00 | 0.00–100.00 |
-| `assessment_attempts.marks_obtained` | 87.03 | 89.52 | 12.71 | 77.04–100.00 | 39.15–100.00 |
-| `availability.available_hours` | 2.49 | 2.41 | 1.09 | 1.65–3.31 | 0.25–6.79 |
-| `study_sessions.actual_duration_minutes` | 49.97 | 51.00 | 25.39 | 37.00–67.00 | 0.00–103.00 |
-| `sleep_records.total_sleep_hours` | 6.52 | 6.51 | 1.03 | 5.78–7.25 | 3.50–9.50 |
-| `daily_wellbeing.total_screen_minutes` | 228.82 | 227.00 | 75.16 | 176.00–279.00 | 12.00–570.00 |
-| `daily_wellbeing.fatigue_score` | 0.47 | 0.00 | 0.69 | 0.00–0.81 | 0.00–4.68 |
+| `academic_performance.semester_gpa` | 6.70 | 6.59 | 1.42 | 5.53–7.86 | 4.00–10.00 |
+| `attendance_records.attendance_percentage` | 80.12 | 84.62 | 20.82 | 66.67–100.00 | 0.00–100.00 |
+| `assessment_attempts.marks_obtained` | 87.05 | 89.41 | 12.62 | 77.19–100.00 | 39.15–100.00 |
+| `availability.available_hours` | 2.50 | 2.42 | 1.09 | 1.68–3.32 | 0.25–6.52 |
+| `study_sessions.actual_duration_minutes` | 49.98 | 51.00 | 25.48 | 37.00–67.00 | 0.00–103.00 |
+| `sleep_records.total_sleep_hours` | 6.53 | 6.53 | 1.04 | 5.80–7.27 | 3.50–9.50 |
+| `daily_wellbeing.total_screen_minutes` | 229.61 | 228.00 | 75.01 | 177.00–280.00 | 12.00–612.00 |
+| `daily_wellbeing.fatigue_score` | 0.47 | 0.00 | 0.69 | 0.00–0.80 | 0.00–4.68 |
 
 These values are a quality-control snapshot of seed 42. They are not target
 benchmarks and must be regenerated whenever the configuration, code, or seed
@@ -452,3 +452,33 @@ calibration against authorised aggregate institutional statistics, and
 prospective validation with consented, de-identified data. Any such extension
 must preserve provenance, privacy, temporal validity, and the distinction
 between simulated and observed data.
+
+### 12.1 Improvements implemented in the current generator
+
+The generator now addresses several development gaps without presenting the
+simulation as real institutional evidence:
+
+- `curriculum_prerequisites.csv` makes course dependencies explicit. The
+  feature pipeline derives prerequisite count and unmet-prerequisite count
+  using only prerequisite outcomes from earlier terms.
+- `academic_performance` is joined as lagged history. The feature pipeline
+  exposes prior-term GPA, prior cumulative GPA, prior failed credits, prior
+  backlog count, and prior completed terms only when those records precede the
+  current offering.
+- Student context includes prior education stream, first-generation status,
+  internet access type, financial-aid status, and preferred language. These
+  fields support documented subgroup analysis; sensitive and consent-related
+  fields are excluded from the default baseline predictor matrix.
+- `early_warning_targets.csv` provides separate simulated labels for final
+  non-pass, withdrawal, attendance-requirement breach, late submission,
+  low-assessment performance, and study-plan abandonment. These labels support
+  future task-specific models and are not causal intervention outcomes.
+- The configurable `missingness_rate` applies deterministic, seed-controlled
+  missingness to observational fields while preserving identifiers, dates, and
+  relational keys. Missingness is intentionally visible so preprocessing can
+  be tested under incomplete-data conditions.
+
+These changes improve software and schema realism. They do not resolve the
+fundamental limitations of synthetic provenance, institutional diversity, or
+prospective validation. Those require authorised aggregate statistics and
+consented, de-identified observations and must not be fabricated.

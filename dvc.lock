@@ -86,22 +86,22 @@ stages:
     deps:
     - path: configs/simulation.yaml
       hash: md5
-      md5: aa6c90938a9ce867c326186ab5105262
-      size: 168
+      md5: 96c2232008f42d281d2b4857cdb66be7
+      size: 191
     - path: src/simulation/scenarios.py
       hash: md5
-      md5: 4c36eee45a9c6d93b2dda00b9dfbb709
-      size: 6057
+      md5: 8475e6d7d5af0f32906529fb963ef853
+      size: 6499
     - path: src/simulation/simulator.py
       hash: md5
-      md5: 52c6c17c86a0a298cbd07ab7002c40e2
-      size: 41863
+      md5: 4ffa9467ad6409510817477d236d2fa7
+      size: 47177
     outs:
     - path: data/raw/synthetic
       hash: md5
-      md5: e3042f80a60d027b009f32c07d2ee744.dir
-      size: 169676525
-      nfiles: 35
+      md5: 72ef90109863794bc50e6d421cf6d123.dir
+      size: 173772971
+      nfiles: 37
   synthetic_baseline:
     cmd: python -m pipeline.synthetic_baseline_pipeline --data-dir
       data/raw/synthetic --metrics-output
@@ -110,32 +110,32 @@ stages:
     deps:
     - path: data/raw/synthetic
       hash: md5
-      md5: e3042f80a60d027b009f32c07d2ee744.dir
-      size: 169676525
-      nfiles: 35
+      md5: 72ef90109863794bc50e6d421cf6d123.dir
+      size: 173772971
+      nfiles: 37
     - path: pipeline/synthetic_baseline_pipeline.py
       hash: md5
-      md5: 26c1115f65e8287c7f0f608b114973c7
-      size: 4280
+      md5: 3f7f01796bbf4f9ae5b82d95e939b5ff
+      size: 4370
     - path: src/features/synthetic_features.py
       hash: md5
-      md5: 158338840538b0aeea446948ef4df366
-      size: 9236
+      md5: 41b9876d71268dad3e8171875b430995
+      size: 13374
     - path: src/models/synthetic_baseline.py
       hash: md5
-      md5: 6c4dafe8a302be4aca9dbfd0ca65c81a
-      size: 7397
+      md5: bc46d698ffe434cdd690f714143cde7f
+      size: 14697
     - path: src/tracking/mlflow_tracking.py
       hash: md5
-      md5: d6aab89e6dba628234dafe644d52a680
-      size: 11039
+      md5: 646f684f1376e96e53551766577825cc
+      size: 11497
     outs:
     - path: models/metrics/synthetic_baseline_metrics.json
       hash: md5
-      md5: 67c58f08386854a02bd0f7e94d650e18
-      size: 7198
+      md5: 8b420ab8ba19edd7e4b39113ce8135f4
+      size: 71866
     - path: models/synthetic_baseline
       hash: md5
-      md5: 7babf4571230c9cf1372a5213baa2925.dir
-      size: 12269099
+      md5: cb62cb3d9a8e0a5ac532794a7f1f2ffc.dir
+      size: 24285968
       nfiles: 3

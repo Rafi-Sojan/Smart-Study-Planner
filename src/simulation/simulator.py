@@ -19,6 +19,7 @@ import yaml
 
 from .scenarios import (
     COURSE_CATALOG,
+    COURSE_PREREQUISITES,
     RESOURCE_TYPES,
     STUDENT_PROFILES,
     TOPIC_TEMPLATES,
@@ -41,6 +42,7 @@ class SimulationConfig:
     terms: int = 3
     weeks_per_term: int = 16
     start_date: str = "2025-07-01"
+    missingness_rate: float = 0.03
     overwrite: bool = False
 
 
@@ -101,6 +103,7 @@ def _term_rows(config: SimulationConfig) -> list[dict[str, Any]]:
         rows.append(
             {
                 "term_id": f"TERM{term_number}",
+                "term_number": term_number,
                 "university_id": "UNI001",
                 "academic_year": f"{term_start.year}-{term_end.year}",
                 "semester_name": f"Semester {term_number}",
@@ -165,6 +168,21 @@ def _course_rows() -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[dic
     return courses, topics, course_topics
 
 
+def _prerequisite_rows() -> list[dict[str, Any]]:
+    """Create an explicit course-prerequisite bridge for planner logic."""
+
+    return [
+        {
+            "prerequisite_id": f"PREREQ-{course_id}-{prerequisite_id}",
+            "course_id": course_id,
+            "prerequisite_course_id": prerequisite_id,
+            "minimum_status": "passed",
+        }
+        for course_id, prerequisites in COURSE_PREREQUISITES.items()
+        for prerequisite_id in prerequisites
+    ]
+
+
 def _students(rng: np.random.Generator, count: int) -> tuple[list[dict[str, Any]], dict[str, dict[str, float]]]:
     """Create student profile rows and unobserved behavioural state.
 
@@ -191,6 +209,11 @@ def _students(rng: np.random.Generator, count: int) -> tuple[list[dict[str, Any]
                 "study_mode": "regular",
                 "residence_type": profile["residence_type"],
                 "employment_status": profile["employment_status"],
+                "prior_education_stream": str(rng.choice(["science", "vocational", "other"])),
+                "first_generation_student": bool(rng.random() < 0.28),
+                "internet_access_type": str(rng.choice(["home_broadband", "mobile_data", "campus_wifi"])),
+                "financial_aid_status": str(rng.choice(["none", "scholarship", "fee_support"])),
+                "preferred_language": str(rng.choice(["English", "Hindi", "Kannada", "Malayalam"])),
                 "consent_status": "synthetic_development_only",
             }
         )
@@ -221,6 +244,8 @@ def generate_dataset(config: SimulationConfig) -> dict[str, int]:
         raise ValueError("terms must be between 1 and 3 for the supplied course catalogue")
     if config.weeks_per_term < 8:
         raise ValueError("weeks_per_term must be at least 8")
+    if not 0 <= config.missingness_rate < 1:
+        raise ValueError("missingness_rate must be between 0 and 1")
 
     output_dir = Path(config.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -240,6 +265,7 @@ def generate_dataset(config: SimulationConfig) -> dict[str, int]:
     rng = np.random.default_rng(config.seed)
     terms = _term_rows(config)
     courses, topics, course_topics = _course_rows()
+    curriculum_prerequisites = _prerequisite_rows()
     students, latent = _students(rng, config.students)
     term_by_number = {index + 1: row for index, row in enumerate(terms)}
     course_by_id = {course["course_id"]: course for course in COURSE_CATALOG}
@@ -753,6 +779,43 @@ def generate_dataset(config: SimulationConfig) -> dict[str, int]:
         for assessment in assessments
     ]
 
+    early_warning_targets = []
+    attendance_by_enrollment = pd.DataFrame(attendance).groupby("enrollment_id")["attendance_status"].agg(
+        attendance_classes_observed="size",
+        attendance_absences=lambda values: int((values == "absent").sum()),
+    )
+    attempts_by_enrollment = pd.DataFrame(assessment_attempts).groupby("enrollment_id").agg(
+        late_submission_count=("late_submission", "sum"),
+        low_assessment_count=("marks_obtained", lambda values: int((values < 40).sum())),
+    )
+    sessions_frame = pd.DataFrame(study_sessions)
+    sessions_by_enrollment = sessions_frame.groupby("enrollment_id").agg(
+        planned_session_count=("session_id", "size"),
+        completed_session_count=("completion_status", lambda values: int((values == "completed").sum())),
+    )
+    outcomes_by_key = {(row["student_id"], row["offering_id"]): row for row in outcomes}
+    for enrollment in enrollments:
+        enrollment_id = enrollment["enrollment_id"]
+        outcome = outcomes_by_key[(enrollment["student_id"], enrollment["offering_id"])]
+        attendance_row = attendance_by_enrollment.loc[enrollment_id]
+        attempt_row = attempts_by_enrollment.loc[enrollment_id]
+        session_row = sessions_by_enrollment.loc[enrollment_id]
+        attendance_rate = 1 - (attendance_row["attendance_absences"] / attendance_row["attendance_classes_observed"])
+        completion_rate = session_row["completed_session_count"] / session_row["planned_session_count"]
+        early_warning_targets.append(
+            {
+                "enrollment_id": enrollment_id,
+                "final_non_pass": int(not outcome["passed"]),
+                "withdrawal": int(outcome["withdrawn"]),
+                "attendance_requirement_breach": int(attendance_rate < 0.75),
+                "late_submission_risk": int(attempt_row["late_submission_count"] > 0),
+                "low_assessment_risk": int(attempt_row["low_assessment_count"] > 0),
+                "study_plan_abandonment": int(completion_rate < 0.5),
+                "attendance_rate_full_course": _round(attendance_rate, 4),
+                "session_completion_rate_full_course": _round(completion_rate, 4),
+            }
+        )
+
     tables: dict[str, list[dict[str, Any]]] = {
         "universities": universities,
         "campuses": campuses,
@@ -765,6 +828,7 @@ def generate_dataset(config: SimulationConfig) -> dict[str, int]:
         "enrollments": enrollments,
         "topics": topics,
         "course_topics": course_topics,
+        "curriculum_prerequisites": curriculum_prerequisites,
         "academic_performance": academic_performance,
         "class_timetable": timetable,
         "attendance_records": attendance,
@@ -788,7 +852,35 @@ def generate_dataset(config: SimulationConfig) -> dict[str, int]:
         "faculty_support": faculty_support,
         "academic_events": academic_events,
         "outcomes": outcomes,
+        "early_warning_targets": early_warning_targets,
     }
+    missingness_columns = {
+        "attendance_records": ("attendance_percentage", "attendance_gap_to_required"),
+        "assessment_attempts": ("marks_obtained", "grade"),
+        "availability": ("available_hours", "class_hours", "commute_hours", "part_time_work_hours"),
+        "sleep_records": ("total_sleep_hours", "sleep_quality_score", "nap_minutes", "sleep_interruptions"),
+        "daily_wellbeing": (
+            "academic_screen_minutes",
+            "recreational_screen_minutes",
+            "total_screen_minutes",
+            "total_break_minutes",
+            "sleep_hours",
+            "sleep_deficit_hours",
+            "fatigue_score",
+            "concentration_score",
+            "stress_score",
+        ),
+        "study_sessions": ("post_session_mastery",),
+        "student_topic_state": ("mastery_score", "confidence_score", "fatigue_score", "remaining_effort_hours"),
+        "student_goal_progress": ("current_progress", "target_progress", "progress_gap"),
+        "resource_interactions": ("view_duration_minutes", "resource_rating"),
+        "recommendation_feedback": ("usefulness_score", "difficulty_score", "feedback_text"),
+    }
+    for table_name, columns in missingness_columns.items():
+        for row in tables[table_name]:
+            for column in columns:
+                if column in row and rng.random() < config.missingness_rate:
+                    row[column] = None
     for table_name, rows in tables.items():
         pd.DataFrame(rows).to_csv(output_dir / f"{table_name}.csv", index=False)
 
@@ -804,6 +896,7 @@ def generate_dataset(config: SimulationConfig) -> dict[str, int]:
             "terms": config.terms,
             "weeks_per_term": config.weeks_per_term,
             "start_date": config.start_date,
+            "missingness_rate": config.missingness_rate,
         },
         "tables": counts,
         "limitations": [
@@ -835,6 +928,7 @@ def main() -> None:
     parser.add_argument("--terms", type=int, default=None)
     parser.add_argument("--weeks-per-term", type=int, default=None)
     parser.add_argument("--start-date", default=None)
+    parser.add_argument("--missingness-rate", type=float, default=None)
     parser.add_argument("--overwrite", action="store_true", help="Replace generated CSVs in the exact output directory")
     args = parser.parse_args()
     config_values = _load_config(args.config) if args.config is not None else {}
@@ -848,6 +942,11 @@ def main() -> None:
         else int(config_values.get("weeks_per_term", 16))
     )
     start_date = args.start_date or str(config_values.get("start_date", "2025-07-01"))
+    missingness_rate = (
+        args.missingness_rate
+        if args.missingness_rate is not None
+        else float(config_values.get("missingness_rate", 0.03))
+    )
     counts = generate_dataset(
         SimulationConfig(
             output_dir=output_dir,
@@ -856,6 +955,7 @@ def main() -> None:
             terms=terms,
             weeks_per_term=weeks_per_term,
             start_date=start_date,
+            missingness_rate=missingness_rate,
             overwrite=args.overwrite,
         )
     )

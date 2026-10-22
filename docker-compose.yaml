@@ -1,29 +1,32 @@
 services:
   prometheus:
-    image: prom/prometheus
+    image: prom/prometheus:v2.55.1
     container_name: smart-study-planner-prometheus
     restart: unless-stopped
     ports:
-      - "9090:9090"
+      - "127.0.0.1:9090:9090"
     volumes:
       - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus_data:/prometheus
 
   pushgateway:
-    image: prom/pushgateway
+    image: prom/pushgateway:v1.11.1
     container_name: smart-study-planner-pushgateway
     restart: unless-stopped
     ports:
-      - "9091:9091"
+      - "127.0.0.1:9091:9091"
 
   grafana:
-    image: grafana/grafana
+    image: grafana/grafana:11.4.0
     container_name: smart-study-planner-grafana
     restart: unless-stopped
     depends_on:
       - prometheus
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:?Set GRAFANA_ADMIN_PASSWORD before starting Grafana}
+      GF_USERS_ALLOW_SIGN_UP: "false"
     ports:
-      - "3000:3000"
+      - "127.0.0.1:3000:3000"
     volumes:
       - grafana_data:/var/lib/grafana
       - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro

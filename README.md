@@ -25,6 +25,8 @@ definitions, and rationale for each generated field are documented in
 The synthetic feature contract, baseline-model comparison, metric definitions,
 confusion-matrix interpretation, and model-selection rule are documented in
 [docs/synthetic-baseline.md](docs/synthetic-baseline.md).
+The formal risk register and release controls are documented in
+[docs/risk-register.md](docs/risk-register.md).
 
 ## Analysis notebooks
 
@@ -83,6 +85,13 @@ screen-time, break, and wellbeing records. A formal description of the
 generation functions and required statistics is provided in
 [docs/synthetic-data.md](docs/synthetic-data.md).
 
+The current snapshot contains 36 relational CSV tables. It includes an explicit
+course-prerequisite bridge, lagged academic-history inputs for cutoff features,
+student-context fields for subgroup auditing, configurable seed-controlled
+missingness, and `early_warning_targets.csv` for task-specific simulated
+labels. These additions improve development realism but do not convert the
+dataset into observed institutional evidence.
+
 Run it from the repository root:
 
 ```powershell
@@ -130,20 +139,24 @@ The baseline metrics have the following interpretations:
 - balanced accuracy is the mean of sensitivity and specificity, giving equal
   weight to both classes; and
 - ROC-AUC measures ranking quality across classification thresholds.
+- PR-AUC summarizes precision-recall performance under class imbalance;
+- Brier score measures the squared error of predicted probabilities.
 
 Confusion matrices report actual classes by predicted classes. They make false
 positives and false negatives visible and are therefore necessary for judging
 whether a model is appropriate for a support-screening workflow. The model
-selection rule prioritizes ROC-AUC, then balanced accuracy, then F1, while the
-confusion matrices provide the operational context for that ranking.
+selection rule prioritizes validation PR-AUC, then validation ROC-AUC,
+validation balanced accuracy, and validation F1, while the confusion matrices
+provide the operational context for that ranking.
 
 Imputation and categorical encoding are fitted within each model pipeline
-after the train/test split. This prevents information from the holdout set
-from influencing preprocessing. The full-course benchmark uses a stratified
-holdout to preserve the observed class proportions. The early-warning
-evaluation additionally removes observations after days 30, 60, and 90 and
-holds out the latest course presentation, because a deployment-time model
-could not use future activity or later-course presentation information.
+after the split. Model selection uses a validation partition, and the final
+metrics are reported once on a locked test partition. OULAD partitions are
+student-grouped so one learner cannot contribute rows to both sides of a
+partition. The early-warning evaluation additionally removes observations
+after days 30, 60, and 90 and uses an earlier presentation for validation and a
+later presentation for testing. This is stricter than the previous single
+holdout comparison and may reduce the measured scores.
 
 The selected feature families are tied to the planner's intended decision
 context. Demographic and enrollment attributes provide baseline context for
@@ -204,8 +217,8 @@ python -m pipeline.training_pipeline `
 ```
 
 Add `--register-models` to register all four full-course baseline model
-artifacts in MLflow. The selected full-course model remains
-`hist_gradient_boosting` based on the measured comparison.
+artifacts in MLflow. The selected model is determined from validation data at
+runtime; the locked test partition is not used for model selection.
 
 Evaluate the four models using only observations available by course day 30,
 60, and 90, with the latest course presentation held out:
@@ -225,17 +238,11 @@ when its data or code dependencies change.
 With DagsHub MLflow credentials configured, add `--mlflow --register-models`
 to log the run and register the selected model separately for each cutoff.
 
-Random forest is selected for the early-warning evaluation at all three
-cutoffs because it has the highest measured ROC-AUC at days 30, 60, and 90
-under the declared ranking rule: ROC-AUC first, balanced accuracy second, and
-F1 third. This choice is not based on accuracy alone. At day 30, histogram
-gradient boosting has higher accuracy, balanced accuracy, and F1, but random
-forest has the strongest ROC-AUC and recall. At days 60 and 90, random forest
-has the strongest ROC-AUC and balanced accuracy; at day 90, extra trees has a
-slightly higher F1, illustrating why the selection rule and confusion matrices
-must be documented together. The full-course benchmark has a different result:
-histogram gradient boosting is selected when complete-course information is
-available.
+The early-warning selection is determined independently at each cutoff using
+validation PR-AUC, validation ROC-AUC, validation balanced accuracy, and
+validation F1. Numeric results must be regenerated after the grouped
+train-validation-locked-test contract changed; no previous model ranking is
+carried forward as a current claim.
 
 Run the same checks used by CI:
 
@@ -243,6 +250,11 @@ Run the same checks used by CI:
 ruff check src pipeline tests
 pytest -v
 ```
+
+CI also generates a small seed-controlled synthetic fixture and runs the
+synthetic baseline pipeline without DVC or MLflow credentials. This verifies
+the end-to-end generator-to-model path while keeping large raw data and
+external secrets out of GitHub Actions.
 
 Run the synthetic baseline pipeline locally:
 
@@ -259,6 +271,12 @@ cutoff protocol, writes the measured comparison to
 `models/metrics/synthetic_baseline_metrics.json`, and saves the selected model
 for each cutoff under `models/synthetic_baseline/`. The local run does not
 contact DagsHub unless `--mlflow` or `--register-models` is supplied.
+
+The metrics file also stores fixed-threshold diagnostics and subgroup audit
+metrics. Threshold diagnostics are descriptive test-set comparisons, not a
+production threshold-selection procedure; any deployment threshold must be
+chosen using training/validation data, intervention capacity, and reviewed
+false-negative and false-positive costs.
 
 Register every synthetic baseline model at every cutoff in DagsHub MLflow:
 
@@ -320,9 +338,9 @@ from version control.
 
 The full-course baseline is a retrospective benchmark and is not a causal
 model. The early-warning evaluation applies 30-, 60-, and 90-day observation
-cutoffs and holds out the latest course presentation, but it still uses final
-course outcomes as labels. Future work includes prospective validation,
-probability calibration, intervention-threshold selection, API and container
-implementation, monitoring, and evaluation on additional locally supplied
-OULAD releases.
+cutoffs and holds out a later presentation, but it still uses final course
+outcomes as labels. Prospective validation, calibration, institutional privacy
+approval, intervention-threshold review, and fairness review remain release
+gates. See [docs/risk-register.md](docs/risk-register.md) before using any
+registered artifact.
 

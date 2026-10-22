@@ -189,3 +189,17 @@ TOPIC_TEMPLATES = {
 
 RESOURCE_TYPES = ("lecture_video", "reading", "practice_quiz", "previous_year_paper")
 ASSESSMENT_TYPES = ("internal", "assignment", "practical", "end_semester")
+
+# Course-level prerequisites make the simulated curriculum usable for
+# workload-aware planning. They are development assumptions, not a claim about
+# any particular university's regulation scheme.
+COURSE_PREREQUISITES = {
+    "CSE201": ("CSE101",),
+    "CSE202": ("CSE101",),
+    "CSE203": ("CSE101",),
+    "CSE204": ("CSE101",),
+    "CSE301": ("CSE201",),
+    "CSE302": ("CSE201",),
+    "CSE303": ("CSE202",),
+    "CSE304": ("CSE201",),
+}

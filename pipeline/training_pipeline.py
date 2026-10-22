@@ -8,6 +8,8 @@ from typing import Any
 
 from src.data.cleaner import clean_oulad_tables
 from src.data.loader import load_oulad_tables
+from src.data.provenance import build_provenance
+from src.data.validation import validate_oulad_tables
 from src.features.feature_engineering import build_oulad_features
 from src.models.baseline import train_baselines
 from src.monitoring.prometheus_exporter import push_training_metrics
@@ -26,6 +28,7 @@ def run_training(
 ) -> dict[str, Any]:
     raw_tables = load_oulad_tables(data_dir)
     cleaned_tables = clean_oulad_tables(raw_tables)
+    validate_oulad_tables(cleaned_tables)
     features = build_oulad_features(cleaned_tables, clean=False)
     best_name, models, model_results = train_baselines(features)
     best_model = models[best_name]
@@ -39,12 +42,16 @@ def run_training(
         "n_test": first_result["n_test"],
         "random_state": first_result["random_state"],
         "models": model_results,
+        "provenance": build_provenance(data_dir, "oulad-enrollment-v2-grouped-evaluation"),
     }
 
-    if metrics_output is not None:
-        path = Path(metrics_output)
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(json.dumps(metrics, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    def write_metrics() -> None:
+        if metrics_output is not None:
+            path = Path(metrics_output)
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(json.dumps(metrics, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+    write_metrics()
     if model_output is not None:
         path = Path(model_output)
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -70,6 +77,7 @@ def run_training(
             run_name=run_name,
         )
         metrics["mlflow_run_id"] = run_id
+    write_metrics()
     push_training_metrics(metrics, pushgateway_url=pushgateway_url)
     return metrics
 

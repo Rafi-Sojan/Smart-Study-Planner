@@ -17,4 +17,7 @@ def test_synthetic_features_are_enrollment_level_and_keep_label(tmp_path: Path) 
     assert features["observation_cutoff_days"].eq(30).all()
     assert "result_status" not in features.columns
     assert "final_grade" not in features.columns
+    assert "prior_cumulative_gpa" in features.columns
+    assert "unmet_prerequisite_count" in features.columns
+    assert features.loc[features["term_number"] == 1, "prior_cumulative_gpa"].isna().all()
 

@@ -39,10 +39,13 @@ def run_synthetic_baseline_pipeline(
         cutoffs_days=cutoffs_days,
         random_state=random_state,
     )
-    if metrics_output is not None:
-        metrics_path = Path(metrics_output)
-        metrics_path.parent.mkdir(parents=True, exist_ok=True)
-        metrics_path.write_text(json.dumps(metrics, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    def write_metrics() -> None:
+        if metrics_output is not None:
+            metrics_path = Path(metrics_output)
+            metrics_path.parent.mkdir(parents=True, exist_ok=True)
+            metrics_path.write_text(json.dumps(metrics, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+    write_metrics()
     if model_dir is not None:
         output_dir = Path(model_dir)
         output_dir.mkdir(parents=True, exist_ok=True)
@@ -65,6 +68,7 @@ def run_synthetic_baseline_pipeline(
         metrics["mlflow_run_id"] = run_id
         if registered:
             metrics["registered_models"] = {str(key): value for key, value in registered.items()}
+    write_metrics()
     return metrics
 
 

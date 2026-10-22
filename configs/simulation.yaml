@@ -5,3 +5,4 @@ students: 1000
 terms: 3
 weeks_per_term: 16
 start_date: 2025-07-01
+missingness_rate: 0.03

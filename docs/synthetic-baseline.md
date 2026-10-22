@@ -59,16 +59,24 @@ because they correlate with the target in this generated sample.
 
 ### 3.1 Actual predictor fields
 
-The generated feature table contains 51 columns. The following 43 fields are the
-intended predictor set after exclusion of identifiers, label fields, cutoff
-metadata, and final-outcome fields:
+The generated feature table currently contains 64 columns. The baseline matrix
+contains 55 predictor fields after exclusion of identifiers, labels, sensitive
+audit-only fields, cutoff metadata, and final-outcome fields:
 
 **Enrollment and course context**
 
 `attempt_number`, `is_backlog`, `enrollment_status`,
 `enrollment_date`, `term_id`, `section`, `attendance_requirement_percent`,
-`course_type`, `credits`, `difficulty`, `estimated_effort_hours`,
+`term_number`, `course_type`, `credits`, `difficulty`, `estimated_effort_hours`,
 `residence_type`, `employment_status`, and `study_mode`.
+
+**Student history and curriculum context**
+
+`prior_education_stream`, `first_generation_student`,
+`internet_access_type`, `financial_aid_status`, `prior_semester_gpa`,
+`prior_cumulative_gpa`, `prior_failed_credits`, `prior_backlog_count`,
+`prior_terms_completed`, `prerequisite_count`, and
+`unmet_prerequisite_count`.
 
 **Attendance and assessment progress**
 
@@ -93,6 +101,12 @@ metadata, and final-outcome fields:
 `mean_available_hours`, `mean_commute_hours`, and
 `mean_part_time_work_hours`.
 
+The feature contract also includes lagged academic history and curriculum
+context: `prior_semester_gpa`, `prior_cumulative_gpa`, `prior_failed_credits`,
+`prior_backlog_count`, `prior_terms_completed`, `prerequisite_count`, and
+`unmet_prerequisite_count`. A term-one enrollment has no prior academic history
+by definition. Current-term and future performance records remain excluded.
+
 The exact feature inventory is also printed by Notebook 07 for each cutoff,
 including the pandas data type. Categorical fields are not assigned arbitrary
 numeric codes; they are imputed and one-hot encoded inside the model pipeline.
@@ -106,6 +120,8 @@ The following fields are not predictors:
   present as identifiers;
 - labels and final outcomes: `risk_label`, `passed`, `withdrawn`,
   `requires_retake`, final grade, and result status;
+- sensitive or consent-related audit fields: `category`, `preferred_language`,
+  and `consent_status`;
 - temporal metadata: `observation_cutoff_days`, `cutoff_date`, and
   `start_date`;
 - any future event or outcome occurring after the stated cutoff.
@@ -132,11 +148,11 @@ missing event records. The modelling stage then applies:
 
 All learned preprocessing parameters are fitted on training students only.
 The split is student-disjoint: students, rather than individual enrollment
-rows, are assigned to the 75% training or 25% test partition. This prevents a
-student's behaviour from appearing in both partitions and producing an
-optimistic estimate of generalization to unseen students. The split uses random
-state 42 and stratifies students by whether they have at least one risky
-enrollment.
+rows, are assigned to training, validation, or locked-test partitions. This
+prevents a student's behaviour from appearing in multiple partitions and
+producing an optimistic estimate of generalization to unseen students. The
+split uses random state 42 and stratifies students by whether they have at
+least one risky enrollment.
 
 ## 5. Baseline algorithms and reasons for inclusion
 
@@ -156,7 +172,11 @@ reference points before more advanced tuning is attempted.
 ## 6. Evaluation statistics
 
 Notebook 08 reports accuracy, precision, recall, F1, balanced accuracy,
-ROC-AUC, model ranking, and confusion matrices.
+ROC-AUC, PR-AUC, Brier score, model ranking, confusion matrices, validation
+threshold diagnostics, and
+descriptive subgroup metrics for category, residence, employment, and study
+mode. Protected attributes are used for auditing only and are not included in
+the default predictor matrix.
 
 | Statistic | Definition | Why it matters for a planner |
 |---|---|---|
@@ -167,6 +187,8 @@ ROC-AUC, model ranking, and confusion matrices.
 | F1 | Harmonic mean of precision and recall | Summarizes the precision-recall trade-off at the selected threshold. |
 | Balanced accuracy | `(sensitivity + specificity) / 2` | Gives both classes equal importance. |
 | ROC-AUC | Threshold-independent ranking measure | Evaluates whether risky enrollments tend to receive higher scores before choosing an alert threshold. |
+| PR-AUC | Area under the precision-recall curve | More informative than accuracy when the risky class is rare. |
+| Brier score | Mean squared probability error | Assesses probability calibration; lower is better. |
 
 Mean, median, standard deviation, quartiles, IQR, and missing percentages are
 used in the processing and exploration notebooks to describe generated
@@ -180,37 +202,40 @@ experience of a typical student.
 
 The selection rule is declared before interpreting the results:
 
-1. highest ROC-AUC;
-2. if tied, highest balanced accuracy;
-3. if still tied, highest F1.
+1. highest validation PR-AUC;
+2. if tied, highest validation ROC-AUC;
+3. if tied, highest validation balanced accuracy;
+4. if still tied, highest validation F1.
 
-ROC-AUC is primary because the system ultimately needs to rank learners by
-risk. Balanced accuracy is the first tie-breaker because both the risk and
-non-risk classes matter. F1 is the second tie-breaker because it summarizes
-alert precision and risk recall. Accuracy is reported but is not the selection
-criterion.
+PR-AUC is primary because the simulated risky class is rare and the planner
+needs to understand precision-recall behaviour. ROC-AUC remains useful for
+ranking, balanced accuracy gives both classes equal importance, and F1
+summarizes alert precision and risk recall. Accuracy is reported but is not the
+selection criterion.
 
 The ranking audit table in Notebook 08 displays every model's rank separately
 for days 30, 60, and 90. Therefore the selected algorithm may differ by cutoff.
 The decision should be reported with the measured table and not reduced to a
 claim that random forest, or any other model, is always superior.
 
-In the current executed seed-42 snapshot, the risky class is approximately
-1.27% of enrollments. The 3,000-enrollment holdout contains 34 risky cases.
-At the default 0.5 threshold, every candidate predicts the negative class for
-the test rows, so recall and F1 are 0 and balanced accuracy is 0.5. ROC-AUC is
-still above 0.90 because the predicted probabilities rank cases reasonably
-well. This measured contrast is a central result, not an error to conceal: it
-shows why a high ROC-AUC or accuracy cannot by itself justify an alert policy.
+In the current executed seed-42 snapshot, 152 of 12,000 enrollment rows are
+risky, and the locked test partition contains 3,000 rows. At the default 0.5
+threshold, the candidates predict almost all rows as low risk, so locked-test
+recall and F1 are zero while ROC-AUC and PR-AUC still show ranking signal.
+This measured contrast is a central result, not an error to conceal: it shows
+why a high ROC-AUC or accuracy cannot by itself justify an alert policy.
 The current benchmark therefore selects a ranking baseline, but it does not
-claim that its default threshold is ready for planner intervention.
+claim that its default threshold is ready for planner intervention. A threshold
+is selected from validation data for diagnostic reporting and then evaluated on
+the locked test partition. Intervention capacity and support costs have not
+yet been supplied, so this is not a production threshold.
 
-For the current executed seed-42 comparison, the declared rule selects
-logistic regression at 30 days (ROC-AUC 0.9048), logistic regression at 60 days
-(0.9184), and extra trees at 90 days (0.9367). The selected model changes
-because the measured ranking changes by observation window. These values are
-reported from the executed notebook output and must be regenerated if the
-dataset, seed, or feature contract changes.
+For the current executed seed-42 comparison, the validation rule selects extra
+trees at 30 days (validation PR-AUC 0.1091), logistic regression at 60 days
+(0.1212), and extra trees at 90 days (0.1497). These values are from the
+regenerated synthetic pipeline and must be regenerated if the dataset, seed, or
+feature contract changes. The selection is a synthetic development comparison,
+not a production model recommendation.
 
 ## 8. Confusion matrices and operational interpretation
 
@@ -253,4 +278,10 @@ calibration, intervention benefit, causal effects, or suitability for an
 Indian university. Those claims require consented, de-identified institutional
 data, prospective validation, calibration, subgroup analysis, threshold
 review, and drift monitoring.
+
+The generated `early_warning_targets.csv` separates several operational labels
+that can be modelled in later work. The present baseline continues to use final
+non-pass as its primary risk target so that comparisons remain directly
+comparable with the earlier experiments. A task-specific evaluation must define
+its prediction horizon and intervention utility before selecting a model.
 

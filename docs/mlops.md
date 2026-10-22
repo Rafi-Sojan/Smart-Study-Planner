@@ -26,6 +26,9 @@ The metrics JSON files are retained as small, reviewable reports. They contain
 measured outputs rather than assumptions about model quality. A new experiment
 should therefore create a new run and should not overwrite a previous result
 without recording the changed data, code, parameters, and evaluation split.
+The pipelines also record a deterministic data-directory hash, feature-schema
+version, runtime, platform, and Git commit when available. Credentials are
+never included in this provenance.
 
 ## 1. Install the pinned dependencies
 
@@ -133,6 +136,8 @@ classifiers, `metrics.json`, and the trained model artifact. Without
 `--mlflow`, the pipeline remains fully local and does not require tracking
 credentials. With `--register-models`, all four full-course model artifacts
 are saved in MLflow-compatible format and registered as versioned models.
+Registration is not promotion: the model remains a candidate until the risk
+register release gates are completed.
 
 For the leakage-safe early-warning pipeline, use:
 
@@ -229,6 +234,11 @@ metrics, and cutoff-specific early-warning metrics. The integration is
 opt-in so that ordinary local and DVC runs remain independent of Docker.
 Pushgateway retains pushed series until they are removed, so stale batch-job
 series must be managed if the monitoring stack is used continuously.
+
+The monitoring utilities also support privacy-preserving schema, missingness,
+and numeric-quantile drift checks. They report aggregates and do not write
+student identifiers or row-level values. Monitoring does not replace a review
+of calibration, subgroup performance, intervention outcomes, or data quality.
 
 ## 6. Initial setup sequence
 

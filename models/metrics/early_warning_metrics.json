@@ -7,56 +7,1136 @@
   "evaluation": "time-aware course-presentation holdout",
   "evaluations": {
     "30": {
-      "best_model": "random_forest",
+      "best_model": "hist_gradient_boosting",
       "cutoff_days": 30,
       "models": {
         "extra_trees": {
-          "accuracy": 0.7230905861456484,
-          "balanced_accuracy": 0.7216433804167756,
-          "f1": 0.7410299003322259,
-          "n_samples": 32593,
+          "accuracy": 0.7217584369449378,
+          "balanced_accuracy": 0.7210720753810018,
+          "brier_score": 0.18528346489744268,
+          "confusion_matrix": [
+            [
+              3813,
+              1644
+            ],
+            [
+              1489,
+              4314
+            ]
+          ],
+          "f1": 0.7336110874925602,
+          "n_samples": 29949,
           "n_test": 11260,
-          "n_train": 21333,
-          "precision": 0.7152477152477152,
+          "n_train": 18689,
+          "n_validation": 6997,
+          "pr_auc": 0.8312162810378761,
+          "precision": 0.7240684793554885,
           "random_state": 42,
-          "recall": 0.7687403067378942,
-          "roc_auc": 0.8038248274519214
+          "recall": 0.743408581768051,
+          "roc_auc": 0.8020121343465404,
+          "selection_split": "time_ordered_validation",
+          "subgroup_metrics": {
+            "age_band": {
+              "0-35": {
+                "false_positive_rate": 0.327392377296408,
+                "n": 7885,
+                "recall": 0.7708824917413875
+              },
+              "35-55": {
+                "false_positive_rate": 0.2542759407069555,
+                "n": 3278,
+                "recall": 0.6712598425196851
+              },
+              "55<=": {
+                "false_positive_rate": 0.07142857142857142,
+                "n": 97,
+                "recall": 0.5853658536585366
+              }
+            },
+            "disability": {
+              "N": {
+                "false_positive_rate": 0.29863447456956266,
+                "n": 10183,
+                "recall": 0.7415204678362574
+              },
+              "Y": {
+                "false_positive_rate": 0.3341584158415842,
+                "n": 1077,
+                "recall": 0.7578008915304606
+              }
+            },
+            "gender": {
+              "F": {
+                "false_positive_rate": 0.32424496644295303,
+                "n": 4761,
+                "recall": 0.7076146403029028
+              },
+              "M": {
+                "false_positive_rate": 0.2834363813862675,
+                "n": 6499,
+                "recall": 0.7682428488032691
+              }
+            },
+            "imd_band": {
+              "0-10%": {
+                "false_positive_rate": 0.28846153846153844,
+                "n": 1104,
+                "recall": 0.7281976744186046
+              },
+              "10-20": {
+                "false_positive_rate": 0.3054393305439331,
+                "n": 1198,
+                "recall": 0.7819444444444444
+              },
+              "20-30%": {
+                "false_positive_rate": 0.2965779467680608,
+                "n": 1252,
+                "recall": 0.7575757575757576
+              },
+              "30-40%": {
+                "false_positive_rate": 0.30715532286212915,
+                "n": 1200,
+                "recall": 0.7623604465709729
+              },
+              "40-50%": {
+                "false_positive_rate": 0.3315018315018315,
+                "n": 1147,
+                "recall": 0.757071547420965
+              },
+              "50-60%": {
+                "false_positive_rate": 0.302367941712204,
+                "n": 1103,
+                "recall": 0.7527075812274369
+              },
+              "60-70%": {
+                "false_positive_rate": 0.31645569620253167,
+                "n": 1043,
+                "recall": 0.7326530612244898
+              },
+              "70-80%": {
+                "false_positive_rate": 0.2851782363977486,
+                "n": 1004,
+                "recall": 0.7494692144373672
+              },
+              "80-90%": {
+                "false_positive_rate": 0.3403441682600382,
+                "n": 960,
+                "recall": 0.7162471395881007
+              },
+              "90-100%": {
+                "false_positive_rate": 0.25851703406813625,
+                "n": 854,
+                "recall": 0.6788732394366197
+              },
+              "<missing>": {
+                "false_positive_rate": 0.24904214559386972,
+                "n": 395,
+                "recall": 0.6268656716417911
+              }
+            },
+            "region": {
+              "East Anglian Region": {
+                "false_positive_rate": 0.3295880149812734,
+                "n": 1062,
+                "recall": 0.7727272727272727
+              },
+              "East Midlands Region": {
+                "false_positive_rate": 0.28350515463917525,
+                "n": 817,
+                "recall": 0.7668997668997669
+              },
+              "Ireland": {
+                "false_positive_rate": 0.16666666666666666,
+                "n": 442,
+                "recall": 0.625
+              },
+              "London Region": {
+                "false_positive_rate": 0.29148936170212764,
+                "n": 1080,
+                "recall": 0.7573770491803279
+              },
+              "North Region": {
+                "false_positive_rate": 0.29003021148036257,
+                "n": 638,
+                "recall": 0.7328990228013029
+              },
+              "North Western Region": {
+                "false_positive_rate": 0.33496332518337407,
+                "n": 958,
+                "recall": 0.7868852459016393
+              },
+              "Scotland": {
+                "false_positive_rate": 0.29624478442280944,
+                "n": 1381,
+                "recall": 0.6329305135951662
+              },
+              "South East Region": {
+                "false_positive_rate": 0.33423180592991913,
+                "n": 749,
+                "recall": 0.7671957671957672
+              },
+              "South Region": {
+                "false_positive_rate": 0.3159851301115242,
+                "n": 1036,
+                "recall": 0.7730923694779116
+              },
+              "South West Region": {
+                "false_positive_rate": 0.2740740740740741,
+                "n": 839,
+                "recall": 0.7741935483870968
+              },
+              "Wales": {
+                "false_positive_rate": 0.33146067415730335,
+                "n": 753,
+                "recall": 0.7027707808564232
+              },
+              "West Midlands Region": {
+                "false_positive_rate": 0.2821917808219178,
+                "n": 855,
+                "recall": 0.7755102040816326
+              },
+              "Yorkshire Region": {
+                "false_positive_rate": 0.33865814696485624,
+                "n": 650,
+                "recall": 0.7537091988130564
+              }
+            }
+          },
+          "test_at_validation_threshold": {
+            "accuracy": 0.7047069271758437,
+            "balanced_accuracy": 0.7009888157601181,
+            "confusion_matrix": [
+              [
+                3165,
+                2292
+              ],
+              [
+                1033,
+                4770
+              ]
+            ],
+            "f1": 0.7415468324912553,
+            "precision": 0.675446049277825,
+            "recall": 0.8219886265724625,
+            "threshold": 0.4
+          },
+          "threshold_diagnostics": [
+            {
+              "f1": 0.680225061540265,
+              "precision": 0.5154098943067768,
+              "predicted_positive_count": 11259,
+              "predicted_positive_rate": 0.999911190053286,
+              "recall": 1.0,
+              "threshold": 0.01
+            },
+            {
+              "f1": 0.6803845702896002,
+              "precision": 0.5155930697467792,
+              "predicted_positive_count": 11255,
+              "predicted_positive_rate": 0.9995559502664298,
+              "recall": 1.0,
+              "threshold": 0.02
+            },
+            {
+              "f1": 0.682160508354907,
+              "precision": 0.5179129813276154,
+              "predicted_positive_count": 11193,
+              "predicted_positive_rate": 0.9940497335701599,
+              "recall": 0.9989660520420472,
+              "threshold": 0.05
+            },
+            {
+              "f1": 0.6908392364029295,
+              "precision": 0.5300783049286043,
+              "predicted_positive_count": 10855,
+              "predicted_positive_rate": 0.9640319715808171,
+              "recall": 0.991556091676719,
+              "threshold": 0.1
+            },
+            {
+              "f1": 0.7148842905949848,
+              "precision": 0.5710607621009269,
+              "predicted_positive_count": 9710,
+              "predicted_positive_rate": 0.8623445825932504,
+              "recall": 0.9555402378080303,
+              "threshold": 0.2
+            },
+            {
+              "f1": 0.7355610270840661,
+              "precision": 0.6214931050879696,
+              "predicted_positive_count": 8412,
+              "predicted_positive_rate": 0.747069271758437,
+              "recall": 0.9009133206961917,
+              "threshold": 0.3
+            },
+            {
+              "f1": 0.7415468324912553,
+              "precision": 0.675446049277825,
+              "predicted_positive_count": 7062,
+              "predicted_positive_rate": 0.6271758436944938,
+              "recall": 0.8219886265724625,
+              "threshold": 0.4
+            },
+            {
+              "f1": 0.7343339269057916,
+              "precision": 0.7228714524207012,
+              "predicted_positive_count": 5990,
+              "predicted_positive_rate": 0.5319715808170515,
+              "recall": 0.7461657763225917,
+              "threshold": 0.5
+            }
+          ],
+          "validation_balanced_accuracy": 0.727614286510577,
+          "validation_f1": 0.7670958869858733,
+          "validation_pr_auc": 0.873811666323243,
+          "validation_roc_auc": 0.8236712781436955,
+          "validation_selected_threshold": 0.4
         },
         "hist_gradient_boosting": {
-          "accuracy": 0.7410301953818828,
-          "balanced_accuracy": 0.7411623928287931,
-          "f1": 0.7457272410184862,
-          "n_samples": 32593,
+          "accuracy": 0.730550621669627,
+          "balanced_accuracy": 0.7306346729530905,
+          "brier_score": 0.18624432321006978,
+          "confusion_matrix": [
+            [
+              4002,
+              1455
+            ],
+            [
+              1579,
+              4224
+            ]
+          ],
+          "f1": 0.7357603205016547,
+          "n_samples": 29949,
           "n_test": 11260,
-          "n_train": 21333,
-          "precision": 0.754810238305384,
+          "n_train": 18689,
+          "n_validation": 6997,
+          "pr_auc": 0.8255759288692645,
+          "precision": 0.7437929212889594,
           "random_state": 42,
-          "recall": 0.7368602447010167,
-          "roc_auc": 0.8067768148712423
+          "recall": 0.7278993623987593,
+          "roc_auc": 0.8027537272194427,
+          "selection_split": "time_ordered_validation",
+          "subgroup_metrics": {
+            "age_band": {
+              "0-35": {
+                "false_positive_rate": 0.291472443103921,
+                "n": 7885,
+                "recall": 0.7524775837659273
+              },
+              "35-55": {
+                "false_positive_rate": 0.2217787913340935,
+                "n": 3278,
+                "recall": 0.6640419947506562
+              },
+              "55<=": {
+                "false_positive_rate": 0.05357142857142857,
+                "n": 97,
+                "recall": 0.5609756097560976
+              }
+            },
+            "disability": {
+              "N": {
+                "false_positive_rate": 0.26459528992677617,
+                "n": 10183,
+                "recall": 0.7255360623781676
+              },
+              "Y": {
+                "false_positive_rate": 0.29207920792079206,
+                "n": 1077,
+                "recall": 0.7459138187221397
+              }
+            },
+            "gender": {
+              "F": {
+                "false_positive_rate": 0.30201342281879195,
+                "n": 4761,
+                "recall": 0.7042490534286916
+              },
+              "M": {
+                "false_positive_rate": 0.23917995444191345,
+                "n": 6499,
+                "recall": 0.7443082311733801
+              }
+            },
+            "imd_band": {
+              "0-10%": {
+                "false_positive_rate": 0.2668269230769231,
+                "n": 1104,
+                "recall": 0.7267441860465116
+              },
+              "10-20": {
+                "false_positive_rate": 0.2907949790794979,
+                "n": 1198,
+                "recall": 0.7652777777777777
+              },
+              "20-30%": {
+                "false_positive_rate": 0.2509505703422053,
+                "n": 1252,
+                "recall": 0.7575757575757576
+              },
+              "30-40%": {
+                "false_positive_rate": 0.28272251308900526,
+                "n": 1200,
+                "recall": 0.7496012759170654
+              },
+              "40-50%": {
+                "false_positive_rate": 0.2765567765567766,
+                "n": 1147,
+                "recall": 0.7321131447587355
+              },
+              "50-60%": {
+                "false_positive_rate": 0.2896174863387978,
+                "n": 1103,
+                "recall": 0.7382671480144405
+              },
+              "60-70%": {
+                "false_positive_rate": 0.27124773960216997,
+                "n": 1043,
+                "recall": 0.7204081632653061
+              },
+              "70-80%": {
+                "false_positive_rate": 0.2551594746716698,
+                "n": 1004,
+                "recall": 0.7006369426751592
+              },
+              "80-90%": {
+                "false_positive_rate": 0.28489483747609945,
+                "n": 960,
+                "recall": 0.7048054919908466
+              },
+              "90-100%": {
+                "false_positive_rate": 0.23046092184368738,
+                "n": 854,
+                "recall": 0.6676056338028169
+              },
+              "<missing>": {
+                "false_positive_rate": 0.19540229885057472,
+                "n": 395,
+                "recall": 0.5671641791044776
+              }
+            },
+            "region": {
+              "East Anglian Region": {
+                "false_positive_rate": 0.29775280898876405,
+                "n": 1062,
+                "recall": 0.7537878787878788
+              },
+              "East Midlands Region": {
+                "false_positive_rate": 0.24484536082474226,
+                "n": 817,
+                "recall": 0.7412587412587412
+              },
+              "Ireland": {
+                "false_positive_rate": 0.1434108527131783,
+                "n": 442,
+                "recall": 0.6358695652173914
+              },
+              "London Region": {
+                "false_positive_rate": 0.2531914893617021,
+                "n": 1080,
+                "recall": 0.7573770491803279
+              },
+              "North Region": {
+                "false_positive_rate": 0.27794561933534745,
+                "n": 638,
+                "recall": 0.6938110749185668
+              },
+              "North Western Region": {
+                "false_positive_rate": 0.2787286063569682,
+                "n": 958,
+                "recall": 0.7723132969034608
+              },
+              "Scotland": {
+                "false_positive_rate": 0.2517385257301808,
+                "n": 1381,
+                "recall": 0.620845921450151
+              },
+              "South East Region": {
+                "false_positive_rate": 0.2695417789757412,
+                "n": 749,
+                "recall": 0.7645502645502645
+              },
+              "South Region": {
+                "false_positive_rate": 0.275092936802974,
+                "n": 1036,
+                "recall": 0.7610441767068273
+              },
+              "South West Region": {
+                "false_positive_rate": 0.2641975308641975,
+                "n": 839,
+                "recall": 0.7511520737327189
+              },
+              "Wales": {
+                "false_positive_rate": 0.31179775280898875,
+                "n": 753,
+                "recall": 0.6624685138539043
+              },
+              "West Midlands Region": {
+                "false_positive_rate": 0.27671232876712326,
+                "n": 855,
+                "recall": 0.7448979591836735
+              },
+              "Yorkshire Region": {
+                "false_positive_rate": 0.29073482428115016,
+                "n": 650,
+                "recall": 0.7685459940652819
+              }
+            }
+          },
+          "test_at_validation_threshold": {
+            "accuracy": 0.719449378330373,
+            "balanced_accuracy": 0.7166793912812185,
+            "confusion_matrix": [
+              [
+                3419,
+                2038
+              ],
+              [
+                1121,
+                4682
+              ]
+            ],
+            "f1": 0.7477441507625968,
+            "precision": 0.6967261904761904,
+            "recall": 0.8068240565224883,
+            "threshold": 0.4
+          },
+          "threshold_diagnostics": [
+            {
+              "f1": 0.6801851960382114,
+              "precision": 0.5153641207815275,
+              "predicted_positive_count": 11260,
+              "predicted_positive_rate": 1.0,
+              "recall": 1.0,
+              "threshold": 0.01
+            },
+            {
+              "f1": 0.6801851960382114,
+              "precision": 0.5153641207815275,
+              "predicted_positive_count": 11260,
+              "predicted_positive_rate": 1.0,
+              "recall": 1.0,
+              "threshold": 0.02
+            },
+            {
+              "f1": 0.6803048065650644,
+              "precision": 0.5155014657546415,
+              "predicted_positive_count": 11257,
+              "predicted_positive_rate": 0.9997335701598579,
+              "recall": 1.0,
+              "threshold": 0.05
+            },
+            {
+              "f1": 0.6885617214043035,
+              "precision": 0.5263349735739019,
+              "predicted_positive_count": 10974,
+              "predicted_positive_rate": 0.9746003552397868,
+              "recall": 0.9953472341892124,
+              "threshold": 0.1
+            },
+            {
+              "f1": 0.7226923833890966,
+              "precision": 0.5834745762711865,
+              "predicted_positive_count": 9440,
+              "predicted_positive_rate": 0.8383658969804618,
+              "recall": 0.9491642254006548,
+              "threshold": 0.2
+            },
+            {
+              "f1": 0.7383486766398158,
+              "precision": 0.6336254783360079,
+              "predicted_positive_count": 8101,
+              "predicted_positive_rate": 0.719449378330373,
+              "recall": 0.8845424780286059,
+              "threshold": 0.3
+            },
+            {
+              "f1": 0.7477441507625968,
+              "precision": 0.6967261904761904,
+              "predicted_positive_count": 6720,
+              "predicted_positive_rate": 0.5968028419182948,
+              "recall": 0.8068240565224883,
+              "threshold": 0.4
+            },
+            {
+              "f1": 0.7357603205016547,
+              "precision": 0.7437929212889594,
+              "predicted_positive_count": 5679,
+              "predicted_positive_rate": 0.5043516873889876,
+              "recall": 0.7278993623987593,
+              "threshold": 0.5
+            }
+          ],
+          "validation_balanced_accuracy": 0.7570865165669579,
+          "validation_f1": 0.767248322147651,
+          "validation_pr_auc": 0.8877805862082688,
+          "validation_roc_auc": 0.8364601194175378,
+          "validation_selected_threshold": 0.4
         },
         "logistic_regression": {
-          "accuracy": 0.7251332149200711,
-          "balanced_accuracy": 0.7254115494658456,
-          "f1": 0.7287229380313788,
-          "n_samples": 32593,
+          "accuracy": 0.7075488454706927,
+          "balanced_accuracy": 0.707455458875432,
+          "brier_score": 0.2030130144642503,
+          "confusion_matrix": [
+            [
+              3844,
+              1613
+            ],
+            [
+              1680,
+              4123
+            ]
+          ],
+          "f1": 0.7146199844007279,
+          "n_samples": 29949,
           "n_test": 11260,
-          "n_train": 21333,
-          "precision": 0.741526935426329,
+          "n_train": 18689,
+          "n_validation": 6997,
+          "pr_auc": 0.7085477118928383,
+          "precision": 0.7187935843793585,
           "random_state": 42,
-          "recall": 0.7163536102016198,
-          "roc_auc": 0.7724506079220523
+          "recall": 0.7104945717732207,
+          "roc_auc": 0.7550900116086253,
+          "selection_split": "time_ordered_validation",
+          "subgroup_metrics": {
+            "age_band": {
+              "0-35": {
+                "false_positive_rate": 0.327118179325473,
+                "n": 7885,
+                "recall": 0.7428032090608778
+              },
+              "35-55": {
+                "false_positive_rate": 0.23660205245153934,
+                "n": 3278,
+                "recall": 0.6259842519685039
+              },
+              "55<=": {
+                "false_positive_rate": 0.08928571428571429,
+                "n": 97,
+                "recall": 0.5121951219512195
+              }
+            },
+            "disability": {
+              "N": {
+                "false_positive_rate": 0.2968533544429052,
+                "n": 10183,
+                "recall": 0.7091617933723197
+              },
+              "Y": {
+                "false_positive_rate": 0.27970297029702973,
+                "n": 1077,
+                "recall": 0.7206537890044576
+              }
+            },
+            "gender": {
+              "F": {
+                "false_positive_rate": 0.3011744966442953,
+                "n": 4761,
+                "recall": 0.6344131257888094
+              },
+              "M": {
+                "false_positive_rate": 0.29124633908233,
+                "n": 6499,
+                "recall": 0.7632807939287799
+              }
+            },
+            "imd_band": {
+              "0-10%": {
+                "false_positive_rate": 0.3004807692307692,
+                "n": 1104,
+                "recall": 0.7034883720930233
+              },
+              "10-20": {
+                "false_positive_rate": 0.30962343096234307,
+                "n": 1198,
+                "recall": 0.7472222222222222
+              },
+              "20-30%": {
+                "false_positive_rate": 0.27566539923954375,
+                "n": 1252,
+                "recall": 0.71900826446281
+              },
+              "30-40%": {
+                "false_positive_rate": 0.33507853403141363,
+                "n": 1200,
+                "recall": 0.7161084529505582
+              },
+              "40-50%": {
+                "false_positive_rate": 0.29120879120879123,
+                "n": 1147,
+                "recall": 0.7304492512479202
+              },
+              "50-60%": {
+                "false_positive_rate": 0.31876138433515483,
+                "n": 1103,
+                "recall": 0.7021660649819494
+              },
+              "60-70%": {
+                "false_positive_rate": 0.30198915009041594,
+                "n": 1043,
+                "recall": 0.7
+              },
+              "70-80%": {
+                "false_positive_rate": 0.2795497185741088,
+                "n": 1004,
+                "recall": 0.7070063694267515
+              },
+              "80-90%": {
+                "false_positive_rate": 0.3078393881453155,
+                "n": 960,
+                "recall": 0.700228832951945
+              },
+              "90-100%": {
+                "false_positive_rate": 0.2685370741482966,
+                "n": 854,
+                "recall": 0.6732394366197183
+              },
+              "<missing>": {
+                "false_positive_rate": 0.2222222222222222,
+                "n": 395,
+                "recall": 0.6044776119402985
+              }
+            },
+            "region": {
+              "East Anglian Region": {
+                "false_positive_rate": 0.32771535580524347,
+                "n": 1062,
+                "recall": 0.7007575757575758
+              },
+              "East Midlands Region": {
+                "false_positive_rate": 0.27835051546391754,
+                "n": 817,
+                "recall": 0.7156177156177156
+              },
+              "Ireland": {
+                "false_positive_rate": 0.16279069767441862,
+                "n": 442,
+                "recall": 0.5815217391304348
+              },
+              "London Region": {
+                "false_positive_rate": 0.274468085106383,
+                "n": 1080,
+                "recall": 0.7295081967213115
+              },
+              "North Region": {
+                "false_positive_rate": 0.283987915407855,
+                "n": 638,
+                "recall": 0.6938110749185668
+              },
+              "North Western Region": {
+                "false_positive_rate": 0.3374083129584352,
+                "n": 958,
+                "recall": 0.7704918032786885
+              },
+              "Scotland": {
+                "false_positive_rate": 0.2753824756606398,
+                "n": 1381,
+                "recall": 0.6359516616314199
+              },
+              "South East Region": {
+                "false_positive_rate": 0.3261455525606469,
+                "n": 749,
+                "recall": 0.7433862433862434
+              },
+              "South Region": {
+                "false_positive_rate": 0.3308550185873606,
+                "n": 1036,
+                "recall": 0.7349397590361446
+              },
+              "South West Region": {
+                "false_positive_rate": 0.27901234567901234,
+                "n": 839,
+                "recall": 0.7695852534562212
+              },
+              "Wales": {
+                "false_positive_rate": 0.32865168539325845,
+                "n": 753,
+                "recall": 0.6574307304785895
+              },
+              "West Midlands Region": {
+                "false_positive_rate": 0.29863013698630136,
+                "n": 855,
+                "recall": 0.7163265306122449
+              },
+              "Yorkshire Region": {
+                "false_positive_rate": 0.29073482428115016,
+                "n": 650,
+                "recall": 0.7240356083086054
+              }
+            }
+          },
+          "test_at_validation_threshold": {
+            "accuracy": 0.6982238010657194,
+            "balanced_accuracy": 0.6945241463100464,
+            "confusion_matrix": [
+              [
+                3133,
+                2324
+              ],
+              [
+                1074,
+                4729
+              ]
+            ],
+            "f1": 0.735687616677038,
+            "precision": 0.6704948248972069,
+            "recall": 0.8149233155264518,
+            "threshold": 0.4
+          },
+          "threshold_diagnostics": [
+            {
+              "f1": 0.6802042373378719,
+              "precision": 0.5157529369882521,
+              "predicted_positive_count": 11236,
+              "predicted_positive_rate": 0.9978685612788633,
+              "recall": 0.9986214027227296,
+              "threshold": 0.01
+            },
+            {
+              "f1": 0.6810912511759172,
+              "precision": 0.5169120928157073,
+              "predicted_positive_count": 11205,
+              "predicted_positive_rate": 0.9951154529307282,
+              "recall": 0.9981044287437533,
+              "threshold": 0.02
+            },
+            {
+              "f1": 0.6839642201291393,
+              "precision": 0.5211229463802131,
+              "predicted_positive_count": 11078,
+              "predicted_positive_rate": 0.9838365896980462,
+              "recall": 0.9948302602102361,
+              "threshold": 0.05
+            },
+            {
+              "f1": 0.6916984098192152,
+              "precision": 0.5327868852459017,
+              "predicted_positive_count": 10736,
+              "predicted_positive_rate": 0.9534635879218473,
+              "recall": 0.9856970532483198,
+              "threshold": 0.1
+            },
+            {
+              "f1": 0.715174290527407,
+              "precision": 0.5730453743121171,
+              "predicted_positive_count": 9631,
+              "predicted_positive_rate": 0.8553285968028419,
+              "recall": 0.9510597966569017,
+              "threshold": 0.2
+            },
+            {
+              "f1": 0.7337478801582815,
+              "precision": 0.621870882740448,
+              "predicted_positive_count": 8349,
+              "predicted_positive_rate": 0.7414742451154529,
+              "recall": 0.8947096329484749,
+              "threshold": 0.3
+            },
+            {
+              "f1": 0.735687616677038,
+              "precision": 0.6704948248972069,
+              "predicted_positive_count": 7053,
+              "predicted_positive_rate": 0.6263765541740675,
+              "recall": 0.8149233155264518,
+              "threshold": 0.4
+            },
+            {
+              "f1": 0.7146199844007279,
+              "precision": 0.7187935843793585,
+              "predicted_positive_count": 5736,
+              "predicted_positive_rate": 0.5094138543516874,
+              "recall": 0.7104945717732207,
+              "threshold": 0.5
+            }
+          ],
+          "validation_balanced_accuracy": 0.6953379406506317,
+          "validation_f1": 0.7325448302174743,
+          "validation_pr_auc": 0.8113952785843555,
+          "validation_roc_auc": 0.773404265054688,
+          "validation_selected_threshold": 0.4
         },
         "random_forest": {
-          "accuracy": 0.7326820603907638,
-          "balanced_accuracy": 0.7323201514915967,
-          "f1": 0.74154216039842,
-          "n_samples": 32593,
+          "accuracy": 0.7238898756660747,
+          "balanced_accuracy": 0.7239375846840546,
+          "brier_score": 0.18198228750198703,
+          "confusion_matrix": [
+            [
+              3959,
+              1498
+            ],
+            [
+              1611,
+              4192
+            ]
+          ],
+          "f1": 0.7294875141390411,
+          "n_samples": 29949,
           "n_test": 11260,
-          "n_train": 21333,
-          "precision": 0.7390039363340749,
+          "n_train": 18689,
+          "n_validation": 6997,
+          "pr_auc": 0.83784588637667,
+          "precision": 0.7367311072056238,
           "random_state": 42,
-          "recall": 0.7440978804066862,
-          "roc_auc": 0.8152453071687848
+          "recall": 0.7223849732896778,
+          "roc_auc": 0.8064594968682037,
+          "selection_split": "time_ordered_validation",
+          "subgroup_metrics": {
+            "age_band": {
+              "0-35": {
+                "false_positive_rate": 0.2964080065807513,
+                "n": 7885,
+                "recall": 0.7451628126474752
+              },
+              "35-55": {
+                "false_positive_rate": 0.2354618015963512,
+                "n": 3278,
+                "recall": 0.6633858267716536
+              },
+              "55<=": {
+                "false_positive_rate": 0.07142857142857142,
+                "n": 97,
+                "recall": 0.5609756097560976
+              }
+            },
+            "disability": {
+              "N": {
+                "false_positive_rate": 0.2709281614882248,
+                "n": 10183,
+                "recall": 0.7196881091617934
+              },
+              "Y": {
+                "false_positive_rate": 0.3193069306930693,
+                "n": 1077,
+                "recall": 0.7429420505200595
+              }
+            },
+            "gender": {
+              "F": {
+                "false_positive_rate": 0.311241610738255,
+                "n": 4761,
+                "recall": 0.7050904501472445
+              },
+              "M": {
+                "false_positive_rate": 0.2460136674259681,
+                "n": 6499,
+                "recall": 0.7343841214244017
+              }
+            },
+            "imd_band": {
+              "0-10%": {
+                "false_positive_rate": 0.27884615384615385,
+                "n": 1104,
+                "recall": 0.7296511627906976
+              },
+              "10-20": {
+                "false_positive_rate": 0.2907949790794979,
+                "n": 1198,
+                "recall": 0.7597222222222222
+              },
+              "20-30%": {
+                "false_positive_rate": 0.2661596958174905,
+                "n": 1252,
+                "recall": 0.7506887052341598
+              },
+              "30-40%": {
+                "false_positive_rate": 0.28970331588132636,
+                "n": 1200,
+                "recall": 0.74481658692185
+              },
+              "40-50%": {
+                "false_positive_rate": 0.2875457875457875,
+                "n": 1147,
+                "recall": 0.7321131447587355
+              },
+              "50-60%": {
+                "false_positive_rate": 0.2768670309653916,
+                "n": 1103,
+                "recall": 0.723826714801444
+              },
+              "60-70%": {
+                "false_positive_rate": 0.27848101265822783,
+                "n": 1043,
+                "recall": 0.6836734693877551
+              },
+              "70-80%": {
+                "false_positive_rate": 0.2589118198874296,
+                "n": 1004,
+                "recall": 0.7112526539278131
+              },
+              "80-90%": {
+                "false_positive_rate": 0.3078393881453155,
+                "n": 960,
+                "recall": 0.7048054919908466
+              },
+              "90-100%": {
+                "false_positive_rate": 0.23847695390781562,
+                "n": 854,
+                "recall": 0.6591549295774648
+              },
+              "<missing>": {
+                "false_positive_rate": 0.21455938697318008,
+                "n": 395,
+                "recall": 0.582089552238806
+              }
+            },
+            "region": {
+              "East Anglian Region": {
+                "false_positive_rate": 0.29213483146067415,
+                "n": 1062,
+                "recall": 0.7329545454545454
+              },
+              "East Midlands Region": {
+                "false_positive_rate": 0.2654639175257732,
+                "n": 817,
+                "recall": 0.745920745920746
+              },
+              "Ireland": {
+                "false_positive_rate": 0.17829457364341086,
+                "n": 442,
+                "recall": 0.6032608695652174
+              },
+              "London Region": {
+                "false_positive_rate": 0.25957446808510637,
+                "n": 1080,
+                "recall": 0.7459016393442623
+              },
+              "North Region": {
+                "false_positive_rate": 0.256797583081571,
+                "n": 638,
+                "recall": 0.6905537459283387
+              },
+              "North Western Region": {
+                "false_positive_rate": 0.28117359413202936,
+                "n": 958,
+                "recall": 0.7686703096539163
+              },
+              "Scotland": {
+                "false_positive_rate": 0.27399165507649514,
+                "n": 1381,
+                "recall": 0.6238670694864048
+              },
+              "South East Region": {
+                "false_positive_rate": 0.29649595687331537,
+                "n": 749,
+                "recall": 0.7671957671957672
+              },
+              "South Region": {
+                "false_positive_rate": 0.2862453531598513,
+                "n": 1036,
+                "recall": 0.7389558232931727
+              },
+              "South West Region": {
+                "false_positive_rate": 0.24938271604938272,
+                "n": 839,
+                "recall": 0.7511520737327189
+              },
+              "Wales": {
+                "false_positive_rate": 0.32303370786516855,
+                "n": 753,
+                "recall": 0.6801007556675063
+              },
+              "West Midlands Region": {
+                "false_positive_rate": 0.26301369863013696,
+                "n": 855,
+                "recall": 0.7448979591836735
+              },
+              "Yorkshire Region": {
+                "false_positive_rate": 0.31309904153354634,
+                "n": 650,
+                "recall": 0.7507418397626113
+              }
+            }
+          },
+          "test_at_validation_threshold": {
+            "accuracy": 0.7082593250444049,
+            "balanced_accuracy": 0.7048177263306933,
+            "confusion_matrix": [
+              [
+                3235,
+                2222
+              ],
+              [
+                1063,
+                4740
+              ]
+            ],
+            "f1": 0.7426556991774383,
+            "precision": 0.6808388394139615,
+            "recall": 0.8168188867826986,
+            "threshold": 0.4
+          },
+          "threshold_diagnostics": [
+            {
+              "f1": 0.6801851960382114,
+              "precision": 0.5153641207815275,
+              "predicted_positive_count": 11260,
+              "predicted_positive_rate": 1.0,
+              "recall": 1.0,
+              "threshold": 0.01
+            },
+            {
+              "f1": 0.6802649317156086,
+              "precision": 0.5154556759637591,
+              "predicted_positive_count": 11258,
+              "predicted_positive_rate": 0.999822380106572,
+              "recall": 1.0,
+              "threshold": 0.02
+            },
+            {
+              "f1": 0.6821550405834608,
+              "precision": 0.5178140905437986,
+              "predicted_positive_count": 11199,
+              "predicted_positive_rate": 0.9945825932504441,
+              "recall": 0.9993107013613648,
+              "threshold": 0.05
+            },
+            {
+              "f1": 0.6901754175896545,
+              "precision": 0.5288073394495413,
+              "predicted_positive_count": 10900,
+              "predicted_positive_rate": 0.9680284191829485,
+              "recall": 0.9932793382733069,
+              "threshold": 0.1
+            },
+            {
+              "f1": 0.71511888739345,
+              "precision": 0.5692857142857143,
+              "predicted_positive_count": 9800,
+              "predicted_positive_rate": 0.8703374777975134,
+              "recall": 0.9613992762364294,
+              "threshold": 0.2
+            },
+            {
+              "f1": 0.7373018668545263,
+              "precision": 0.6235700667302193,
+              "predicted_positive_count": 8392,
+              "predicted_positive_rate": 0.7452930728241564,
+              "recall": 0.9017749439944857,
+              "threshold": 0.3
+            },
+            {
+              "f1": 0.7426556991774383,
+              "precision": 0.6808388394139615,
+              "predicted_positive_count": 6962,
+              "predicted_positive_rate": 0.6182948490230906,
+              "recall": 0.8168188867826986,
+              "threshold": 0.4
+            },
+            {
+              "f1": 0.7298422056528524,
+              "precision": 0.7344268016053045,
+              "predicted_positive_count": 5731,
+              "predicted_positive_rate": 0.5089698046181172,
+              "recall": 0.7253144925038773,
+              "threshold": 0.5
+            }
+          ],
+          "validation_balanced_accuracy": 0.7385545020345241,
+          "validation_f1": 0.7678914351555499,
+          "validation_pr_auc": 0.8783267595637669,
+          "validation_roc_auc": 0.8236865859512597,
+          "validation_selected_threshold": 0.4
         }
       },
       "test_presentations": [
@@ -69,56 +1149,1136 @@
       ]
     },
     "60": {
-      "best_model": "random_forest",
+      "best_model": "hist_gradient_boosting",
       "cutoff_days": 60,
       "models": {
         "extra_trees": {
-          "accuracy": 0.7613676731793961,
-          "balanced_accuracy": 0.759478622063348,
-          "f1": 0.7800245599672534,
-          "n_samples": 32593,
+          "accuracy": 0.7520426287744227,
+          "balanced_accuracy": 0.7503168522180413,
+          "brier_score": 0.1625318833261914,
+          "confusion_matrix": [
+            [
+              3788,
+              1669
+            ],
+            [
+              1123,
+              4680
+            ]
+          ],
+          "f1": 0.7702435813034891,
+          "n_samples": 29949,
           "n_test": 11260,
-          "n_train": 21333,
-          "precision": 0.7429819089207735,
+          "n_train": 18689,
+          "n_validation": 6997,
+          "pr_auc": 0.8771797874850441,
+          "precision": 0.7371239565285872,
           "random_state": 42,
-          "recall": 0.8209546786145098,
-          "roc_auc": 0.8528798191655275
+          "recall": 0.8064794072031708,
+          "roc_auc": 0.8493952105491871,
+          "selection_split": "time_ordered_validation",
+          "subgroup_metrics": {
+            "age_band": {
+              "0-35": {
+                "false_positive_rate": 0.3188922401974225,
+                "n": 7885,
+                "recall": 0.8289287399716847
+              },
+              "35-55": {
+                "false_positive_rate": 0.2844925883694413,
+                "n": 3278,
+                "recall": 0.7486876640419947
+              },
+              "55<=": {
+                "false_positive_rate": 0.125,
+                "n": 97,
+                "recall": 0.6341463414634146
+              }
+            },
+            "disability": {
+              "N": {
+                "false_positive_rate": 0.30120720364140113,
+                "n": 10183,
+                "recall": 0.8033138401559454
+              },
+              "Y": {
+                "false_positive_rate": 0.36386138613861385,
+                "n": 1077,
+                "recall": 0.8306092124814265
+              }
+            },
+            "gender": {
+              "F": {
+                "false_positive_rate": 0.42827181208053694,
+                "n": 4761,
+                "recall": 0.8308792595708877
+              },
+              "M": {
+                "false_positive_rate": 0.21086885779368694,
+                "n": 6499,
+                "recall": 0.7895504962054875
+              }
+            },
+            "imd_band": {
+              "0-10%": {
+                "false_positive_rate": 0.3798076923076923,
+                "n": 1104,
+                "recall": 0.8357558139534884
+              },
+              "10-20": {
+                "false_positive_rate": 0.35355648535564854,
+                "n": 1198,
+                "recall": 0.8402777777777778
+              },
+              "20-30%": {
+                "false_positive_rate": 0.30798479087452474,
+                "n": 1252,
+                "recall": 0.8305785123966942
+              },
+              "30-40%": {
+                "false_positive_rate": 0.3298429319371728,
+                "n": 1200,
+                "recall": 0.8070175438596491
+              },
+              "40-50%": {
+                "false_positive_rate": 0.34798534798534797,
+                "n": 1147,
+                "recall": 0.8252911813643927
+              },
+              "50-60%": {
+                "false_positive_rate": 0.30783242258652094,
+                "n": 1103,
+                "recall": 0.7978339350180506
+              },
+              "60-70%": {
+                "false_positive_rate": 0.31103074141048825,
+                "n": 1043,
+                "recall": 0.7857142857142857
+              },
+              "70-80%": {
+                "false_positive_rate": 0.275797373358349,
+                "n": 1004,
+                "recall": 0.7898089171974523
+              },
+              "80-90%": {
+                "false_positive_rate": 0.30592734225621415,
+                "n": 960,
+                "recall": 0.7757437070938215
+              },
+              "90-100%": {
+                "false_positive_rate": 0.23446893787575152,
+                "n": 854,
+                "recall": 0.7633802816901408
+              },
+              "<missing>": {
+                "false_positive_rate": 0.13793103448275862,
+                "n": 395,
+                "recall": 0.6417910447761194
+              }
+            },
+            "region": {
+              "East Anglian Region": {
+                "false_positive_rate": 0.31835205992509363,
+                "n": 1062,
+                "recall": 0.7992424242424242
+              },
+              "East Midlands Region": {
+                "false_positive_rate": 0.3015463917525773,
+                "n": 817,
+                "recall": 0.8391608391608392
+              },
+              "Ireland": {
+                "false_positive_rate": 0.41472868217054265,
+                "n": 442,
+                "recall": 0.7771739130434783
+              },
+              "London Region": {
+                "false_positive_rate": 0.2978723404255319,
+                "n": 1080,
+                "recall": 0.8245901639344262
+              },
+              "North Region": {
+                "false_positive_rate": 0.2084592145015106,
+                "n": 638,
+                "recall": 0.7719869706840391
+              },
+              "North Western Region": {
+                "false_positive_rate": 0.31784841075794623,
+                "n": 958,
+                "recall": 0.8342440801457195
+              },
+              "Scotland": {
+                "false_positive_rate": 0.2698191933240612,
+                "n": 1381,
+                "recall": 0.7190332326283988
+              },
+              "South East Region": {
+                "false_positive_rate": 0.33962264150943394,
+                "n": 749,
+                "recall": 0.8386243386243386
+              },
+              "South Region": {
+                "false_positive_rate": 0.2825278810408922,
+                "n": 1036,
+                "recall": 0.7971887550200804
+              },
+              "South West Region": {
+                "false_positive_rate": 0.2691358024691358,
+                "n": 839,
+                "recall": 0.8248847926267281
+              },
+              "Wales": {
+                "false_positive_rate": 0.3848314606741573,
+                "n": 753,
+                "recall": 0.7909319899244333
+              },
+              "West Midlands Region": {
+                "false_positive_rate": 0.32054794520547947,
+                "n": 855,
+                "recall": 0.8387755102040816
+              },
+              "Yorkshire Region": {
+                "false_positive_rate": 0.3226837060702875,
+                "n": 650,
+                "recall": 0.8427299703264095
+              }
+            }
+          },
+          "test_at_validation_threshold": {
+            "accuracy": 0.7523090586145649,
+            "balanced_accuracy": 0.7504933926266583,
+            "confusion_matrix": [
+              [
+                3773,
+                1684
+              ],
+              [
+                1105,
+                4698
+              ]
+            ],
+            "f1": 0.7711120229790727,
+            "precision": 0.7361328737073017,
+            "recall": 0.8095812510770292,
+            "threshold": 0.5
+          },
+          "threshold_diagnostics": [
+            {
+              "f1": 0.680225061540265,
+              "precision": 0.5154098943067768,
+              "predicted_positive_count": 11259,
+              "predicted_positive_rate": 0.999911190053286,
+              "recall": 1.0,
+              "threshold": 0.01
+            },
+            {
+              "f1": 0.6803470919324578,
+              "precision": 0.5155958411090376,
+              "predicted_positive_count": 11253,
+              "predicted_positive_rate": 0.9993783303730017,
+              "recall": 0.9998276753403412,
+              "threshold": 0.02
+            },
+            {
+              "f1": 0.6833549299092944,
+              "precision": 0.5191051454138702,
+              "predicted_positive_count": 11175,
+              "predicted_positive_rate": 0.9924511545293073,
+              "recall": 0.9996553506806825,
+              "threshold": 0.05
+            },
+            {
+              "f1": 0.694583358438272,
+              "precision": 0.534000370576246,
+              "predicted_positive_count": 10794,
+              "predicted_positive_rate": 0.9586145648312611,
+              "recall": 0.9932793382733069,
+              "threshold": 0.1
+            },
+            {
+              "f1": 0.729787648548607,
+              "precision": 0.5855564818674448,
+              "predicted_positive_count": 9596,
+              "predicted_positive_rate": 0.8522202486678508,
+              "recall": 0.9682922626227813,
+              "threshold": 0.2
+            },
+            {
+              "f1": 0.7576013513513513,
+              "precision": 0.6403331350386675,
+              "predicted_positive_count": 8405,
+              "predicted_positive_rate": 0.7464476021314387,
+              "recall": 0.9274513182836464,
+              "threshold": 0.3
+            },
+            {
+              "f1": 0.7717407800880255,
+              "precision": 0.6894915254237288,
+              "predicted_positive_count": 7375,
+              "predicted_positive_rate": 0.6549733570159858,
+              "recall": 0.8762708943649836,
+              "threshold": 0.4
+            },
+            {
+              "f1": 0.7711120229790727,
+              "precision": 0.7361328737073017,
+              "predicted_positive_count": 6382,
+              "predicted_positive_rate": 0.566785079928952,
+              "recall": 0.8095812510770292,
+              "threshold": 0.5
+            }
+          ],
+          "validation_balanced_accuracy": 0.7716407057897623,
+          "validation_f1": 0.8098990396454075,
+          "validation_pr_auc": 0.9122149233168668,
+          "validation_roc_auc": 0.8710010224617118,
+          "validation_selected_threshold": 0.5
         },
         "hist_gradient_boosting": {
-          "accuracy": 0.7598579040852576,
-          "balanced_accuracy": 0.7582870177258191,
-          "f1": 0.7764919821458093,
-          "n_samples": 32593,
+          "accuracy": 0.7624333925399644,
+          "balanced_accuracy": 0.7613320358300135,
+          "brier_score": 0.16834842259547328,
+          "confusion_matrix": [
+            [
+              3959,
+              1498
+            ],
+            [
+              1177,
+              4626
+            ]
+          ],
+          "f1": 0.7757189569883458,
+          "n_samples": 29949,
           "n_test": 11260,
-          "n_train": 21333,
-          "precision": 0.7461477362986497,
+          "n_train": 18689,
+          "n_validation": 6997,
+          "pr_auc": 0.8702238034564109,
+          "precision": 0.755388634879164,
           "random_state": 42,
-          "recall": 0.8094089264173703,
-          "roc_auc": 0.8465321485910352
+          "recall": 0.7971738755815957,
+          "roc_auc": 0.8461688678718278,
+          "selection_split": "time_ordered_validation",
+          "subgroup_metrics": {
+            "age_band": {
+              "0-35": {
+                "false_positive_rate": 0.2799561283246504,
+                "n": 7885,
+                "recall": 0.8192543652666352
+              },
+              "35-55": {
+                "false_positive_rate": 0.26795895096921324,
+                "n": 3278,
+                "recall": 0.7408136482939632
+              },
+              "55<=": {
+                "false_positive_rate": 0.125,
+                "n": 97,
+                "recall": 0.6097560975609756
+              }
+            },
+            "disability": {
+              "N": {
+                "false_positive_rate": 0.2711260637245201,
+                "n": 10183,
+                "recall": 0.7925925925925926
+              },
+              "Y": {
+                "false_positive_rate": 0.31683168316831684,
+                "n": 1077,
+                "recall": 0.8320950965824666
+              }
+            },
+            "gender": {
+              "F": {
+                "false_positive_rate": 0.40981543624161076,
+                "n": 4761,
+                "recall": 0.8304585612116113
+              },
+              "M": {
+                "false_positive_rate": 0.16954116498535632,
+                "n": 6499,
+                "recall": 0.7740805604203153
+              }
+            },
+            "imd_band": {
+              "0-10%": {
+                "false_positive_rate": 0.35336538461538464,
+                "n": 1104,
+                "recall": 0.8255813953488372
+              },
+              "10-20": {
+                "false_positive_rate": 0.3158995815899582,
+                "n": 1198,
+                "recall": 0.8416666666666667
+              },
+              "20-30%": {
+                "false_positive_rate": 0.2889733840304182,
+                "n": 1252,
+                "recall": 0.8236914600550964
+              },
+              "30-40%": {
+                "false_positive_rate": 0.2879581151832461,
+                "n": 1200,
+                "recall": 0.810207336523126
+              },
+              "40-50%": {
+                "false_positive_rate": 0.304029304029304,
+                "n": 1147,
+                "recall": 0.8069883527454242
+              },
+              "50-60%": {
+                "false_positive_rate": 0.28233151183970856,
+                "n": 1103,
+                "recall": 0.8032490974729242
+              },
+              "60-70%": {
+                "false_positive_rate": 0.2875226039783002,
+                "n": 1043,
+                "recall": 0.7714285714285715
+              },
+              "70-80%": {
+                "false_positive_rate": 0.25140712945590993,
+                "n": 1004,
+                "recall": 0.7643312101910829
+              },
+              "80-90%": {
+                "false_positive_rate": 0.2734225621414914,
+                "n": 960,
+                "recall": 0.7551487414187643
+              },
+              "90-100%": {
+                "false_positive_rate": 0.20040080160320642,
+                "n": 854,
+                "recall": 0.7380281690140845
+              },
+              "<missing>": {
+                "false_positive_rate": 0.09961685823754789,
+                "n": 395,
+                "recall": 0.6417910447761194
+              }
+            },
+            "region": {
+              "East Anglian Region": {
+                "false_positive_rate": 0.28277153558052437,
+                "n": 1062,
+                "recall": 0.7821969696969697
+              },
+              "East Midlands Region": {
+                "false_positive_rate": 0.24484536082474226,
+                "n": 817,
+                "recall": 0.8344988344988346
+              },
+              "Ireland": {
+                "false_positive_rate": 0.4108527131782946,
+                "n": 442,
+                "recall": 0.782608695652174
+              },
+              "London Region": {
+                "false_positive_rate": 0.2723404255319149,
+                "n": 1080,
+                "recall": 0.8327868852459016
+              },
+              "North Region": {
+                "false_positive_rate": 0.16314199395770393,
+                "n": 638,
+                "recall": 0.749185667752443
+              },
+              "North Western Region": {
+                "false_positive_rate": 0.2616136919315403,
+                "n": 958,
+                "recall": 0.819672131147541
+              },
+              "Scotland": {
+                "false_positive_rate": 0.23783031988873435,
+                "n": 1381,
+                "recall": 0.702416918429003
+              },
+              "South East Region": {
+                "false_positive_rate": 0.31805929919137466,
+                "n": 749,
+                "recall": 0.8121693121693122
+              },
+              "South Region": {
+                "false_positive_rate": 0.258364312267658,
+                "n": 1036,
+                "recall": 0.7971887550200804
+              },
+              "South West Region": {
+                "false_positive_rate": 0.23950617283950618,
+                "n": 839,
+                "recall": 0.8087557603686636
+              },
+              "Wales": {
+                "false_positive_rate": 0.3707865168539326,
+                "n": 753,
+                "recall": 0.7884130982367759
+              },
+              "West Midlands Region": {
+                "false_positive_rate": 0.29315068493150687,
+                "n": 855,
+                "recall": 0.8326530612244898
+              },
+              "Yorkshire Region": {
+                "false_positive_rate": 0.2971246006389776,
+                "n": 650,
+                "recall": 0.8367952522255193
+              }
+            }
+          },
+          "test_at_validation_threshold": {
+            "accuracy": 0.7491119005328597,
+            "balanced_accuracy": 0.7458291006108542,
+            "confusion_matrix": [
+              [
+                3487,
+                1970
+              ],
+              [
+                855,
+                4948
+              ]
+            ],
+            "f1": 0.7779262636585174,
+            "precision": 0.7152356172304134,
+            "recall": 0.8526624159917284,
+            "threshold": 0.4
+          },
+          "threshold_diagnostics": [
+            {
+              "f1": 0.6801851960382114,
+              "precision": 0.5153641207815275,
+              "predicted_positive_count": 11260,
+              "predicted_positive_rate": 1.0,
+              "recall": 1.0,
+              "threshold": 0.01
+            },
+            {
+              "f1": 0.6801851960382114,
+              "precision": 0.5153641207815275,
+              "predicted_positive_count": 11260,
+              "predicted_positive_rate": 1.0,
+              "recall": 1.0,
+              "threshold": 0.02
+            },
+            {
+              "f1": 0.6807536538122909,
+              "precision": 0.516200818942496,
+              "predicted_positive_count": 11234,
+              "predicted_positive_rate": 0.9976909413854351,
+              "recall": 0.9993107013613648,
+              "threshold": 0.05
+            },
+            {
+              "f1": 0.7018144052782699,
+              "precision": 0.5436305129661178,
+              "predicted_positive_count": 10566,
+              "predicted_positive_rate": 0.9383658969804618,
+              "recall": 0.9898328450801309,
+              "threshold": 0.1
+            },
+            {
+              "f1": 0.7471054235222425,
+              "precision": 0.615324559446799,
+              "predicted_positive_count": 8966,
+              "predicted_positive_rate": 0.7962699822380107,
+              "recall": 0.950715147337584,
+              "threshold": 0.2
+            },
+            {
+              "f1": 0.7697165516228521,
+              "precision": 0.6706333973128599,
+              "predicted_positive_count": 7815,
+              "predicted_positive_rate": 0.6940497335701599,
+              "recall": 0.903153541271756,
+              "threshold": 0.3
+            },
+            {
+              "f1": 0.7779262636585174,
+              "precision": 0.7152356172304134,
+              "predicted_positive_count": 6918,
+              "predicted_positive_rate": 0.6143872113676732,
+              "recall": 0.8526624159917284,
+              "threshold": 0.4
+            },
+            {
+              "f1": 0.7757189569883458,
+              "precision": 0.755388634879164,
+              "predicted_positive_count": 6124,
+              "predicted_positive_rate": 0.5438721136767318,
+              "recall": 0.7971738755815957,
+              "threshold": 0.5
+            }
+          ],
+          "validation_balanced_accuracy": 0.8009155150453287,
+          "validation_f1": 0.8146591356889531,
+          "validation_pr_auc": 0.9183032407936635,
+          "validation_roc_auc": 0.8780730215698656,
+          "validation_selected_threshold": 0.4
         },
         "logistic_regression": {
-          "accuracy": 0.7449378330373002,
-          "balanced_accuracy": 0.7427901456062849,
-          "f1": 0.7665799739921977,
-          "n_samples": 32593,
+          "accuracy": 0.7372113676731794,
+          "balanced_accuracy": 0.7348078065312909,
+          "brier_score": 0.1816333387737619,
+          "confusion_matrix": [
+            [
+              3583,
+              1874
+            ],
+            [
+              1085,
+              4718
+            ]
+          ],
+          "f1": 0.7612747075433642,
+          "n_samples": 29949,
           "n_test": 11260,
-          "n_train": 21333,
-          "precision": 0.7254268574065529,
+          "n_train": 18689,
+          "n_validation": 6997,
+          "pr_auc": 0.7893699462784459,
+          "precision": 0.7157160194174758,
           "random_state": 42,
-          "recall": 0.8126830949508874,
-          "roc_auc": 0.8144854144717535
+          "recall": 0.8130277442702051,
+          "roc_auc": 0.8049338536357014,
+          "selection_split": "time_ordered_validation",
+          "subgroup_metrics": {
+            "age_band": {
+              "0-35": {
+                "false_positive_rate": 0.3786673978612558,
+                "n": 7885,
+                "recall": 0.8430863614912695
+              },
+              "35-55": {
+                "false_positive_rate": 0.27879133409350054,
+                "n": 3278,
+                "recall": 0.7349081364829396
+              },
+              "55<=": {
+                "false_positive_rate": 0.07142857142857142,
+                "n": 97,
+                "recall": 0.6097560975609756
+              }
+            },
+            "disability": {
+              "N": {
+                "false_positive_rate": 0.34138135760934096,
+                "n": 10183,
+                "recall": 0.8118908382066277
+              },
+              "Y": {
+                "false_positive_rate": 0.3688118811881188,
+                "n": 1077,
+                "recall": 0.8216939078751857
+              }
+            },
+            "gender": {
+              "F": {
+                "false_positive_rate": 0.42575503355704697,
+                "n": 4761,
+                "recall": 0.7951198990323938
+              },
+              "M": {
+                "false_positive_rate": 0.2795314025382363,
+                "n": 6499,
+                "recall": 0.825452422650321
+              }
+            },
+            "imd_band": {
+              "0-10%": {
+                "false_positive_rate": 0.4254807692307692,
+                "n": 1104,
+                "recall": 0.8372093023255814
+              },
+              "10-20": {
+                "false_positive_rate": 0.37447698744769875,
+                "n": 1198,
+                "recall": 0.8527777777777777
+              },
+              "20-30%": {
+                "false_positive_rate": 0.3288973384030418,
+                "n": 1252,
+                "recall": 0.8264462809917356
+              },
+              "30-40%": {
+                "false_positive_rate": 0.3542757417102967,
+                "n": 1200,
+                "recall": 0.7942583732057417
+              },
+              "40-50%": {
+                "false_positive_rate": 0.3772893772893773,
+                "n": 1147,
+                "recall": 0.8236272878535774
+              },
+              "50-60%": {
+                "false_positive_rate": 0.3424408014571949,
+                "n": 1103,
+                "recall": 0.7996389891696751
+              },
+              "60-70%": {
+                "false_positive_rate": 0.3616636528028933,
+                "n": 1043,
+                "recall": 0.8122448979591836
+              },
+              "70-80%": {
+                "false_positive_rate": 0.30956848030018763,
+                "n": 1004,
+                "recall": 0.7834394904458599
+              },
+              "80-90%": {
+                "false_positive_rate": 0.3441682600382409,
+                "n": 960,
+                "recall": 0.8032036613272311
+              },
+              "90-100%": {
+                "false_positive_rate": 0.2925851703406814,
+                "n": 854,
+                "recall": 0.780281690140845
+              },
+              "<missing>": {
+                "false_positive_rate": 0.21839080459770116,
+                "n": 395,
+                "recall": 0.7238805970149254
+              }
+            },
+            "region": {
+              "East Anglian Region": {
+                "false_positive_rate": 0.38202247191011235,
+                "n": 1062,
+                "recall": 0.7859848484848485
+              },
+              "East Midlands Region": {
+                "false_positive_rate": 0.35309278350515466,
+                "n": 817,
+                "recall": 0.8531468531468531
+              },
+              "Ireland": {
+                "false_positive_rate": 0.3875968992248062,
+                "n": 442,
+                "recall": 0.8369565217391305
+              },
+              "London Region": {
+                "false_positive_rate": 0.30638297872340425,
+                "n": 1080,
+                "recall": 0.8278688524590164
+              },
+              "North Region": {
+                "false_positive_rate": 0.27794561933534745,
+                "n": 638,
+                "recall": 0.7882736156351792
+              },
+              "North Western Region": {
+                "false_positive_rate": 0.3471882640586797,
+                "n": 958,
+                "recall": 0.8342440801457195
+              },
+              "Scotland": {
+                "false_positive_rate": 0.31154381084840055,
+                "n": 1381,
+                "recall": 0.729607250755287
+              },
+              "South East Region": {
+                "false_positive_rate": 0.38005390835579517,
+                "n": 749,
+                "recall": 0.8359788359788359
+              },
+              "South Region": {
+                "false_positive_rate": 0.3345724907063197,
+                "n": 1036,
+                "recall": 0.8353413654618473
+              },
+              "South West Region": {
+                "false_positive_rate": 0.30617283950617286,
+                "n": 839,
+                "recall": 0.8317972350230415
+              },
+              "Wales": {
+                "false_positive_rate": 0.38764044943820225,
+                "n": 753,
+                "recall": 0.7858942065491183
+              },
+              "West Midlands Region": {
+                "false_positive_rate": 0.3643835616438356,
+                "n": 855,
+                "recall": 0.8346938775510204
+              },
+              "Yorkshire Region": {
+                "false_positive_rate": 0.36741214057507987,
+                "n": 650,
+                "recall": 0.8338278931750742
+              }
+            }
+          },
+          "test_at_validation_threshold": {
+            "accuracy": 0.7372113676731794,
+            "balanced_accuracy": 0.7348078065312909,
+            "confusion_matrix": [
+              [
+                3583,
+                1874
+              ],
+              [
+                1085,
+                4718
+              ]
+            ],
+            "f1": 0.7612747075433642,
+            "precision": 0.7157160194174758,
+            "recall": 0.8130277442702051,
+            "threshold": 0.5
+          },
+          "threshold_diagnostics": [
+            {
+              "f1": 0.681305777360263,
+              "precision": 0.5166978359604595,
+              "predicted_positive_count": 11229,
+              "predicted_positive_rate": 0.997246891651865,
+              "recall": 0.9998276753403412,
+              "threshold": 0.01
+            },
+            {
+              "f1": 0.6828377980571092,
+              "precision": 0.5186013235557145,
+              "predicted_positive_count": 11182,
+              "predicted_positive_rate": 0.9930728241563055,
+              "recall": 0.9993107013613648,
+              "threshold": 0.02
+            },
+            {
+              "f1": 0.6898156434580276,
+              "precision": 0.5275597736813287,
+              "predicted_positive_count": 10958,
+              "predicted_positive_rate": 0.9731793960923624,
+              "recall": 0.9962088574875064,
+              "threshold": 0.05
+            },
+            {
+              "f1": 0.7006906668296559,
+              "precision": 0.5429058533813222,
+              "predicted_positive_count": 10558,
+              "predicted_positive_rate": 0.9376554174067495,
+              "recall": 0.9877649491642254,
+              "threshold": 0.1
+            },
+            {
+              "f1": 0.7242002063983488,
+              "precision": 0.5787032264714977,
+              "predicted_positive_count": 9701,
+              "predicted_positive_rate": 0.8615452930728241,
+              "recall": 0.9674306393244874,
+              "threshold": 0.2
+            },
+            {
+              "f1": 0.74373795761079,
+              "precision": 0.6190858059342422,
+              "predicted_positive_count": 8729,
+              "predicted_positive_rate": 0.775222024866785,
+              "recall": 0.9312424607961399,
+              "threshold": 0.3
+            },
+            {
+              "f1": 0.7559254030760086,
+              "precision": 0.6644461859979102,
+              "predicted_positive_count": 7656,
+              "predicted_positive_rate": 0.6799289520426288,
+              "recall": 0.8766155436843012,
+              "threshold": 0.4
+            },
+            {
+              "f1": 0.7612747075433642,
+              "precision": 0.7157160194174758,
+              "predicted_positive_count": 6592,
+              "predicted_positive_rate": 0.5854351687388988,
+              "recall": 0.8130277442702051,
+              "threshold": 0.5
+            }
+          ],
+          "validation_balanced_accuracy": 0.7525170112171288,
+          "validation_f1": 0.7990790111488124,
+          "validation_pr_auc": 0.856145665079301,
+          "validation_roc_auc": 0.8284056752032651,
+          "validation_selected_threshold": 0.5
         },
         "random_forest": {
-          "accuracy": 0.7673179396092362,
-          "balanced_accuracy": 0.7659835542843678,
-          "f1": 0.7819210920592642,
-          "n_samples": 32593,
+          "accuracy": 0.761101243339254,
+          "balanced_accuracy": 0.7600559901987468,
+          "brier_score": 0.15938989574090054,
+          "confusion_matrix": [
+            [
+              3962,
+              1495
+            ],
+            [
+              1195,
+              4608
+            ]
+          ],
+          "f1": 0.7740634973962708,
+          "n_samples": 29949,
           "n_test": 11260,
-          "n_train": 21333,
-          "precision": 0.756238930928997,
+          "n_train": 18689,
+          "n_validation": 6997,
+          "pr_auc": 0.87946766198958,
+          "precision": 0.7550385056529576,
           "random_state": 42,
-          "recall": 0.8094089264173703,
-          "roc_auc": 0.8555796669027802
+          "recall": 0.7940720317077373,
+          "roc_auc": 0.8521105949792293,
+          "selection_split": "time_ordered_validation",
+          "subgroup_metrics": {
+            "age_band": {
+              "0-35": {
+                "false_positive_rate": 0.2807787222374554,
+                "n": 7885,
+                "recall": 0.8140632373761209
+              },
+              "35-55": {
+                "false_positive_rate": 0.26396807297605474,
+                "n": 3278,
+                "recall": 0.7408136482939632
+              },
+              "55<=": {
+                "false_positive_rate": 0.14285714285714285,
+                "n": 97,
+                "recall": 0.7073170731707317
+              }
+            },
+            "disability": {
+              "N": {
+                "false_positive_rate": 0.26934494359786265,
+                "n": 10183,
+                "recall": 0.7900584795321638
+              },
+              "Y": {
+                "false_positive_rate": 0.3316831683168317,
+                "n": 1077,
+                "recall": 0.8246656760772659
+              }
+            },
+            "gender": {
+              "F": {
+                "false_positive_rate": 0.39681208053691275,
+                "n": 4761,
+                "recall": 0.8237273874631889
+              },
+              "M": {
+                "false_positive_rate": 0.17865278229742923,
+                "n": 6499,
+                "recall": 0.7734967892586107
+              }
+            },
+            "imd_band": {
+              "0-10%": {
+                "false_positive_rate": 0.34375,
+                "n": 1104,
+                "recall": 0.8284883720930233
+              },
+              "10-20": {
+                "false_positive_rate": 0.3305439330543933,
+                "n": 1198,
+                "recall": 0.8236111111111111
+              },
+              "20-30%": {
+                "false_positive_rate": 0.2737642585551331,
+                "n": 1252,
+                "recall": 0.8140495867768595
+              },
+              "30-40%": {
+                "false_positive_rate": 0.2931937172774869,
+                "n": 1200,
+                "recall": 0.8006379585326954
+              },
+              "40-50%": {
+                "false_positive_rate": 0.29120879120879123,
+                "n": 1147,
+                "recall": 0.8169717138103162
+              },
+              "50-60%": {
+                "false_positive_rate": 0.2859744990892532,
+                "n": 1103,
+                "recall": 0.7851985559566786
+              },
+              "60-70%": {
+                "false_positive_rate": 0.2730560578661845,
+                "n": 1043,
+                "recall": 0.7714285714285715
+              },
+              "70-80%": {
+                "false_positive_rate": 0.25140712945590993,
+                "n": 1004,
+                "recall": 0.7749469214437368
+              },
+              "80-90%": {
+                "false_positive_rate": 0.2734225621414914,
+                "n": 960,
+                "recall": 0.7643020594965675
+              },
+              "90-100%": {
+                "false_positive_rate": 0.20240480961923848,
+                "n": 854,
+                "recall": 0.7577464788732394
+              },
+              "<missing>": {
+                "false_positive_rate": 0.1417624521072797,
+                "n": 395,
+                "recall": 0.5970149253731343
+              }
+            },
+            "region": {
+              "East Anglian Region": {
+                "false_positive_rate": 0.27902621722846443,
+                "n": 1062,
+                "recall": 0.7784090909090909
+              },
+              "East Midlands Region": {
+                "false_positive_rate": 0.26288659793814434,
+                "n": 817,
+                "recall": 0.8228438228438228
+              },
+              "Ireland": {
+                "false_positive_rate": 0.3643410852713178,
+                "n": 442,
+                "recall": 0.75
+              },
+              "London Region": {
+                "false_positive_rate": 0.26595744680851063,
+                "n": 1080,
+                "recall": 0.8229508196721311
+              },
+              "North Region": {
+                "false_positive_rate": 0.18731117824773413,
+                "n": 638,
+                "recall": 0.7361563517915309
+              },
+              "North Western Region": {
+                "false_positive_rate": 0.29095354523227385,
+                "n": 958,
+                "recall": 0.819672131147541
+              },
+              "Scotland": {
+                "false_positive_rate": 0.2364394993045897,
+                "n": 1381,
+                "recall": 0.7145015105740181
+              },
+              "South East Region": {
+                "false_positive_rate": 0.31536388140161725,
+                "n": 749,
+                "recall": 0.8227513227513228
+              },
+              "South Region": {
+                "false_positive_rate": 0.25464684014869887,
+                "n": 1036,
+                "recall": 0.7911646586345381
+              },
+              "South West Region": {
+                "false_positive_rate": 0.23703703703703705,
+                "n": 839,
+                "recall": 0.8064516129032258
+              },
+              "Wales": {
+                "false_positive_rate": 0.3707865168539326,
+                "n": 753,
+                "recall": 0.7934508816120907
+              },
+              "West Midlands Region": {
+                "false_positive_rate": 0.28493150684931506,
+                "n": 855,
+                "recall": 0.8244897959183674
+              },
+              "Yorkshire Region": {
+                "false_positive_rate": 0.28115015974440893,
+                "n": 650,
+                "recall": 0.8338278931750742
+              }
+            }
+          },
+          "test_at_validation_threshold": {
+            "accuracy": 0.76101243339254,
+            "balanced_accuracy": 0.7598660288664805,
+            "confusion_matrix": [
+              [
+                3943,
+                1514
+              ],
+              [
+                1177,
+                4626
+              ]
+            ],
+            "f1": 0.774679728711379,
+            "precision": 0.7534201954397394,
+            "recall": 0.7971738755815957,
+            "threshold": 0.5
+          },
+          "threshold_diagnostics": [
+            {
+              "f1": 0.680225061540265,
+              "precision": 0.5154098943067768,
+              "predicted_positive_count": 11259,
+              "predicted_positive_rate": 0.999911190053286,
+              "recall": 1.0,
+              "threshold": 0.01
+            },
+            {
+              "f1": 0.6806638906808985,
+              "precision": 0.5159139402560455,
+              "predicted_positive_count": 11248,
+              "predicted_positive_rate": 0.9989342806394316,
+              "recall": 1.0,
+              "threshold": 0.02
+            },
+            {
+              "f1": 0.6844932412490408,
+              "precision": 0.5205602442090141,
+              "predicted_positive_count": 11138,
+              "predicted_positive_rate": 0.9891651865008881,
+              "recall": 0.999138376701706,
+              "threshold": 0.05
+            },
+            {
+              "f1": 0.6973509132696262,
+              "precision": 0.5372285900661634,
+              "predicted_positive_count": 10731,
+              "predicted_positive_rate": 0.9530195381882771,
+              "recall": 0.9934516629329657,
+              "threshold": 0.1
+            },
+            {
+              "f1": 0.7353753122124359,
+              "precision": 0.594410795877165,
+              "predicted_positive_count": 9411,
+              "predicted_positive_rate": 0.8357904085257549,
+              "recall": 0.9639841461313113,
+              "threshold": 0.2
+            },
+            {
+              "f1": 0.7617550378733743,
+              "precision": 0.6507141985105603,
+              "predicted_positive_count": 8191,
+              "predicted_positive_rate": 0.7274422735346359,
+              "recall": 0.9184904359813889,
+              "threshold": 0.3
+            },
+            {
+              "f1": 0.7753399258343634,
+              "precision": 0.7027027027027027,
+              "predicted_positive_count": 7141,
+              "predicted_positive_rate": 0.6341918294849023,
+              "recall": 0.8647251421678442,
+              "threshold": 0.4
+            },
+            {
+              "f1": 0.774679728711379,
+              "precision": 0.7534201954397394,
+              "predicted_positive_count": 6140,
+              "predicted_positive_rate": 0.5452930728241563,
+              "recall": 0.7971738755815957,
+              "threshold": 0.5
+            }
+          ],
+          "validation_balanced_accuracy": 0.7800991014150571,
+          "validation_f1": 0.8086450960566228,
+          "validation_pr_auc": 0.9141156365541052,
+          "validation_roc_auc": 0.8715088007414303,
+          "validation_selected_threshold": 0.5
         }
       },
       "test_presentations": [
@@ -131,56 +2291,1136 @@
       ]
     },
     "90": {
-      "best_model": "random_forest",
+      "best_model": "hist_gradient_boosting",
       "cutoff_days": 90,
       "models": {
         "extra_trees": {
-          "accuracy": 0.7791296625222025,
-          "balanced_accuracy": 0.7767001618184448,
-          "f1": 0.7997423303003462,
-          "n_samples": 32593,
+          "accuracy": 0.7654529307282416,
+          "balanced_accuracy": 0.7629504097502726,
+          "brier_score": 0.15702986113974965,
+          "confusion_matrix": [
+            [
+              3719,
+              1738
+            ],
+            [
+              903,
+              4900
+            ]
+          ],
+          "f1": 0.7877180290973395,
+          "n_samples": 29949,
           "n_test": 11260,
-          "n_train": 21333,
-          "precision": 0.7506045949214026,
+          "n_train": 18689,
+          "n_validation": 6997,
+          "pr_auc": 0.8940153821849148,
+          "precision": 0.7381741488400121,
           "random_state": 42,
-          "recall": 0.8557642598655868,
-          "roc_auc": 0.8749971697640422
+          "recall": 0.8443908323281062,
+          "roc_auc": 0.8688230238376762,
+          "selection_split": "time_ordered_validation",
+          "subgroup_metrics": {
+            "age_band": {
+              "0-35": {
+                "false_positive_rate": 0.3328763367151083,
+                "n": 7885,
+                "recall": 0.8695139216611609
+              },
+              "35-55": {
+                "false_positive_rate": 0.29475484606613456,
+                "n": 3278,
+                "recall": 0.7788713910761155
+              },
+              "55<=": {
+                "false_positive_rate": 0.125,
+                "n": 97,
+                "recall": 0.6829268292682927
+              }
+            },
+            "disability": {
+              "N": {
+                "false_positive_rate": 0.3168414803087275,
+                "n": 10183,
+                "recall": 0.8421052631578947
+              },
+              "Y": {
+                "false_positive_rate": 0.33910891089108913,
+                "n": 1077,
+                "recall": 0.861812778603269
+              }
+            },
+            "gender": {
+              "F": {
+                "false_positive_rate": 0.45679530201342283,
+                "n": 4761,
+                "recall": 0.864955826672276
+              },
+              "M": {
+                "false_positive_rate": 0.21119427269768956,
+                "n": 6499,
+                "recall": 0.830122591943958
+              }
+            },
+            "imd_band": {
+              "0-10%": {
+                "false_positive_rate": 0.3798076923076923,
+                "n": 1104,
+                "recall": 0.873546511627907
+              },
+              "10-20": {
+                "false_positive_rate": 0.39539748953974896,
+                "n": 1198,
+                "recall": 0.8791666666666667
+              },
+              "20-30%": {
+                "false_positive_rate": 0.3288973384030418,
+                "n": 1252,
+                "recall": 0.8663911845730028
+              },
+              "30-40%": {
+                "false_positive_rate": 0.32809773123909247,
+                "n": 1200,
+                "recall": 0.8309409888357256
+              },
+              "40-50%": {
+                "false_positive_rate": 0.34798534798534797,
+                "n": 1147,
+                "recall": 0.8635607321131448
+              },
+              "50-60%": {
+                "false_positive_rate": 0.3224043715846995,
+                "n": 1103,
+                "recall": 0.8447653429602888
+              },
+              "60-70%": {
+                "false_positive_rate": 0.32007233273056057,
+                "n": 1043,
+                "recall": 0.826530612244898
+              },
+              "70-80%": {
+                "false_positive_rate": 0.29831144465290804,
+                "n": 1004,
+                "recall": 0.8237791932059448
+              },
+              "80-90%": {
+                "false_positive_rate": 0.2982791586998088,
+                "n": 960,
+                "recall": 0.8215102974828375
+              },
+              "90-100%": {
+                "false_positive_rate": 0.25250501002004005,
+                "n": 854,
+                "recall": 0.8056338028169014
+              },
+              "<missing>": {
+                "false_positive_rate": 0.1724137931034483,
+                "n": 395,
+                "recall": 0.6791044776119403
+              }
+            },
+            "region": {
+              "East Anglian Region": {
+                "false_positive_rate": 0.32209737827715357,
+                "n": 1062,
+                "recall": 0.8428030303030303
+              },
+              "East Midlands Region": {
+                "false_positive_rate": 0.2963917525773196,
+                "n": 817,
+                "recall": 0.8671328671328671
+              },
+              "Ireland": {
+                "false_positive_rate": 0.4883720930232558,
+                "n": 442,
+                "recall": 0.8532608695652174
+              },
+              "London Region": {
+                "false_positive_rate": 0.2957446808510638,
+                "n": 1080,
+                "recall": 0.8688524590163934
+              },
+              "North Region": {
+                "false_positive_rate": 0.22658610271903323,
+                "n": 638,
+                "recall": 0.7850162866449512
+              },
+              "North Western Region": {
+                "false_positive_rate": 0.34474327628361856,
+                "n": 958,
+                "recall": 0.8670309653916212
+              },
+              "Scotland": {
+                "false_positive_rate": 0.2851182197496523,
+                "n": 1381,
+                "recall": 0.770392749244713
+              },
+              "South East Region": {
+                "false_positive_rate": 0.33692722371967654,
+                "n": 749,
+                "recall": 0.8518518518518519
+              },
+              "South Region": {
+                "false_positive_rate": 0.2862453531598513,
+                "n": 1036,
+                "recall": 0.8614457831325302
+              },
+              "South West Region": {
+                "false_positive_rate": 0.27901234567901234,
+                "n": 839,
+                "recall": 0.8571428571428571
+              },
+              "Wales": {
+                "false_positive_rate": 0.40168539325842695,
+                "n": 753,
+                "recall": 0.8110831234256927
+              },
+              "West Midlands Region": {
+                "false_positive_rate": 0.3232876712328767,
+                "n": 855,
+                "recall": 0.8795918367346939
+              },
+              "Yorkshire Region": {
+                "false_positive_rate": 0.35782747603833864,
+                "n": 650,
+                "recall": 0.8694362017804155
+              }
+            }
+          },
+          "test_at_validation_threshold": {
+            "accuracy": 0.7649200710479573,
+            "balanced_accuracy": 0.762340562979642,
+            "confusion_matrix": [
+              [
+                3702,
+                1755
+              ],
+              [
+                892,
+                4911
+              ]
+            ],
+            "f1": 0.7877135295532922,
+            "precision": 0.7367236723672367,
+            "recall": 0.8462864035843529,
+            "threshold": 0.5
+          },
+          "threshold_diagnostics": [
+            {
+              "f1": 0.6803446860894542,
+              "precision": 0.5155472636815921,
+              "predicted_positive_count": 11256,
+              "predicted_positive_rate": 0.9996447602131439,
+              "recall": 1.0,
+              "threshold": 0.01
+            },
+            {
+              "f1": 0.6809434405069232,
+              "precision": 0.5162352103905347,
+              "predicted_positive_count": 11241,
+              "predicted_positive_rate": 0.9983126110124334,
+              "recall": 1.0,
+              "threshold": 0.02
+            },
+            {
+              "f1": 0.6851808083195462,
+              "precision": 0.5213559931660822,
+              "predicted_positive_count": 11121,
+              "predicted_positive_rate": 0.9876554174067496,
+              "recall": 0.999138376701706,
+              "threshold": 0.05
+            },
+            {
+              "f1": 0.7016517340159688,
+              "precision": 0.5428140324405885,
+              "predicted_positive_count": 10604,
+              "predicted_positive_rate": 0.941740674955595,
+              "recall": 0.9919007409960365,
+              "threshold": 0.1
+            },
+            {
+              "f1": 0.7393907493914074,
+              "precision": 0.5980204342273308,
+              "predicted_positive_count": 9396,
+              "predicted_positive_rate": 0.8344582593250444,
+              "recall": 0.9682922626227813,
+              "threshold": 0.2
+            },
+            {
+              "f1": 0.766251144446792,
+              "precision": 0.6479275845640782,
+              "predicted_positive_count": 8396,
+              "predicted_positive_rate": 0.7456483126110124,
+              "recall": 0.9374461485438567,
+              "threshold": 0.3
+            },
+            {
+              "f1": 0.7837188344848303,
+              "precision": 0.6945294822307999,
+              "predicted_positive_count": 7513,
+              "predicted_positive_rate": 0.6672291296625222,
+              "recall": 0.8991900740996036,
+              "threshold": 0.4
+            },
+            {
+              "f1": 0.7877135295532922,
+              "precision": 0.7367236723672367,
+              "predicted_positive_count": 6666,
+              "predicted_positive_rate": 0.5920071047957371,
+              "recall": 0.8462864035843529,
+              "threshold": 0.5
+            }
+          ],
+          "validation_balanced_accuracy": 0.81368093703749,
+          "validation_f1": 0.8361926547210573,
+          "validation_pr_auc": 0.934561346863251,
+          "validation_roc_auc": 0.9002565721659134,
+          "validation_selected_threshold": 0.5
         },
         "hist_gradient_boosting": {
-          "accuracy": 0.7631438721136767,
-          "balanced_accuracy": 0.7608358405987108,
-          "f1": 0.7843803056027164,
-          "n_samples": 32593,
+          "accuracy": 0.7684724689165187,
+          "balanced_accuracy": 0.7668578248295361,
+          "brier_score": 0.1659726996574964,
+          "confusion_matrix": [
+            [
+              3898,
+              1559
+            ],
+            [
+              1048,
+              4755
+            ]
+          ],
+          "f1": 0.7848477345877692,
+          "n_samples": 29949,
           "n_test": 11260,
-          "n_train": 21333,
-          "precision": 0.7388059701492538,
+          "n_train": 18689,
+          "n_validation": 6997,
+          "pr_auc": 0.8881216968922422,
+          "precision": 0.7530883750395946,
           "random_state": 42,
-          "recall": 0.8359469240048251,
-          "roc_auc": 0.8635922267399683
+          "recall": 0.8194037566775806,
+          "roc_auc": 0.8646188800311845,
+          "selection_split": "time_ordered_validation",
+          "subgroup_metrics": {
+            "age_band": {
+              "0-35": {
+                "false_positive_rate": 0.29311763092953114,
+                "n": 7885,
+                "recall": 0.841670599339311
+              },
+              "35-55": {
+                "false_positive_rate": 0.27708095781071834,
+                "n": 3278,
+                "recall": 0.7611548556430446
+              },
+              "55<=": {
+                "false_positive_rate": 0.07142857142857142,
+                "n": 97,
+                "recall": 0.6829268292682927
+              }
+            },
+            "disability": {
+              "N": {
+                "false_positive_rate": 0.2835939046111221,
+                "n": 10183,
+                "recall": 0.8157894736842105
+              },
+              "Y": {
+                "false_positive_rate": 0.3118811881188119,
+                "n": 1077,
+                "recall": 0.8469539375928677
+              }
+            },
+            "gender": {
+              "F": {
+                "false_positive_rate": 0.42533557046979864,
+                "n": 4761,
+                "recall": 0.850231384097602
+              },
+              "M": {
+                "false_positive_rate": 0.1773511226814188,
+                "n": 6499,
+                "recall": 0.7980151780502043
+              }
+            },
+            "imd_band": {
+              "0-10%": {
+                "false_positive_rate": 0.3605769230769231,
+                "n": 1104,
+                "recall": 0.8561046511627907
+              },
+              "10-20": {
+                "false_positive_rate": 0.3598326359832636,
+                "n": 1198,
+                "recall": 0.8722222222222222
+              },
+              "20-30%": {
+                "false_positive_rate": 0.2870722433460076,
+                "n": 1252,
+                "recall": 0.8471074380165289
+              },
+              "30-40%": {
+                "false_positive_rate": 0.3054101221640489,
+                "n": 1200,
+                "recall": 0.810207336523126
+              },
+              "40-50%": {
+                "false_positive_rate": 0.3076923076923077,
+                "n": 1147,
+                "recall": 0.848585690515807
+              },
+              "50-60%": {
+                "false_positive_rate": 0.2877959927140255,
+                "n": 1103,
+                "recall": 0.8122743682310469
+              },
+              "60-70%": {
+                "false_positive_rate": 0.2857142857142857,
+                "n": 1043,
+                "recall": 0.7918367346938775
+              },
+              "70-80%": {
+                "false_positive_rate": 0.26454033771106944,
+                "n": 1004,
+                "recall": 0.8004246284501062
+              },
+              "80-90%": {
+                "false_positive_rate": 0.248565965583174,
+                "n": 960,
+                "recall": 0.7711670480549199
+              },
+              "90-100%": {
+                "false_positive_rate": 0.22645290581162325,
+                "n": 854,
+                "recall": 0.7549295774647887
+              },
+              "<missing>": {
+                "false_positive_rate": 0.16475095785440613,
+                "n": 395,
+                "recall": 0.6343283582089553
+              }
+            },
+            "region": {
+              "East Anglian Region": {
+                "false_positive_rate": 0.2808988764044944,
+                "n": 1062,
+                "recall": 0.8106060606060606
+              },
+              "East Midlands Region": {
+                "false_positive_rate": 0.25,
+                "n": 817,
+                "recall": 0.8531468531468531
+              },
+              "Ireland": {
+                "false_positive_rate": 0.45348837209302323,
+                "n": 442,
+                "recall": 0.8206521739130435
+              },
+              "London Region": {
+                "false_positive_rate": 0.25957446808510637,
+                "n": 1080,
+                "recall": 0.8459016393442623
+              },
+              "North Region": {
+                "false_positive_rate": 0.21148036253776434,
+                "n": 638,
+                "recall": 0.749185667752443
+              },
+              "North Western Region": {
+                "false_positive_rate": 0.2885085574572127,
+                "n": 958,
+                "recall": 0.8524590163934426
+              },
+              "Scotland": {
+                "false_positive_rate": 0.24617524339360222,
+                "n": 1381,
+                "recall": 0.7507552870090635
+              },
+              "South East Region": {
+                "false_positive_rate": 0.3261455525606469,
+                "n": 749,
+                "recall": 0.8201058201058201
+              },
+              "South Region": {
+                "false_positive_rate": 0.25464684014869887,
+                "n": 1036,
+                "recall": 0.8112449799196787
+              },
+              "South West Region": {
+                "false_positive_rate": 0.254320987654321,
+                "n": 839,
+                "recall": 0.8271889400921659
+              },
+              "Wales": {
+                "false_positive_rate": 0.38764044943820225,
+                "n": 753,
+                "recall": 0.8035264483627204
+              },
+              "West Midlands Region": {
+                "false_positive_rate": 0.30684931506849317,
+                "n": 855,
+                "recall": 0.8612244897959184
+              },
+              "Yorkshire Region": {
+                "false_positive_rate": 0.30990415335463256,
+                "n": 650,
+                "recall": 0.8456973293768546
+              }
+            }
+          },
+          "test_at_validation_threshold": {
+            "accuracy": 0.7603019538188277,
+            "balanced_accuracy": 0.7568986152796237,
+            "confusion_matrix": [
+              [
+                3526,
+                1931
+              ],
+              [
+                768,
+                5035
+              ]
+            ],
+            "f1": 0.7886287101574125,
+            "precision": 0.7227964398507034,
+            "recall": 0.8676546613820437,
+            "threshold": 0.4
+          },
+          "threshold_diagnostics": [
+            {
+              "f1": 0.6801851960382114,
+              "precision": 0.5153641207815275,
+              "predicted_positive_count": 11260,
+              "predicted_positive_rate": 1.0,
+              "recall": 1.0,
+              "threshold": 0.01
+            },
+            {
+              "f1": 0.680225061540265,
+              "precision": 0.5154098943067768,
+              "predicted_positive_count": 11259,
+              "predicted_positive_rate": 0.999911190053286,
+              "recall": 1.0,
+              "threshold": 0.02
+            },
+            {
+              "f1": 0.6852956814556626,
+              "precision": 0.5213951815893564,
+              "predicted_positive_count": 11124,
+              "predicted_positive_rate": 0.9879218472468917,
+              "recall": 0.9994830260210236,
+              "threshold": 0.05
+            },
+            {
+              "f1": 0.7170805116629044,
+              "precision": 0.5636274026614095,
+              "predicted_positive_count": 10145,
+              "predicted_positive_rate": 0.9009769094138543,
+              "recall": 0.9853524039290023,
+              "threshold": 0.1
+            },
+            {
+              "f1": 0.761608623548922,
+              "precision": 0.6357134617602953,
+              "predicted_positive_count": 8669,
+              "predicted_positive_rate": 0.7698934280639431,
+              "recall": 0.9496811993796312,
+              "threshold": 0.2
+            },
+            {
+              "f1": 0.7813424009461857,
+              "precision": 0.6841423948220064,
+              "predicted_positive_count": 7725,
+              "predicted_positive_rate": 0.6860568383658969,
+              "recall": 0.9107358262967431,
+              "threshold": 0.3
+            },
+            {
+              "f1": 0.7886287101574125,
+              "precision": 0.7227964398507034,
+              "predicted_positive_count": 6966,
+              "predicted_positive_rate": 0.6186500888099468,
+              "recall": 0.8676546613820437,
+              "threshold": 0.4
+            },
+            {
+              "f1": 0.7848477345877692,
+              "precision": 0.7530883750395946,
+              "predicted_positive_count": 6314,
+              "predicted_positive_rate": 0.5607460035523979,
+              "recall": 0.8194037566775806,
+              "threshold": 0.5
+            }
+          ],
+          "validation_balanced_accuracy": 0.8305703988599011,
+          "validation_f1": 0.8341410877759827,
+          "validation_pr_auc": 0.9380690659864952,
+          "validation_roc_auc": 0.9067544868931058,
+          "validation_selected_threshold": 0.4
         },
         "logistic_regression": {
-          "accuracy": 0.7304618117229129,
-          "balanced_accuracy": 0.7278388103491173,
-          "f1": 0.7566744167401588,
-          "n_samples": 32593,
+          "accuracy": 0.7303730017761989,
+          "balanced_accuracy": 0.7275778286467627,
+          "brier_score": 0.18172757804848266,
+          "confusion_matrix": [
+            [
+              3474,
+              1983
+            ],
+            [
+              1053,
+              4750
+            ]
+          ],
+          "f1": 0.7578174856413529,
+          "n_samples": 29949,
           "n_test": 11260,
-          "n_train": 21333,
-          "precision": 0.707496251874063,
+          "n_train": 18689,
+          "n_validation": 6997,
+          "pr_auc": 0.8018006012906849,
+          "precision": 0.7054804693301648,
           "random_state": 42,
-          "recall": 0.8132000689298639,
-          "roc_auc": 0.8098195435237555
+          "recall": 0.8185421333792866,
+          "roc_auc": 0.806371566134317,
+          "selection_split": "time_ordered_validation",
+          "subgroup_metrics": {
+            "age_band": {
+              "0-35": {
+                "false_positive_rate": 0.40197422539073213,
+                "n": 7885,
+                "recall": 0.8482774893817838
+              },
+              "35-55": {
+                "false_positive_rate": 0.2919042189281642,
+                "n": 3278,
+                "recall": 0.7401574803149606
+              },
+              "55<=": {
+                "false_positive_rate": 0.08928571428571429,
+                "n": 97,
+                "recall": 0.6585365853658537
+              }
+            },
+            "disability": {
+              "N": {
+                "false_positive_rate": 0.3623589946566396,
+                "n": 10183,
+                "recall": 0.816374269005848
+              },
+              "Y": {
+                "false_positive_rate": 0.37623762376237624,
+                "n": 1077,
+                "recall": 0.8350668647845468
+              }
+            },
+            "gender": {
+              "F": {
+                "false_positive_rate": 0.42953020134228187,
+                "n": 4761,
+                "recall": 0.7824989482541018
+              },
+              "M": {
+                "false_positive_rate": 0.3120728929384966,
+                "n": 6499,
+                "recall": 0.843549328663164
+              }
+            },
+            "imd_band": {
+              "0-10%": {
+                "false_positive_rate": 0.42788461538461536,
+                "n": 1104,
+                "recall": 0.8546511627906976
+              },
+              "10-20": {
+                "false_positive_rate": 0.39748953974895396,
+                "n": 1198,
+                "recall": 0.8416666666666667
+              },
+              "20-30%": {
+                "false_positive_rate": 0.3517110266159696,
+                "n": 1252,
+                "recall": 0.8168044077134986
+              },
+              "30-40%": {
+                "false_positive_rate": 0.3961605584642234,
+                "n": 1200,
+                "recall": 0.8038277511961722
+              },
+              "40-50%": {
+                "false_positive_rate": 0.3901098901098901,
+                "n": 1147,
+                "recall": 0.8452579034941764
+              },
+              "50-60%": {
+                "false_positive_rate": 0.3424408014571949,
+                "n": 1103,
+                "recall": 0.8050541516245487
+              },
+              "60-70%": {
+                "false_positive_rate": 0.3779385171790235,
+                "n": 1043,
+                "recall": 0.8040816326530612
+              },
+              "70-80%": {
+                "false_positive_rate": 0.31894934333958724,
+                "n": 1004,
+                "recall": 0.8089171974522293
+              },
+              "80-90%": {
+                "false_positive_rate": 0.3690248565965583,
+                "n": 960,
+                "recall": 0.816933638443936
+              },
+              "90-100%": {
+                "false_positive_rate": 0.3226452905811623,
+                "n": 854,
+                "recall": 0.7830985915492957
+              },
+              "<missing>": {
+                "false_positive_rate": 0.26436781609195403,
+                "n": 395,
+                "recall": 0.7089552238805971
+              }
+            },
+            "region": {
+              "East Anglian Region": {
+                "false_positive_rate": 0.41947565543071164,
+                "n": 1062,
+                "recall": 0.7916666666666666
+              },
+              "East Midlands Region": {
+                "false_positive_rate": 0.38402061855670105,
+                "n": 817,
+                "recall": 0.8531468531468531
+              },
+              "Ireland": {
+                "false_positive_rate": 0.37209302325581395,
+                "n": 442,
+                "recall": 0.8152173913043478
+              },
+              "London Region": {
+                "false_positive_rate": 0.33404255319148934,
+                "n": 1080,
+                "recall": 0.8311475409836065
+              },
+              "North Region": {
+                "false_positive_rate": 0.31419939577039274,
+                "n": 638,
+                "recall": 0.7915309446254072
+              },
+              "North Western Region": {
+                "false_positive_rate": 0.35207823960880197,
+                "n": 958,
+                "recall": 0.8633879781420765
+              },
+              "Scotland": {
+                "false_positive_rate": 0.3282336578581363,
+                "n": 1381,
+                "recall": 0.7386706948640483
+              },
+              "South East Region": {
+                "false_positive_rate": 0.40970350404312667,
+                "n": 749,
+                "recall": 0.8386243386243386
+              },
+              "South Region": {
+                "false_positive_rate": 0.3550185873605948,
+                "n": 1036,
+                "recall": 0.8433734939759037
+              },
+              "South West Region": {
+                "false_positive_rate": 0.3234567901234568,
+                "n": 839,
+                "recall": 0.8271889400921659
+              },
+              "Wales": {
+                "false_positive_rate": 0.40730337078651685,
+                "n": 753,
+                "recall": 0.7758186397984886
+              },
+              "West Midlands Region": {
+                "false_positive_rate": 0.39452054794520547,
+                "n": 855,
+                "recall": 0.8469387755102041
+              },
+              "Yorkshire Region": {
+                "false_positive_rate": 0.3514376996805112,
+                "n": 650,
+                "recall": 0.8427299703264095
+              }
+            }
+          },
+          "test_at_validation_threshold": {
+            "accuracy": 0.7118117229129662,
+            "balanced_accuracy": 0.7059423997325163,
+            "confusion_matrix": [
+              [
+                2810,
+                2647
+              ],
+              [
+                598,
+                5205
+              ]
+            ],
+            "f1": 0.7623581105822044,
+            "precision": 0.662888436067244,
+            "recall": 0.8969498535240393,
+            "threshold": 0.4
+          },
+          "threshold_diagnostics": [
+            {
+              "f1": 0.6808236053264504,
+              "precision": 0.5160974742084667,
+              "predicted_positive_count": 11244,
+              "predicted_positive_rate": 0.9985790408525755,
+              "recall": 1.0,
+              "threshold": 0.01
+            },
+            {
+              "f1": 0.6825480854067408,
+              "precision": 0.5181282371852116,
+              "predicted_positive_count": 11198,
+              "predicted_positive_rate": 0.9944937833037301,
+              "recall": 0.9998276753403412,
+              "threshold": 0.02
+            },
+            {
+              "f1": 0.6890066067495982,
+              "precision": 0.5262775050009093,
+              "predicted_positive_count": 10998,
+              "predicted_positive_rate": 0.9767317939609236,
+              "recall": 0.9974151301051181,
+              "threshold": 0.05
+            },
+            {
+              "f1": 0.7014142891977566,
+              "precision": 0.5426846523912838,
+              "predicted_positive_count": 10601,
+              "predicted_positive_rate": 0.941474245115453,
+              "recall": 0.9913837670170601,
+              "threshold": 0.1
+            },
+            {
+              "f1": 0.7246023601847101,
+              "precision": 0.5770763101440393,
+              "predicted_positive_count": 9789,
+              "predicted_positive_rate": 0.8693605683836589,
+              "recall": 0.9734620024125452,
+              "threshold": 0.2
+            },
+            {
+              "f1": 0.7476431206448968,
+              "precision": 0.6193548387096774,
+              "predicted_positive_count": 8835,
+              "predicted_positive_rate": 0.7846358792184724,
+              "recall": 0.9429605376529381,
+              "threshold": 0.3
+            },
+            {
+              "f1": 0.7623581105822044,
+              "precision": 0.662888436067244,
+              "predicted_positive_count": 7852,
+              "predicted_positive_rate": 0.697335701598579,
+              "recall": 0.8969498535240393,
+              "threshold": 0.4
+            },
+            {
+              "f1": 0.7578174856413529,
+              "precision": 0.7054804693301648,
+              "predicted_positive_count": 6733,
+              "predicted_positive_rate": 0.5979573712255772,
+              "recall": 0.8185421333792866,
+              "threshold": 0.5
+            }
+          ],
+          "validation_balanced_accuracy": 0.7512506229196149,
+          "validation_f1": 0.7810033104150751,
+          "validation_pr_auc": 0.8647562047304445,
+          "validation_roc_auc": 0.8354981401845756,
+          "validation_selected_threshold": 0.4
         },
         "random_forest": {
-          "accuracy": 0.7829484902309058,
-          "balanced_accuracy": 0.7816070251872211,
-          "f1": 0.7967060389286308,
-          "n_samples": 32593,
+          "accuracy": 0.7767317939609236,
+          "balanced_accuracy": 0.7753899165158549,
+          "brier_score": 0.14929930437171576,
+          "confusion_matrix": [
+            [
+              3993,
+              1464
+            ],
+            [
+              1050,
+              4753
+            ]
+          ],
+          "f1": 0.7908485856905159,
+          "n_samples": 29949,
           "n_test": 11260,
-          "n_train": 21333,
-          "precision": 0.7700594950956745,
+          "n_train": 18689,
+          "n_validation": 6997,
+          "pr_auc": 0.9000876454112385,
+          "precision": 0.7645166479009169,
           "random_state": 42,
-          "recall": 0.8252627951059797,
-          "roc_auc": 0.8777777325150549
+          "recall": 0.8190591073582629,
+          "roc_auc": 0.874528953211218,
+          "selection_split": "time_ordered_validation",
+          "subgroup_metrics": {
+            "age_band": {
+              "0-35": {
+                "false_positive_rate": 0.2747463668768851,
+                "n": 7885,
+                "recall": 0.8411986786219915
+              },
+              "35-55": {
+                "false_positive_rate": 0.25997719498289623,
+                "n": 3278,
+                "recall": 0.760498687664042
+              },
+              "55<=": {
+                "false_positive_rate": 0.10714285714285714,
+                "n": 97,
+                "recall": 0.7073170731707317
+              }
+            },
+            "disability": {
+              "N": {
+                "false_positive_rate": 0.2665743122897289,
+                "n": 10183,
+                "recall": 0.8159844054580897
+              },
+              "Y": {
+                "false_positive_rate": 0.2896039603960396,
+                "n": 1077,
+                "recall": 0.8424962852897474
+              }
+            },
+            "gender": {
+              "F": {
+                "false_positive_rate": 0.3976510067114094,
+                "n": 4761,
+                "recall": 0.8468657972233908
+              },
+              "M": {
+                "false_positive_rate": 0.1679140904653433,
+                "n": 6499,
+                "recall": 0.7997664915353182
+              }
+            },
+            "imd_band": {
+              "0-10%": {
+                "false_positive_rate": 0.3293269230769231,
+                "n": 1104,
+                "recall": 0.8575581395348837
+              },
+              "10-20": {
+                "false_positive_rate": 0.3200836820083682,
+                "n": 1198,
+                "recall": 0.8638888888888889
+              },
+              "20-30%": {
+                "false_positive_rate": 0.279467680608365,
+                "n": 1252,
+                "recall": 0.8471074380165289
+              },
+              "30-40%": {
+                "false_positive_rate": 0.2774869109947644,
+                "n": 1200,
+                "recall": 0.8118022328548644
+              },
+              "40-50%": {
+                "false_positive_rate": 0.304029304029304,
+                "n": 1147,
+                "recall": 0.8435940099833611
+              },
+              "50-60%": {
+                "false_positive_rate": 0.26229508196721313,
+                "n": 1103,
+                "recall": 0.8249097472924187
+              },
+              "60-70%": {
+                "false_positive_rate": 0.2730560578661845,
+                "n": 1043,
+                "recall": 0.7877551020408163
+              },
+              "70-80%": {
+                "false_positive_rate": 0.25328330206378985,
+                "n": 1004,
+                "recall": 0.7813163481953291
+              },
+              "80-90%": {
+                "false_positive_rate": 0.25812619502868067,
+                "n": 960,
+                "recall": 0.782608695652174
+              },
+              "90-100%": {
+                "false_positive_rate": 0.20040080160320642,
+                "n": 854,
+                "recall": 0.7577464788732394
+              },
+              "<missing>": {
+                "false_positive_rate": 0.1417624521072797,
+                "n": 395,
+                "recall": 0.6567164179104478
+              }
+            },
+            "region": {
+              "East Anglian Region": {
+                "false_positive_rate": 0.2565543071161049,
+                "n": 1062,
+                "recall": 0.8068181818181818
+              },
+              "East Midlands Region": {
+                "false_positive_rate": 0.2422680412371134,
+                "n": 817,
+                "recall": 0.8508158508158508
+              },
+              "Ireland": {
+                "false_positive_rate": 0.3875968992248062,
+                "n": 442,
+                "recall": 0.8206521739130435
+              },
+              "London Region": {
+                "false_positive_rate": 0.26382978723404255,
+                "n": 1080,
+                "recall": 0.8491803278688524
+              },
+              "North Region": {
+                "false_positive_rate": 0.18731117824773413,
+                "n": 638,
+                "recall": 0.755700325732899
+              },
+              "North Western Region": {
+                "false_positive_rate": 0.2860635696821516,
+                "n": 958,
+                "recall": 0.8506375227686703
+              },
+              "Scotland": {
+                "false_positive_rate": 0.23504867872044508,
+                "n": 1381,
+                "recall": 0.7416918429003021
+              },
+              "South East Region": {
+                "false_positive_rate": 0.2857142857142857,
+                "n": 749,
+                "recall": 0.8095238095238095
+              },
+              "South Region": {
+                "false_positive_rate": 0.25092936802973975,
+                "n": 1036,
+                "recall": 0.8052208835341366
+              },
+              "South West Region": {
+                "false_positive_rate": 0.2123456790123457,
+                "n": 839,
+                "recall": 0.8410138248847926
+              },
+              "Wales": {
+                "false_positive_rate": 0.3651685393258427,
+                "n": 753,
+                "recall": 0.8060453400503779
+              },
+              "West Midlands Region": {
+                "false_positive_rate": 0.29863013698630136,
+                "n": 855,
+                "recall": 0.8693877551020408
+              },
+              "Yorkshire Region": {
+                "false_positive_rate": 0.3035143769968051,
+                "n": 650,
+                "recall": 0.8456973293768546
+              }
+            }
+          },
+          "test_at_validation_threshold": {
+            "accuracy": 0.7756660746003552,
+            "balanced_accuracy": 0.7742412433446824,
+            "confusion_matrix": [
+              [
+                3972,
+                1485
+              ],
+              [
+                1041,
+                4762
+              ]
+            ],
+            "f1": 0.7903734439834025,
+            "precision": 0.7622858972306708,
+            "recall": 0.8206100292951921,
+            "threshold": 0.5
+          },
+          "threshold_diagnostics": [
+            {
+              "f1": 0.6806638906808985,
+              "precision": 0.5159139402560455,
+              "predicted_positive_count": 11248,
+              "predicted_positive_rate": 0.9989342806394316,
+              "recall": 1.0,
+              "threshold": 0.01
+            },
+            {
+              "f1": 0.6814658210007047,
+              "precision": 0.5168819599109131,
+              "predicted_positive_count": 11225,
+              "predicted_positive_rate": 0.9968916518650088,
+              "recall": 0.9998276753403412,
+              "threshold": 0.02
+            },
+            {
+              "f1": 0.6887488106565176,
+              "precision": 0.525833106328884,
+              "predicted_positive_count": 11013,
+              "predicted_positive_rate": 0.9780639431616341,
+              "recall": 0.9979321040840944,
+              "threshold": 0.05
+            },
+            {
+              "f1": 0.7074796346581091,
+              "precision": 0.5511008556869532,
+              "predicted_positive_count": 10401,
+              "predicted_positive_rate": 0.9237122557726465,
+              "recall": 0.9877649491642254,
+              "threshold": 0.1
+            },
+            {
+              "f1": 0.7494453781512606,
+              "precision": 0.6144179894179894,
+              "predicted_positive_count": 9072,
+              "predicted_positive_rate": 0.805683836589698,
+              "recall": 0.9605376529381354,
+              "threshold": 0.2
+            },
+            {
+              "f1": 0.7751009809578765,
+              "precision": 0.6665426125790844,
+              "predicted_positive_count": 8061,
+              "predicted_positive_rate": 0.7158969804618117,
+              "recall": 0.9259003963467172,
+              "threshold": 0.3
+            },
+            {
+              "f1": 0.7894247170103892,
+              "precision": 0.7175475687103594,
+              "predicted_positive_count": 7095,
+              "predicted_positive_rate": 0.6301065719360568,
+              "recall": 0.8773048423229364,
+              "threshold": 0.4
+            },
+            {
+              "f1": 0.7903734439834025,
+              "precision": 0.7622858972306708,
+              "predicted_positive_count": 6247,
+              "predicted_positive_rate": 0.5547957371225577,
+              "recall": 0.8206100292951921,
+              "threshold": 0.5
+            }
+          ],
+          "validation_balanced_accuracy": 0.8212064299447338,
+          "validation_f1": 0.8354826103946854,
+          "validation_pr_auc": 0.9355514279541737,
+          "validation_roc_auc": 0.9022482510413885,
+          "validation_selected_threshold": 0.5
         }
       },
       "test_presentations": [
@@ -192,6 +3432,14 @@
         "2014B"
       ]
     }
+  },
+  "provenance": {
+    "data_sha256": "fc91eccbb94eb5e0a3865711d5200256aa7e766e2742c9aaae2f55e79e083af8",
+    "feature_schema_version": "oulad-early-warning-v2-grouped-validation",
+    "git_commit": null,
+    "platform": "win32",
+    "python_version": "3.12.14",
+    "scikit_learn_version": "1.5.2"
   },
   "target": "Fail/Withdrawn = 1; Pass/Distinction = 0",
   "task": "early_warning_enrollment_risk_classification"

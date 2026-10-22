@@ -1,6 +1,8 @@
 name: CI
 
 on:
+  workflow_dispatch:
+
   push:
     branches:
       - main
@@ -35,3 +37,20 @@ jobs:
         run: |
           ruff check src pipeline tests
           pytest -v
+
+      - name: Generate synthetic smoke dataset
+        run: |
+          python -m src.simulation.simulator \
+            --output-dir .ci-data/synthetic \
+            --students 100 \
+            --terms 2 \
+            --weeks-per-term 8 \
+            --overwrite
+
+      - name: Run synthetic baseline smoke test
+        run: |
+          python -m pipeline.synthetic_baseline_pipeline \
+            --data-dir .ci-data/synthetic \
+            --metrics-output .ci-output/synthetic_metrics.json \
+            --model-dir .ci-output/models \
+            --cutoffs-days 30

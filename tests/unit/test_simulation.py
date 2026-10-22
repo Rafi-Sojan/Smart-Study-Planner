@@ -14,10 +14,16 @@ def test_simulation_is_reproducible_and_covers_profiles(tmp_path: Path) -> None:
 
     assert first_counts == second_counts
     assert (first / "manifest.json").exists()
-    assert pd.read_csv(first / "students.csv").shape == (8, 8)
+    students = pd.read_csv(first / "students.csv")
+    assert students.shape == (8, 13)
+    assert {"internet_access_type", "financial_aid_status", "first_generation_student"}.issubset(students.columns)
     assert pd.read_csv(first / "students.csv").equals(pd.read_csv(second / "students.csv"))
     assert pd.read_csv(first / "outcomes.csv").shape[0] > 0
     assert pd.read_csv(first / "study_sessions.csv").shape[0] > 0
+    assert pd.read_csv(first / "curriculum_prerequisites.csv").shape[0] == 8
+    assert pd.read_csv(first / "early_warning_targets.csv").shape[0] == len(pd.read_csv(first / "enrollments.csv"))
+    manifest = (first / "manifest.json").read_text(encoding="utf-8")
+    assert '"missingness_rate": 0.03' in manifest
 
 
 def test_simulation_requires_explicit_overwrite(tmp_path: Path) -> None:

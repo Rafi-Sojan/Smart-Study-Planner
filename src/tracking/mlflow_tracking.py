@@ -49,6 +49,17 @@ def _configure_tracking() -> Any:
     return mlflow
 
 
+def _provenance_params(metrics: dict[str, Any]) -> dict[str, str]:
+    """Flatten non-sensitive provenance into MLflow parameters."""
+
+    provenance = metrics.get("provenance", {})
+    return {
+        f"provenance.{key}": str(value)
+        for key, value in provenance.items()
+        if value is not None
+    }
+
+
 def log_training_run(
     metrics: dict[str, Any],
     metrics_path: str | Path | None = None,
@@ -75,6 +86,7 @@ def log_training_run(
                 "n_samples": metrics["n_samples"],
                 "n_train": metrics["n_train"],
                 "n_test": metrics["n_test"],
+                **_provenance_params(metrics),
             }
         )
         for model_name, model_metrics in metrics["models"].items():
@@ -116,6 +128,7 @@ def log_baseline_models_run(
                 "n_samples": metrics["n_samples"],
                 "n_train": metrics["n_train"],
                 "n_test": metrics["n_test"],
+                **_provenance_params(metrics),
             }
         )
         for model_name, model_metrics in metrics["models"].items():
@@ -229,6 +242,7 @@ def log_synthetic_baseline_run(
                 "evaluation": metrics["evaluation"],
                 "cutoffs_days": ",".join(str(value) for value in metrics["cutoffs_days"]),
                 "random_state": metrics["random_state"],
+                **_provenance_params(metrics),
             }
         )
         for cutoff_text, evaluation in metrics["evaluations"].items():

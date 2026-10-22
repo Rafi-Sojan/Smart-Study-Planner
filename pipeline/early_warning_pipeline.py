@@ -7,6 +7,8 @@ from typing import Any, Iterable
 
 from src.data.cleaner import clean_oulad_tables
 from src.data.loader import load_oulad_tables
+from src.data.provenance import build_provenance
+from src.data.validation import validate_oulad_tables
 from src.features.feature_engineering import build_oulad_features
 from src.models.baseline import split_time_aware_data, train_time_aware_baselines
 from src.monitoring.prometheus_exporter import push_early_warning_metrics
@@ -35,6 +37,7 @@ def run_early_warning(
 
     raw_tables = load_oulad_tables(data_dir)
     cleaned_tables = clean_oulad_tables(raw_tables)
+    validate_oulad_tables(cleaned_tables)
     cutoffs = sorted({int(cutoff) for cutoff in cutoffs_days})
     if not cutoffs or any(cutoff < 0 for cutoff in cutoffs):
         raise ValueError("cutoffs_days must contain non-negative integers")
@@ -67,14 +70,18 @@ def run_early_warning(
     metrics: dict[str, Any] = {
         "task": "early_warning_enrollment_risk_classification",
         "target": "Fail/Withdrawn = 1; Pass/Distinction = 0",
-        "evaluation": "time-aware course-presentation holdout",
+        "evaluation": "time-aware presentation train-validation-locked-test",
         "cutoffs_days": cutoffs,
+        "provenance": build_provenance(data_dir, "oulad-early-warning-v2-grouped-validation"),
         "evaluations": evaluations,
     }
-    if metrics_output is not None:
-        path = Path(metrics_output)
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(json.dumps(metrics, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    def write_metrics() -> None:
+        if metrics_output is not None:
+            path = Path(metrics_output)
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(json.dumps(metrics, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+    write_metrics()
     if mlflow_enabled or register_models:
         run_id, registered = log_early_warning_run(
             metrics,
@@ -87,6 +94,7 @@ def run_early_warning(
         metrics["mlflow_run_id"] = run_id
         if registered:
             metrics["registered_models"] = {str(key): value for key, value in registered.items()}
+    write_metrics()
     push_early_warning_metrics(metrics, pushgateway_url=pushgateway_url)
     return metrics
 

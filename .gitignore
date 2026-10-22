@@ -94,6 +94,10 @@ logs/*
 
 !logs/.gitkeep
 
+# CI smoke-test artifacts
+.ci-data/
+.ci-output/
+
 # Local MLflow tracking store
 mlruns/
 
