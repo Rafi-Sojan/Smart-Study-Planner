@@ -37,6 +37,7 @@ jobs:
         run: |
           ruff check src pipeline tests
           pytest -v
+          git diff --check
 
       - name: Generate synthetic smoke dataset
         run: |
@@ -54,3 +55,9 @@ jobs:
             --metrics-output .ci-output/synthetic_metrics.json \
             --model-dir .ci-output/models \
             --cutoffs-days 30
+
+      - name: Validate synthetic relational integrity
+        run: |
+          python -m src.data.synthetic_validation \
+            --data-dir .ci-data/synthetic \
+            --output .ci-output/synthetic_validation.json

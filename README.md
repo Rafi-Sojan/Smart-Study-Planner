@@ -27,6 +27,10 @@ confusion-matrix interpretation, and model-selection rule are documented in
 [docs/synthetic-baseline.md](docs/synthetic-baseline.md).
 The formal risk register and release controls are documented in
 [docs/risk-register.md](docs/risk-register.md).
+The evidence classification, calibration diagnostics, intervention-policy
+thresholds, synthetic validity checks, and Git/DVC release sequence are
+documented in
+[docs/evaluation-and-release-policy.md](docs/evaluation-and-release-policy.md).
 
 ## Analysis notebooks
 
@@ -277,6 +281,10 @@ metrics. Threshold diagnostics are descriptive test-set comparisons, not a
 production threshold-selection procedure; any deployment threshold must be
 chosen using training/validation data, intervention capacity, and reviewed
 false-negative and false-positive costs.
+
+Calibration diagnostics are also recorded as Brier score, expected calibration
+error, and probability-bin reliability summaries. These are evidence for
+calibration review, not permission to display risk scores as probabilities.
 
 Register every synthetic baseline model at every cutoff in DagsHub MLflow:
 

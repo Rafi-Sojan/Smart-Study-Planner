@@ -31,6 +31,9 @@ def run_synthetic_baseline_pipeline(
     run_name: str | None = None,
     register_models: bool = False,
     registered_model_prefix: str = "smart-study-planner-synthetic-baseline",
+    max_alert_rate: float | None = None,
+    false_negative_cost: float | None = None,
+    false_positive_cost: float | None = None,
 ) -> dict[str, Any]:
     """Run the synthetic comparison, save outputs, and optionally register models."""
 
@@ -38,6 +41,9 @@ def run_synthetic_baseline_pipeline(
         data_dir=data_dir,
         cutoffs_days=cutoffs_days,
         random_state=random_state,
+        max_alert_rate=max_alert_rate,
+        false_negative_cost=false_negative_cost,
+        false_positive_cost=false_positive_cost,
     )
     def write_metrics() -> None:
         if metrics_output is not None:
@@ -85,6 +91,9 @@ def main() -> None:
     parser.add_argument("--run-name", default=None)
     parser.add_argument("--register-models", action="store_true", help="Register all four models at every cutoff")
     parser.add_argument("--registered-model-prefix", default="smart-study-planner-synthetic-baseline")
+    parser.add_argument("--max-alert-rate", type=float, default=None)
+    parser.add_argument("--false-negative-cost", type=float, default=None)
+    parser.add_argument("--false-positive-cost", type=float, default=None)
     args = parser.parse_args()
     metrics = run_synthetic_baseline_pipeline(
         data_dir=args.data_dir,
@@ -97,6 +106,9 @@ def main() -> None:
         run_name=args.run_name,
         register_models=args.register_models,
         registered_model_prefix=args.registered_model_prefix,
+        max_alert_rate=args.max_alert_rate,
+        false_negative_cost=args.false_negative_cost,
+        false_positive_cost=args.false_positive_cost,
     )
     print(json.dumps(metrics, indent=2, sort_keys=True))
 

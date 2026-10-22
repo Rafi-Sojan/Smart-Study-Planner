@@ -14,6 +14,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 from src.models.evaluate import evaluate_at_threshold, evaluate_classifier, select_threshold_by_validation_f1
+from src.models.policy import intervention_policy_summary
 
 
 TARGET = "target_risk"
@@ -398,6 +399,9 @@ def train_baselines(
     frame: pd.DataFrame,
     test_size: float = 0.25,
     random_state: int = 42,
+    max_alert_rate: float | None = None,
+    false_negative_cost: float | None = None,
+    false_positive_cost: float | None = None,
 ) -> tuple[str, dict[str, Pipeline], dict[str, dict[str, Any]]]:
     """Select on validation data, then evaluate once on a locked grouped test set."""
 
@@ -425,6 +429,13 @@ def train_baselines(
         validation_threshold = select_threshold_by_validation_f1(
             validation_target, validation_probabilities
         )
+        intervention_policy = intervention_policy_summary(
+            validation_target,
+            validation_probabilities,
+            max_alert_rate=max_alert_rate,
+            false_negative_cost=false_negative_cost,
+            false_positive_cost=false_positive_cost,
+        )
 
         combined_features = pd.concat([train_features, validation_features], axis=0)
         combined_target = pd.concat([train_target, validation_target], axis=0)
@@ -444,6 +455,7 @@ def train_baselines(
                 "validation_balanced_accuracy": validation_results[model_name].get("balanced_accuracy"),
                 "validation_f1": validation_results[model_name].get("f1"),
                 "validation_selected_threshold": validation_threshold,
+                "intervention_policy": intervention_policy,
                 "test_at_validation_threshold": evaluate_at_threshold(
                     test_target, test_probabilities, validation_threshold
                 ),
@@ -455,6 +467,12 @@ def train_baselines(
                 "selection_split": "grouped_validation",
             }
         )
+        if intervention_policy["selected_threshold"] is not None:
+            metrics["test_at_intervention_policy_threshold"] = evaluate_at_threshold(
+                test_target,
+                test_probabilities,
+                float(intervention_policy["selected_threshold"]),
+            )
         fitted[model_name] = final_model
         results[model_name] = metrics
 
@@ -478,6 +496,9 @@ def train_time_aware_baselines(
     frame: pd.DataFrame,
     test_presentations: Iterable[str] | None = None,
     random_state: int = 42,
+    max_alert_rate: float | None = None,
+    false_negative_cost: float | None = None,
+    false_positive_cost: float | None = None,
 ) -> tuple[str, dict[str, Pipeline], dict[str, dict[str, Any]]]:
     """Select on a prior presentation and evaluate on a later locked presentation."""
 
@@ -499,6 +520,13 @@ def train_time_aware_baselines(
         validation_threshold = select_threshold_by_validation_f1(
             validation_target, validation_probabilities
         )
+        intervention_policy = intervention_policy_summary(
+            validation_target,
+            validation_probabilities,
+            max_alert_rate=max_alert_rate,
+            false_negative_cost=false_negative_cost,
+            false_positive_cost=false_positive_cost,
+        )
         combined_features = pd.concat([train_features, validation_features], axis=0)
         combined_target = pd.concat([train_target, validation_target], axis=0)
         final_model = _make_comparison_pipeline(combined_features, model_name, random_state)
@@ -517,6 +545,7 @@ def train_time_aware_baselines(
                 "validation_balanced_accuracy": validation_metrics.get("balanced_accuracy"),
                 "validation_f1": validation_metrics.get("f1"),
                 "validation_selected_threshold": validation_threshold,
+                "intervention_policy": intervention_policy,
                 "test_at_validation_threshold": evaluate_at_threshold(
                     test_target, test_probabilities, validation_threshold
                 ),
@@ -528,6 +557,12 @@ def train_time_aware_baselines(
                 "selection_split": "time_ordered_validation",
             }
         )
+        if intervention_policy["selected_threshold"] is not None:
+            metrics["test_at_intervention_policy_threshold"] = evaluate_at_threshold(
+                test_target,
+                test_probabilities,
+                float(intervention_policy["selected_threshold"]),
+            )
         fitted[model_name] = final_model
         results[model_name] = metrics
 

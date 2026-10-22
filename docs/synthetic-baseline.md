@@ -259,9 +259,11 @@ The acceptable balance depends on available intervention resources and the
 relative cost of missing risk versus contacting a learner who would have
 passed. A production deployment must therefore choose a threshold using
 validated intervention costs rather than using the default 0.5 threshold
-without review. The next experiment should add precision-recall curves,
-threshold sweeps, class-weight or resampling sensitivity, probability
-calibration, and an intervention-capacity analysis.
+without review. Further analysis should include precision-recall curves,
+threshold sweeps, class-weight or resampling sensitivity, calibration-method
+comparison, and an intervention-capacity analysis using reviewed capacity or
+error costs. The reusable policy utility supports this analysis without
+selecting a policy from the locked test set.
 
 ## 9. What the results can and cannot establish
 

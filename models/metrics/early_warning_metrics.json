@@ -4,6 +4,7 @@
     60,
     90
   ],
+  "deployment_claim": "not_prospective_intervention_evidence",
   "evaluation": "time-aware presentation train-validation-locked-test",
   "evaluations": {
     "30": {
@@ -14,6 +15,93 @@
           "accuracy": 0.7217584369449378,
           "balanced_accuracy": 0.7210720753810018,
           "brier_score": 0.18528346489744268,
+          "calibration": {
+            "bins": [
+              {
+                "absolute_gap": 0.05133562042893995,
+                "bin_lower": 0.0,
+                "bin_upper": 0.1,
+                "count": 405,
+                "mean_predicted_probability": 0.0696520338920477,
+                "observed_positive_rate": 0.12098765432098765
+              },
+              {
+                "absolute_gap": 0.030674936916397028,
+                "bin_lower": 0.1,
+                "bin_upper": 0.2,
+                "count": 1145,
+                "mean_predicted_probability": 0.15185781417530603,
+                "observed_positive_rate": 0.18253275109170305
+              },
+              {
+                "absolute_gap": 0.00668779646151807,
+                "bin_lower": 0.2,
+                "bin_upper": 0.30000000000000004,
+                "count": 1343,
+                "mean_predicted_probability": 0.25166173540418374,
+                "observed_positive_rate": 0.24497393894266567
+              },
+              {
+                "absolute_gap": 0.006945436260008986,
+                "bin_lower": 0.30000000000000004,
+                "bin_upper": 0.4,
+                "count": 1305,
+                "mean_predicted_probability": 0.34870788836728867,
+                "observed_positive_rate": 0.3417624521072797
+              },
+              {
+                "absolute_gap": 0.03636211441271575,
+                "bin_lower": 0.4,
+                "bin_upper": 0.5,
+                "count": 1072,
+                "mean_predicted_probability": 0.4468098756067456,
+                "observed_positive_rate": 0.41044776119402987
+              },
+              {
+                "absolute_gap": 0.04631440985640356,
+                "bin_lower": 0.5,
+                "bin_upper": 0.6000000000000001,
+                "count": 962,
+                "mean_predicted_probability": 0.5483934119354056,
+                "observed_positive_rate": 0.502079002079002
+              },
+              {
+                "absolute_gap": 0.08559153416924914,
+                "bin_lower": 0.6000000000000001,
+                "bin_upper": 0.7000000000000001,
+                "count": 929,
+                "mean_predicted_probability": 0.6496388969249004,
+                "observed_positive_rate": 0.5640473627556513
+              },
+              {
+                "absolute_gap": 0.07734301197490956,
+                "bin_lower": 0.7000000000000001,
+                "bin_upper": 0.8,
+                "count": 802,
+                "mean_predicted_probability": 0.7494128374113186,
+                "observed_positive_rate": 0.672069825436409
+              },
+              {
+                "absolute_gap": 0.18791279656099924,
+                "bin_lower": 0.8,
+                "bin_upper": 0.9,
+                "count": 1029,
+                "mean_predicted_probability": 0.8516640113326222,
+                "observed_positive_rate": 0.6637512147716229
+              },
+              {
+                "absolute_gap": 0.043985906277062226,
+                "bin_lower": 0.9,
+                "bin_upper": 1.0,
+                "count": 2268,
+                "mean_predicted_probability": 0.9703527493105719,
+                "observed_positive_rate": 0.9263668430335097
+              }
+            ],
+            "curve_bins": 10,
+            "expected_calibration_error": 0.05258968178394072,
+            "n_bins": 10
+          },
           "confusion_matrix": [
             [
               3813,
@@ -24,7 +112,92 @@
               4314
             ]
           ],
+          "expected_calibration_error": 0.05258968178394072,
           "f1": 0.7336110874925602,
+          "intervention_policy": {
+            "configured": false,
+            "false_negative_cost": null,
+            "false_positive_cost": null,
+            "max_alert_rate": null,
+            "reason": "Supply reviewed capacity or error costs before deployment.",
+            "selected_threshold": null,
+            "selection_basis": null,
+            "status": "not_configured",
+            "validation_diagnostics": [
+              {
+                "alert_count": 6997,
+                "alert_rate": 1.0,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 0,
+                "false_positive_count": 3030,
+                "threshold": 0.01,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 6994,
+                "alert_rate": 0.9995712448192082,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 0,
+                "false_positive_count": 3027,
+                "threshold": 0.02,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 6966,
+                "alert_rate": 0.9955695297984851,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 5,
+                "false_positive_count": 3004,
+                "threshold": 0.05,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 6850,
+                "alert_rate": 0.9789909961412033,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 20,
+                "false_positive_count": 2903,
+                "threshold": 0.1,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 6361,
+                "alert_rate": 0.9091039016721452,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 107,
+                "false_positive_count": 2501,
+                "threshold": 0.2,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 5587,
+                "alert_rate": 0.7984850650278691,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 294,
+                "false_positive_count": 1914,
+                "threshold": 0.3,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 4811,
+                "alert_rate": 0.6875803915963985,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 572,
+                "false_positive_count": 1416,
+                "threshold": 0.4,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 4058,
+                "alert_rate": 0.5799628412176647,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 885,
+                "false_positive_count": 976,
+                "threshold": 0.5,
+                "within_capacity": true
+              }
+            ]
+          },
           "n_samples": 29949,
           "n_test": 11260,
           "n_train": 18689,
@@ -296,6 +469,93 @@
           "accuracy": 0.730550621669627,
           "balanced_accuracy": 0.7306346729530905,
           "brier_score": 0.18624432321006978,
+          "calibration": {
+            "bins": [
+              {
+                "absolute_gap": 0.010555345181201173,
+                "bin_lower": 0.0,
+                "bin_upper": 0.1,
+                "count": 286,
+                "mean_predicted_probability": 0.08385024922439323,
+                "observed_positive_rate": 0.0944055944055944
+              },
+              {
+                "absolute_gap": 0.022632285200995722,
+                "bin_lower": 0.1,
+                "bin_upper": 0.2,
+                "count": 1534,
+                "mean_predicted_probability": 0.15207436408192473,
+                "observed_positive_rate": 0.17470664928292046
+              },
+              {
+                "absolute_gap": 0.030622752517503765,
+                "bin_lower": 0.2,
+                "bin_upper": 0.30000000000000004,
+                "count": 1339,
+                "mean_predicted_probability": 0.2494369935616598,
+                "observed_positive_rate": 0.28005974607916356
+              },
+              {
+                "absolute_gap": 0.02124241821035555,
+                "bin_lower": 0.30000000000000004,
+                "bin_upper": 0.4,
+                "count": 1381,
+                "mean_predicted_probability": 0.34781736390188345,
+                "observed_positive_rate": 0.3265749456915279
+              },
+              {
+                "absolute_gap": 0.009639348607440201,
+                "bin_lower": 0.4,
+                "bin_upper": 0.5,
+                "count": 1041,
+                "mean_predicted_probability": 0.4496009240157015,
+                "observed_positive_rate": 0.4399615754082613
+              },
+              {
+                "absolute_gap": 0.06255150199997489,
+                "bin_lower": 0.5,
+                "bin_upper": 0.6000000000000001,
+                "count": 840,
+                "mean_predicted_probability": 0.5494562639047368,
+                "observed_positive_rate": 0.4869047619047619
+              },
+              {
+                "absolute_gap": 0.03289276168871025,
+                "bin_lower": 0.6000000000000001,
+                "bin_upper": 0.7000000000000001,
+                "count": 754,
+                "mean_predicted_probability": 0.6482773770733257,
+                "observed_positive_rate": 0.6153846153846154
+              },
+              {
+                "absolute_gap": 0.0049911539704371455,
+                "bin_lower": 0.7000000000000001,
+                "bin_upper": 0.8,
+                "count": 595,
+                "mean_predicted_probability": 0.7479500225001511,
+                "observed_positive_rate": 0.7529411764705882
+              },
+              {
+                "absolute_gap": 0.08162026329819372,
+                "bin_lower": 0.8,
+                "bin_upper": 0.9,
+                "count": 552,
+                "mean_predicted_probability": 0.8569825821387734,
+                "observed_positive_rate": 0.7753623188405797
+              },
+              {
+                "absolute_gap": 0.11759024691860265,
+                "bin_lower": 0.9,
+                "bin_upper": 1.0,
+                "count": 2938,
+                "mean_predicted_probability": 0.9600000495053964,
+                "observed_positive_rate": 0.8424098025867938
+              }
+            ],
+            "curve_bins": 10,
+            "expected_calibration_error": 0.05230547359529918,
+            "n_bins": 10
+          },
           "confusion_matrix": [
             [
               4002,
@@ -306,7 +566,92 @@
               4224
             ]
           ],
+          "expected_calibration_error": 0.05230547359529918,
           "f1": 0.7357603205016547,
+          "intervention_policy": {
+            "configured": false,
+            "false_negative_cost": null,
+            "false_positive_cost": null,
+            "max_alert_rate": null,
+            "reason": "Supply reviewed capacity or error costs before deployment.",
+            "selected_threshold": null,
+            "selection_basis": null,
+            "status": "not_configured",
+            "validation_diagnostics": [
+              {
+                "alert_count": 6997,
+                "alert_rate": 1.0,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 0,
+                "false_positive_count": 3030,
+                "threshold": 0.01,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 6997,
+                "alert_rate": 1.0,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 0,
+                "false_positive_count": 3030,
+                "threshold": 0.02,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 6996,
+                "alert_rate": 0.9998570816064027,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 0,
+                "false_positive_count": 3029,
+                "threshold": 0.05,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 6839,
+                "alert_rate": 0.9774188938116336,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 25,
+                "false_positive_count": 2897,
+                "threshold": 0.1,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 5960,
+                "alert_rate": 0.8517936258396456,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 196,
+                "false_positive_count": 2189,
+                "threshold": 0.2,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 5188,
+                "alert_rate": 0.7414606259825639,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 406,
+                "false_positive_count": 1627,
+                "threshold": 0.3,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 4324,
+                "alert_rate": 0.6179791339145349,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 732,
+                "false_positive_count": 1089,
+                "threshold": 0.4,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 3483,
+                "alert_rate": 0.49778476489924256,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 1109,
+                "false_positive_count": 625,
+                "threshold": 0.5,
+                "within_capacity": true
+              }
+            ]
+          },
           "n_samples": 29949,
           "n_test": 11260,
           "n_train": 18689,
@@ -578,6 +923,93 @@
           "accuracy": 0.7075488454706927,
           "balanced_accuracy": 0.707455458875432,
           "brier_score": 0.2030130144642503,
+          "calibration": {
+            "bins": [
+              {
+                "absolute_gap": 0.09814999139974839,
+                "bin_lower": 0.0,
+                "bin_upper": 0.1,
+                "count": 524,
+                "mean_predicted_probability": 0.06024695516513708,
+                "observed_positive_rate": 0.15839694656488548
+              },
+              {
+                "absolute_gap": 0.028970383985042036,
+                "bin_lower": 0.1,
+                "bin_upper": 0.2,
+                "count": 1105,
+                "mean_predicted_probability": 0.15293006850364574,
+                "observed_positive_rate": 0.18190045248868777
+              },
+              {
+                "absolute_gap": 0.005168871129498653,
+                "bin_lower": 0.2,
+                "bin_upper": 0.30000000000000004,
+                "count": 1282,
+                "mean_predicted_probability": 0.24990133167861367,
+                "observed_positive_rate": 0.2550702028081123
+              },
+              {
+                "absolute_gap": 0.008533419835224987,
+                "bin_lower": 0.30000000000000004,
+                "bin_upper": 0.4,
+                "count": 1296,
+                "mean_predicted_probability": 0.3487196665845281,
+                "observed_positive_rate": 0.35725308641975306
+              },
+              {
+                "absolute_gap": 0.009542136513836064,
+                "bin_lower": 0.4,
+                "bin_upper": 0.5,
+                "count": 1317,
+                "mean_predicted_probability": 0.450594537745845,
+                "observed_positive_rate": 0.4601366742596811
+              },
+              {
+                "absolute_gap": 0.018996323783986635,
+                "bin_lower": 0.5,
+                "bin_upper": 0.6000000000000001,
+                "count": 1158,
+                "mean_predicted_probability": 0.5509479645439176,
+                "observed_positive_rate": 0.531951640759931
+              },
+              {
+                "absolute_gap": 0.08764193903760165,
+                "bin_lower": 0.6000000000000001,
+                "bin_upper": 0.7000000000000001,
+                "count": 1229,
+                "mean_predicted_probability": 0.6495427639729761,
+                "observed_positive_rate": 0.7371847030105777
+              },
+              {
+                "absolute_gap": 0.06958474073871324,
+                "bin_lower": 0.7000000000000001,
+                "bin_upper": 0.8,
+                "count": 1199,
+                "mean_predicted_probability": 0.7494311058000691,
+                "observed_positive_rate": 0.8190158465387823
+              },
+              {
+                "absolute_gap": 0.022810180937098634,
+                "bin_lower": 0.8,
+                "bin_upper": 0.9,
+                "count": 1299,
+                "mean_predicted_probability": 0.8496000192742811,
+                "observed_positive_rate": 0.8267898383371824
+              },
+              {
+                "absolute_gap": 0.29692816462747074,
+                "bin_lower": 0.9,
+                "bin_upper": 1.0,
+                "count": 851,
+                "mean_predicted_probability": 0.9373511963548503,
+                "observed_positive_rate": 0.6404230317273796
+              }
+            ],
+            "curve_bins": 10,
+            "expected_calibration_error": 0.05409891223625093,
+            "n_bins": 10
+          },
           "confusion_matrix": [
             [
               3844,
@@ -588,7 +1020,92 @@
               4123
             ]
           ],
+          "expected_calibration_error": 0.05409891223625093,
           "f1": 0.7146199844007279,
+          "intervention_policy": {
+            "configured": false,
+            "false_negative_cost": null,
+            "false_positive_cost": null,
+            "max_alert_rate": null,
+            "reason": "Supply reviewed capacity or error costs before deployment.",
+            "selected_threshold": null,
+            "selection_basis": null,
+            "status": "not_configured",
+            "validation_diagnostics": [
+              {
+                "alert_count": 6989,
+                "alert_rate": 0.9988566528512219,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 5,
+                "false_positive_count": 3027,
+                "threshold": 0.01,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 6985,
+                "alert_rate": 0.9982849792768329,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 6,
+                "false_positive_count": 3024,
+                "threshold": 0.02,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 6940,
+                "alert_rate": 0.9918536515649564,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 12,
+                "false_positive_count": 2985,
+                "threshold": 0.05,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 6808,
+                "alert_rate": 0.9729884236101186,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 27,
+                "false_positive_count": 2868,
+                "threshold": 0.1,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 6353,
+                "alert_rate": 0.9079605545233671,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 117,
+                "false_positive_count": 2503,
+                "threshold": 0.2,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 5715,
+                "alert_rate": 0.8167786194083179,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 284,
+                "false_positive_count": 2032,
+                "threshold": 0.3,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 4871,
+                "alert_rate": 0.6961554952122339,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 575,
+                "false_positive_count": 1479,
+                "threshold": 0.4,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 3896,
+                "alert_rate": 0.5568100614549093,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 1087,
+                "false_positive_count": 1016,
+                "threshold": 0.5,
+                "within_capacity": true
+              }
+            ]
+          },
           "n_samples": 29949,
           "n_test": 11260,
           "n_train": 18689,
@@ -860,6 +1377,93 @@
           "accuracy": 0.7238898756660747,
           "balanced_accuracy": 0.7239375846840546,
           "brier_score": 0.18198228750198703,
+          "calibration": {
+            "bins": [
+              {
+                "absolute_gap": 0.038333333333333344,
+                "bin_lower": 0.0,
+                "bin_upper": 0.1,
+                "count": 360,
+                "mean_predicted_probability": 0.06999999999999999,
+                "observed_positive_rate": 0.10833333333333334
+              },
+              {
+                "absolute_gap": 0.015677825342700236,
+                "bin_lower": 0.1,
+                "bin_upper": 0.2,
+                "count": 1100,
+                "mean_predicted_probability": 0.15250399283911795,
+                "observed_positive_rate": 0.16818181818181818
+              },
+              {
+                "absolute_gap": 0.006225213401090585,
+                "bin_lower": 0.2,
+                "bin_upper": 0.30000000000000004,
+                "count": 1453,
+                "mean_predicted_probability": 0.2505473056240775,
+                "observed_positive_rate": 0.24432209222298693
+              },
+              {
+                "absolute_gap": 0.00125727384198282,
+                "bin_lower": 0.30000000000000004,
+                "bin_upper": 0.4,
+                "count": 1385,
+                "mean_predicted_probability": 0.3507157575964955,
+                "observed_positive_rate": 0.34945848375451266
+              },
+              {
+                "absolute_gap": 0.014933445585345262,
+                "bin_lower": 0.4,
+                "bin_upper": 0.5,
+                "count": 1231,
+                "mean_predicted_probability": 0.44629006621897643,
+                "observed_positive_rate": 0.43135662063363117
+              },
+              {
+                "absolute_gap": 0.04129954687286219,
+                "bin_lower": 0.5,
+                "bin_upper": 0.6000000000000001,
+                "count": 1001,
+                "mean_predicted_probability": 0.5467940523673677,
+                "observed_positive_rate": 0.5054945054945055
+              },
+              {
+                "absolute_gap": 0.021571236099568347,
+                "bin_lower": 0.6000000000000001,
+                "bin_upper": 0.7000000000000001,
+                "count": 768,
+                "mean_predicted_probability": 0.649175402766235,
+                "observed_positive_rate": 0.6276041666666666
+              },
+              {
+                "absolute_gap": 0.1225225633349325,
+                "bin_lower": 0.7000000000000001,
+                "bin_upper": 0.8,
+                "count": 703,
+                "mean_predicted_probability": 0.7512565604899822,
+                "observed_positive_rate": 0.6287339971550497
+              },
+              {
+                "absolute_gap": 0.22994866959121263,
+                "bin_lower": 0.8,
+                "bin_upper": 0.9,
+                "count": 1037,
+                "mean_predicted_probability": 0.8471135683375964,
+                "observed_positive_rate": 0.6171648987463838
+              },
+              {
+                "absolute_gap": 0.013998775705284627,
+                "bin_lower": 0.9,
+                "bin_upper": 1.0,
+                "count": 2222,
+                "mean_predicted_probability": 0.9766450403317473,
+                "observed_positive_rate": 0.9626462646264626
+              }
+            ],
+            "curve_bins": 10,
+            "expected_calibration_error": 0.04207976967027994,
+            "n_bins": 10
+          },
           "confusion_matrix": [
             [
               3959,
@@ -870,7 +1474,92 @@
               4192
             ]
           ],
+          "expected_calibration_error": 0.04207976967027994,
           "f1": 0.7294875141390411,
+          "intervention_policy": {
+            "configured": false,
+            "false_negative_cost": null,
+            "false_positive_cost": null,
+            "max_alert_rate": null,
+            "reason": "Supply reviewed capacity or error costs before deployment.",
+            "selected_threshold": null,
+            "selection_basis": null,
+            "status": "not_configured",
+            "validation_diagnostics": [
+              {
+                "alert_count": 6997,
+                "alert_rate": 1.0,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 0,
+                "false_positive_count": 3030,
+                "threshold": 0.01,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 6997,
+                "alert_rate": 1.0,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 0,
+                "false_positive_count": 3030,
+                "threshold": 0.02,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 6968,
+                "alert_rate": 0.9958553665856795,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 3,
+                "false_positive_count": 3004,
+                "threshold": 0.05,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 6822,
+                "alert_rate": 0.9749892811204802,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 28,
+                "false_positive_count": 2883,
+                "threshold": 0.1,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 6260,
+                "alert_rate": 0.8946691439188224,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 144,
+                "false_positive_count": 2437,
+                "threshold": 0.2,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 5505,
+                "alert_rate": 0.7867657567528941,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 339,
+                "false_positive_count": 1877,
+                "threshold": 0.3,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 4750,
+                "alert_rate": 0.6788623695869659,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 609,
+                "false_positive_count": 1392,
+                "threshold": 0.4,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 3875,
+                "alert_rate": 0.5538087751893669,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 954,
+                "false_positive_count": 862,
+                "threshold": 0.5,
+                "within_capacity": true
+              }
+            ]
+          },
           "n_samples": 29949,
           "n_test": 11260,
           "n_train": 18689,
@@ -1156,6 +1845,93 @@
           "accuracy": 0.7520426287744227,
           "balanced_accuracy": 0.7503168522180413,
           "brier_score": 0.1625318833261914,
+          "calibration": {
+            "bins": [
+              {
+                "absolute_gap": 0.015586552217453503,
+                "bin_lower": 0.0,
+                "bin_upper": 0.1,
+                "count": 466,
+                "mean_predicted_probability": 0.06810443490701001,
+                "observed_positive_rate": 0.08369098712446352
+              },
+              {
+                "absolute_gap": 0.028637140623254023,
+                "bin_lower": 0.1,
+                "bin_upper": 0.2,
+                "count": 1198,
+                "mean_predicted_probability": 0.1496721990539719,
+                "observed_positive_rate": 0.12103505843071787
+              },
+              {
+                "absolute_gap": 0.04806917211328979,
+                "bin_lower": 0.2,
+                "bin_upper": 0.30000000000000004,
+                "count": 1224,
+                "mean_predicted_probability": 0.24823257080610026,
+                "observed_positive_rate": 0.20016339869281047
+              },
+              {
+                "absolute_gap": 0.060069474280872004,
+                "bin_lower": 0.30000000000000004,
+                "bin_upper": 0.4,
+                "count": 997,
+                "mean_predicted_probability": 0.34993908310735145,
+                "observed_positive_rate": 0.28986960882647944
+              },
+              {
+                "absolute_gap": 0.05706447643005108,
+                "bin_lower": 0.4,
+                "bin_upper": 0.5,
+                "count": 993,
+                "mean_predicted_probability": 0.4467925731067882,
+                "observed_positive_rate": 0.38972809667673713
+              },
+              {
+                "absolute_gap": 0.08606830392198678,
+                "bin_lower": 0.5,
+                "bin_upper": 0.6000000000000001,
+                "count": 983,
+                "mean_predicted_probability": 0.5499543669942146,
+                "observed_positive_rate": 0.46388606307222785
+              },
+              {
+                "absolute_gap": 0.09572748686702137,
+                "bin_lower": 0.6000000000000001,
+                "bin_upper": 0.7000000000000001,
+                "count": 1007,
+                "mean_predicted_probability": 0.6528277847816192,
+                "observed_positive_rate": 0.5571002979145978
+              },
+              {
+                "absolute_gap": 0.15150719026991255,
+                "bin_lower": 0.7000000000000001,
+                "bin_upper": 0.8,
+                "count": 866,
+                "mean_predicted_probability": 0.7496596152121758,
+                "observed_positive_rate": 0.5981524249422633
+              },
+              {
+                "absolute_gap": 0.20651814028940874,
+                "bin_lower": 0.8,
+                "bin_upper": 0.9,
+                "count": 758,
+                "mean_predicted_probability": 0.845040567730042,
+                "observed_positive_rate": 0.6385224274406333
+              },
+              {
+                "absolute_gap": 0.012087598460580828,
+                "bin_lower": 0.9,
+                "bin_upper": 1.0,
+                "count": 2768,
+                "mean_predicted_probability": 0.9799344192698294,
+                "observed_positive_rate": 0.9678468208092486
+              }
+            ],
+            "curve_bins": 10,
+            "expected_calibration_error": 0.06386933899663728,
+            "n_bins": 10
+          },
           "confusion_matrix": [
             [
               3788,
@@ -1166,7 +1942,92 @@
               4680
             ]
           ],
+          "expected_calibration_error": 0.06386933899663728,
           "f1": 0.7702435813034891,
+          "intervention_policy": {
+            "configured": false,
+            "false_negative_cost": null,
+            "false_positive_cost": null,
+            "max_alert_rate": null,
+            "reason": "Supply reviewed capacity or error costs before deployment.",
+            "selected_threshold": null,
+            "selection_basis": null,
+            "status": "not_configured",
+            "validation_diagnostics": [
+              {
+                "alert_count": 6994,
+                "alert_rate": 0.9995712448192082,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 0,
+                "false_positive_count": 3027,
+                "threshold": 0.01,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 6980,
+                "alert_rate": 0.9975703873088466,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 0,
+                "false_positive_count": 3013,
+                "threshold": 0.02,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 6928,
+                "alert_rate": 0.9901386308417893,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 4,
+                "false_positive_count": 2965,
+                "threshold": 0.05,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 6786,
+                "alert_rate": 0.9698442189509789,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 25,
+                "false_positive_count": 2844,
+                "threshold": 0.1,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 6298,
+                "alert_rate": 0.900100042875518,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 92,
+                "false_positive_count": 2423,
+                "threshold": 0.2,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 5603,
+                "alert_rate": 0.8007717593254252,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 233,
+                "false_positive_count": 1869,
+                "threshold": 0.3,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 4854,
+                "alert_rate": 0.6937258825210805,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 434,
+                "false_positive_count": 1321,
+                "threshold": 0.4,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 4186,
+                "alert_rate": 0.5982563955981135,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 663,
+                "false_positive_count": 882,
+                "threshold": 0.5,
+                "within_capacity": true
+              }
+            ]
+          },
           "n_samples": 29949,
           "n_test": 11260,
           "n_train": 18689,
@@ -1438,6 +2299,93 @@
           "accuracy": 0.7624333925399644,
           "balanced_accuracy": 0.7613320358300135,
           "brier_score": 0.16834842259547328,
+          "calibration": {
+            "bins": [
+              {
+                "absolute_gap": 0.006332395419122408,
+                "bin_lower": 0.0,
+                "bin_upper": 0.1,
+                "count": 694,
+                "mean_predicted_probability": 0.07868201380277962,
+                "observed_positive_rate": 0.08501440922190202
+              },
+              {
+                "absolute_gap": 0.0062462978556420135,
+                "bin_lower": 0.1,
+                "bin_upper": 0.2,
+                "count": 1600,
+                "mean_predicted_probability": 0.14812129785564201,
+                "observed_positive_rate": 0.141875
+              },
+              {
+                "absolute_gap": 0.00756514826671334,
+                "bin_lower": 0.2,
+                "bin_upper": 0.30000000000000004,
+                "count": 1151,
+                "mean_predicted_probability": 0.2473566339313528,
+                "observed_positive_rate": 0.23979148566463945
+              },
+              {
+                "absolute_gap": 0.021103125631379505,
+                "bin_lower": 0.30000000000000004,
+                "bin_upper": 0.4,
+                "count": 897,
+                "mean_predicted_probability": 0.3477474957540105,
+                "observed_positive_rate": 0.326644370122631
+              },
+              {
+                "absolute_gap": 0.042746260827216054,
+                "bin_lower": 0.4,
+                "bin_upper": 0.5,
+                "count": 794,
+                "mean_predicted_probability": 0.4482878225400624,
+                "observed_positive_rate": 0.40554156171284633
+              },
+              {
+                "absolute_gap": 0.014585447902949356,
+                "bin_lower": 0.5,
+                "bin_upper": 0.6000000000000001,
+                "count": 704,
+                "mean_predicted_probability": 0.5515172660847676,
+                "observed_positive_rate": 0.5369318181818182
+              },
+              {
+                "absolute_gap": 0.07829437647953552,
+                "bin_lower": 0.6000000000000001,
+                "bin_upper": 0.7000000000000001,
+                "count": 746,
+                "mean_predicted_probability": 0.6506804354607688,
+                "observed_positive_rate": 0.5723860589812333
+              },
+              {
+                "absolute_gap": 0.1490044112495914,
+                "bin_lower": 0.7000000000000001,
+                "bin_upper": 0.8,
+                "count": 668,
+                "mean_predicted_probability": 0.7463098004711483,
+                "observed_positive_rate": 0.5973053892215568
+              },
+              {
+                "absolute_gap": 0.08699021146702735,
+                "bin_lower": 0.8,
+                "bin_upper": 0.9,
+                "count": 587,
+                "mean_predicted_probability": 0.8518965147038247,
+                "observed_positive_rate": 0.7649063032367973
+              },
+              {
+                "absolute_gap": 0.10264584944183197,
+                "bin_lower": 0.9,
+                "bin_upper": 1.0,
+                "count": 3419,
+                "mean_predicted_probability": 0.9721983501730399,
+                "observed_positive_rate": 0.8695525007312079
+              }
+            ],
+            "curve_bins": 10,
+            "expected_calibration_error": 0.0573877797245069,
+            "n_bins": 10
+          },
           "confusion_matrix": [
             [
               3959,
@@ -1448,7 +2396,92 @@
               4626
             ]
           ],
+          "expected_calibration_error": 0.0573877797245069,
           "f1": 0.7757189569883458,
+          "intervention_policy": {
+            "configured": false,
+            "false_negative_cost": null,
+            "false_positive_cost": null,
+            "max_alert_rate": null,
+            "reason": "Supply reviewed capacity or error costs before deployment.",
+            "selected_threshold": null,
+            "selection_basis": null,
+            "status": "not_configured",
+            "validation_diagnostics": [
+              {
+                "alert_count": 6997,
+                "alert_rate": 1.0,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 0,
+                "false_positive_count": 3030,
+                "threshold": 0.01,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 6997,
+                "alert_rate": 1.0,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 0,
+                "false_positive_count": 3030,
+                "threshold": 0.02,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 6986,
+                "alert_rate": 0.9984278976704302,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 1,
+                "false_positive_count": 3020,
+                "threshold": 0.05,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 6709,
+                "alert_rate": 0.9588395026439903,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 37,
+                "false_positive_count": 2779,
+                "threshold": 0.1,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 5639,
+                "alert_rate": 0.8059168214949264,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 208,
+                "false_positive_count": 1880,
+                "threshold": 0.2,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 4829,
+                "alert_rate": 0.690152922681149,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 410,
+                "false_positive_count": 1272,
+                "threshold": 0.3,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 4177,
+                "alert_rate": 0.5969701300557382,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 648,
+                "false_positive_count": 858,
+                "threshold": 0.4,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 3646,
+                "alert_rate": 0.5210804630555953,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 866,
+                "false_positive_count": 545,
+                "threshold": 0.5,
+                "within_capacity": true
+              }
+            ]
+          },
           "n_samples": 29949,
           "n_test": 11260,
           "n_train": 18689,
@@ -1720,6 +2753,93 @@
           "accuracy": 0.7372113676731794,
           "balanced_accuracy": 0.7348078065312909,
           "brier_score": 0.1816333387737619,
+          "calibration": {
+            "bins": [
+              {
+                "absolute_gap": 0.04535001899229534,
+                "bin_lower": 0.0,
+                "bin_upper": 0.1,
+                "count": 702,
+                "mean_predicted_probability": 0.055789582147305804,
+                "observed_positive_rate": 0.10113960113960115
+              },
+              {
+                "absolute_gap": 0.0118341163736366,
+                "bin_lower": 0.1,
+                "bin_upper": 0.2,
+                "count": 857,
+                "mean_predicted_probability": 0.14952373130945923,
+                "observed_positive_rate": 0.13768961493582263
+              },
+              {
+                "absolute_gap": 0.0333046059122481,
+                "bin_lower": 0.2,
+                "bin_upper": 0.30000000000000004,
+                "count": 972,
+                "mean_predicted_probability": 0.24935398862829747,
+                "observed_positive_rate": 0.21604938271604937
+              },
+              {
+                "absolute_gap": 0.05597201528283663,
+                "bin_lower": 0.30000000000000004,
+                "bin_upper": 0.4,
+                "count": 1073,
+                "mean_predicted_probability": 0.35140537968171826,
+                "observed_positive_rate": 0.2954333643988816
+              },
+              {
+                "absolute_gap": 0.10157972452450553,
+                "bin_lower": 0.4,
+                "bin_upper": 0.5,
+                "count": 1064,
+                "mean_predicted_probability": 0.44838423580270104,
+                "observed_positive_rate": 0.3468045112781955
+              },
+              {
+                "absolute_gap": 0.08104977401246932,
+                "bin_lower": 0.5,
+                "bin_upper": 0.6000000000000001,
+                "count": 1098,
+                "mean_predicted_probability": 0.5519058760161123,
+                "observed_positive_rate": 0.470856102003643
+              },
+              {
+                "absolute_gap": 0.03223981213820992,
+                "bin_lower": 0.6000000000000001,
+                "bin_upper": 0.7000000000000001,
+                "count": 1198,
+                "mean_predicted_probability": 0.6474317987826173,
+                "observed_positive_rate": 0.6151919866444073
+              },
+              {
+                "absolute_gap": 0.0020114368369841262,
+                "bin_lower": 0.7000000000000001,
+                "bin_upper": 0.8,
+                "count": 1485,
+                "mean_predicted_probability": 0.752853187678735,
+                "observed_positive_rate": 0.7508417508417509
+              },
+              {
+                "absolute_gap": 0.025773492625057903,
+                "bin_lower": 0.8,
+                "bin_upper": 0.9,
+                "count": 1687,
+                "mean_predicted_probability": 0.850906865476273,
+                "observed_positive_rate": 0.8251333728512151
+              },
+              {
+                "absolute_gap": 0.08954743228308082,
+                "bin_lower": 0.9,
+                "bin_upper": 1.0,
+                "count": 1124,
+                "mean_predicted_probability": 0.9409709198275648,
+                "observed_positive_rate": 0.8514234875444839
+              }
+            ],
+            "curve_bins": 10,
+            "expected_calibration_error": 0.04593450743862384,
+            "n_bins": 10
+          },
           "confusion_matrix": [
             [
               3583,
@@ -1730,7 +2850,92 @@
               4718
             ]
           ],
+          "expected_calibration_error": 0.04593450743862384,
           "f1": 0.7612747075433642,
+          "intervention_policy": {
+            "configured": false,
+            "false_negative_cost": null,
+            "false_positive_cost": null,
+            "max_alert_rate": null,
+            "reason": "Supply reviewed capacity or error costs before deployment.",
+            "selected_threshold": null,
+            "selection_basis": null,
+            "status": "not_configured",
+            "validation_diagnostics": [
+              {
+                "alert_count": 6986,
+                "alert_rate": 0.9984278976704302,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 4,
+                "false_positive_count": 3023,
+                "threshold": 0.01,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 6977,
+                "alert_rate": 0.9971416321280548,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 4,
+                "false_positive_count": 3014,
+                "threshold": 0.02,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 6913,
+                "alert_rate": 0.9879948549378305,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 8,
+                "false_positive_count": 2954,
+                "threshold": 0.05,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 6737,
+                "alert_rate": 0.9628412176647134,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 22,
+                "false_positive_count": 2792,
+                "threshold": 0.1,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 6323,
+                "alert_rate": 0.9036730027154495,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 80,
+                "false_positive_count": 2436,
+                "threshold": 0.2,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 5718,
+                "alert_rate": 0.8172073745891096,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 211,
+                "false_positive_count": 1962,
+                "threshold": 0.3,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 4989,
+                "alert_rate": 0.71301986565671,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 428,
+                "false_positive_count": 1450,
+                "threshold": 0.4,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 4285,
+                "alert_rate": 0.6124053165642418,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 670,
+                "false_positive_count": 988,
+                "threshold": 0.5,
+                "within_capacity": true
+              }
+            ]
+          },
           "n_samples": 29949,
           "n_test": 11260,
           "n_train": 18689,
@@ -2002,6 +3207,93 @@
           "accuracy": 0.761101243339254,
           "balanced_accuracy": 0.7600559901987468,
           "brier_score": 0.15938989574090054,
+          "calibration": {
+            "bins": [
+              {
+                "absolute_gap": 0.006263390044108391,
+                "bin_lower": 0.0,
+                "bin_upper": 0.1,
+                "count": 529,
+                "mean_predicted_probability": 0.06557025834908632,
+                "observed_positive_rate": 0.07183364839319471
+              },
+              {
+                "absolute_gap": 0.02148737373737375,
+                "bin_lower": 0.1,
+                "bin_upper": 0.2,
+                "count": 1320,
+                "mean_predicted_probability": 0.1510328282828283,
+                "observed_positive_rate": 0.12954545454545455
+              },
+              {
+                "absolute_gap": 0.028805196878109784,
+                "bin_lower": 0.2,
+                "bin_upper": 0.30000000000000004,
+                "count": 1254,
+                "mean_predicted_probability": 0.2489008906580141,
+                "observed_positive_rate": 0.22009569377990432
+              },
+              {
+                "absolute_gap": 0.05503235088405867,
+                "bin_lower": 0.30000000000000004,
+                "bin_upper": 0.4,
+                "count": 1016,
+                "mean_predicted_probability": 0.35030794143523974,
+                "observed_positive_rate": 0.2952755905511811
+              },
+              {
+                "absolute_gap": 0.05596369793105538,
+                "bin_lower": 0.4,
+                "bin_upper": 0.5,
+                "count": 1001,
+                "mean_predicted_probability": 0.447572089539447,
+                "observed_positive_rate": 0.3916083916083916
+              },
+              {
+                "absolute_gap": 0.02751807427929942,
+                "bin_lower": 0.5,
+                "bin_upper": 0.6000000000000001,
+                "count": 945,
+                "mean_predicted_probability": 0.5502693970306222,
+                "observed_positive_rate": 0.5227513227513227
+              },
+              {
+                "absolute_gap": 0.08175252641337183,
+                "bin_lower": 0.6000000000000001,
+                "bin_upper": 0.7000000000000001,
+                "count": 941,
+                "mean_predicted_probability": 0.6513593276886109,
+                "observed_positive_rate": 0.5696068012752391
+              },
+              {
+                "absolute_gap": 0.1932236763481896,
+                "bin_lower": 0.7000000000000001,
+                "bin_upper": 0.8,
+                "count": 793,
+                "mean_predicted_probability": 0.7493396914805982,
+                "observed_positive_rate": 0.5561160151324086
+              },
+              {
+                "absolute_gap": 0.18051676124279314,
+                "bin_lower": 0.8,
+                "bin_upper": 0.9,
+                "count": 692,
+                "mean_predicted_probability": 0.8495919057514637,
+                "observed_positive_rate": 0.6690751445086706
+              },
+              {
+                "absolute_gap": 0.010349768134950255,
+                "bin_lower": 0.9,
+                "bin_upper": 1.0,
+                "count": 2769,
+                "mean_predicted_probability": 0.9825418952566548,
+                "observed_positive_rate": 0.9721921271217046
+              }
+            ],
+            "curve_bins": 10,
+            "expected_calibration_error": 0.05235054203532253,
+            "n_bins": 10
+          },
           "confusion_matrix": [
             [
               3962,
@@ -2012,7 +3304,92 @@
               4608
             ]
           ],
+          "expected_calibration_error": 0.05235054203532253,
           "f1": 0.7740634973962708,
+          "intervention_policy": {
+            "configured": false,
+            "false_negative_cost": null,
+            "false_positive_cost": null,
+            "max_alert_rate": null,
+            "reason": "Supply reviewed capacity or error costs before deployment.",
+            "selected_threshold": null,
+            "selection_basis": null,
+            "status": "not_configured",
+            "validation_diagnostics": [
+              {
+                "alert_count": 6995,
+                "alert_rate": 0.9997141632128055,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 0,
+                "false_positive_count": 3028,
+                "threshold": 0.01,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 6989,
+                "alert_rate": 0.9988566528512219,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 0,
+                "false_positive_count": 3022,
+                "threshold": 0.02,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 6935,
+                "alert_rate": 0.9911390595969701,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 6,
+                "false_positive_count": 2974,
+                "threshold": 0.05,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 6804,
+                "alert_rate": 0.9724167500357296,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 20,
+                "false_positive_count": 2857,
+                "threshold": 0.1,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 6195,
+                "alert_rate": 0.8853794483350007,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 107,
+                "false_positive_count": 2335,
+                "threshold": 0.2,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 5428,
+                "alert_rate": 0.7757610404459054,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 284,
+                "false_positive_count": 1745,
+                "threshold": 0.3,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 4677,
+                "alert_rate": 0.6684293268543662,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 488,
+                "false_positive_count": 1198,
+                "threshold": 0.4,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 3969,
+                "alert_rate": 0.5672431041875089,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 758,
+                "false_positive_count": 760,
+                "threshold": 0.5,
+                "within_capacity": true
+              }
+            ]
+          },
           "n_samples": 29949,
           "n_test": 11260,
           "n_train": 18689,
@@ -2298,6 +3675,93 @@
           "accuracy": 0.7654529307282416,
           "balanced_accuracy": 0.7629504097502726,
           "brier_score": 0.15702986113974965,
+          "calibration": {
+            "bins": [
+              {
+                "absolute_gap": 0.005533536585365845,
+                "bin_lower": 0.0,
+                "bin_upper": 0.1,
+                "count": 656,
+                "mean_predicted_probability": 0.06611280487804878,
+                "observed_positive_rate": 0.07164634146341463
+              },
+              {
+                "absolute_gap": 0.03270419426048565,
+                "bin_lower": 0.1,
+                "bin_upper": 0.2,
+                "count": 1208,
+                "mean_predicted_probability": 0.14611479028697572,
+                "observed_positive_rate": 0.11341059602649006
+              },
+              {
+                "absolute_gap": 0.07291607011568535,
+                "bin_lower": 0.2,
+                "bin_upper": 0.30000000000000004,
+                "count": 1039,
+                "mean_predicted_probability": 0.24808450129951595,
+                "observed_positive_rate": 0.1751684311838306
+              },
+              {
+                "absolute_gap": 0.09023301737756712,
+                "bin_lower": 0.30000000000000004,
+                "bin_upper": 0.4,
+                "count": 844,
+                "mean_predicted_probability": 0.3497116903633491,
+                "observed_positive_rate": 0.259478672985782
+              },
+              {
+                "absolute_gap": 0.08600944510035424,
+                "bin_lower": 0.4,
+                "bin_upper": 0.5,
+                "count": 847,
+                "mean_predicted_probability": 0.44846517119244395,
+                "observed_positive_rate": 0.3624557260920897
+              },
+              {
+                "absolute_gap": 0.11413972055888222,
+                "bin_lower": 0.5,
+                "bin_upper": 0.6000000000000001,
+                "count": 835,
+                "mean_predicted_probability": 0.550067864271457,
+                "observed_positive_rate": 0.4359281437125748
+              },
+              {
+                "absolute_gap": 0.1616285501676924,
+                "bin_lower": 0.6000000000000001,
+                "bin_upper": 0.7000000000000001,
+                "count": 746,
+                "mean_predicted_probability": 0.6522451721516066,
+                "observed_positive_rate": 0.4906166219839142
+              },
+              {
+                "absolute_gap": 0.18892324093816637,
+                "bin_lower": 0.7000000000000001,
+                "bin_upper": 0.8,
+                "count": 938,
+                "mean_predicted_probability": 0.7518230277185501,
+                "observed_positive_rate": 0.5628997867803838
+              },
+              {
+                "absolute_gap": 0.21606055156729653,
+                "bin_lower": 0.8,
+                "bin_upper": 0.9,
+                "count": 995,
+                "mean_predicted_probability": 0.8442012550848845,
+                "observed_positive_rate": 0.628140703517588
+              },
+              {
+                "absolute_gap": 0.019475465313028795,
+                "bin_lower": 0.9,
+                "bin_upper": 1.0,
+                "count": 3152,
+                "mean_predicted_probability": 0.9801353637901862,
+                "observed_positive_rate": 0.9606598984771574
+              }
+            ],
+            "curve_bins": 10,
+            "expected_calibration_error": 0.08324703470261301,
+            "n_bins": 10
+          },
           "confusion_matrix": [
             [
               3719,
@@ -2308,7 +3772,92 @@
               4900
             ]
           ],
+          "expected_calibration_error": 0.08324703470261301,
           "f1": 0.7877180290973395,
+          "intervention_policy": {
+            "configured": false,
+            "false_negative_cost": null,
+            "false_positive_cost": null,
+            "max_alert_rate": null,
+            "reason": "Supply reviewed capacity or error costs before deployment.",
+            "selected_threshold": null,
+            "selection_basis": null,
+            "status": "not_configured",
+            "validation_diagnostics": [
+              {
+                "alert_count": 6996,
+                "alert_rate": 0.9998570816064027,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 0,
+                "false_positive_count": 3029,
+                "threshold": 0.01,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 6991,
+                "alert_rate": 0.9991424896384165,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 0,
+                "false_positive_count": 3024,
+                "threshold": 0.02,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 6922,
+                "alert_rate": 0.9892811204802058,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 7,
+                "false_positive_count": 2962,
+                "threshold": 0.05,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 6726,
+                "alert_rate": 0.9612691153351436,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 23,
+                "false_positive_count": 2782,
+                "threshold": 0.1,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 6076,
+                "alert_rate": 0.8683721594969273,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 102,
+                "false_positive_count": 2211,
+                "threshold": 0.2,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 5231,
+                "alert_rate": 0.747606116907246,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 258,
+                "false_positive_count": 1522,
+                "threshold": 0.3,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 4516,
+                "alert_rate": 0.6454194654852079,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 457,
+                "false_positive_count": 1006,
+                "threshold": 0.4,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 3918,
+                "alert_rate": 0.5599542661140489,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 671,
+                "false_positive_count": 622,
+                "threshold": 0.5,
+                "within_capacity": true
+              }
+            ]
+          },
           "n_samples": 29949,
           "n_test": 11260,
           "n_train": 18689,
@@ -2580,6 +4129,93 @@
           "accuracy": 0.7684724689165187,
           "balanced_accuracy": 0.7668578248295361,
           "brier_score": 0.1659726996574964,
+          "calibration": {
+            "bins": [
+              {
+                "absolute_gap": 0.004424158585529123,
+                "bin_lower": 0.0,
+                "bin_upper": 0.1,
+                "count": 1115,
+                "mean_predicted_probability": 0.07180902527097312,
+                "observed_positive_rate": 0.07623318385650224
+              },
+              {
+                "absolute_gap": 0.00522963471622695,
+                "bin_lower": 0.1,
+                "bin_upper": 0.2,
+                "count": 1476,
+                "mean_predicted_probability": 0.14547353715525135,
+                "observed_positive_rate": 0.1402439024390244
+              },
+              {
+                "absolute_gap": 0.011684309819610411,
+                "bin_lower": 0.2,
+                "bin_upper": 0.30000000000000004,
+                "count": 944,
+                "mean_predicted_probability": 0.25109108948062736,
+                "observed_positive_rate": 0.23940677966101695
+              },
+              {
+                "absolute_gap": 0.019477887131178984,
+                "bin_lower": 0.30000000000000004,
+                "bin_upper": 0.4,
+                "count": 759,
+                "mean_predicted_probability": 0.34885865129455185,
+                "observed_positive_rate": 0.32938076416337286
+              },
+              {
+                "absolute_gap": 0.01792623966123974,
+                "bin_lower": 0.4,
+                "bin_upper": 0.5,
+                "count": 652,
+                "mean_predicted_probability": 0.44737409242197596,
+                "observed_positive_rate": 0.4294478527607362
+              },
+              {
+                "absolute_gap": 0.08120898267855947,
+                "bin_lower": 0.5,
+                "bin_upper": 0.6000000000000001,
+                "count": 519,
+                "mean_predicted_probability": 0.5474902928905055,
+                "observed_positive_rate": 0.4662813102119461
+              },
+              {
+                "absolute_gap": 0.10467042062245047,
+                "bin_lower": 0.6000000000000001,
+                "bin_upper": 0.7000000000000001,
+                "count": 457,
+                "mean_predicted_probability": 0.6473400048675271,
+                "observed_positive_rate": 0.5426695842450766
+              },
+              {
+                "absolute_gap": 0.2294790854867126,
+                "bin_lower": 0.7000000000000001,
+                "bin_upper": 0.8,
+                "count": 517,
+                "mean_predicted_probability": 0.7536570351965772,
+                "observed_positive_rate": 0.5241779497098646
+              },
+              {
+                "absolute_gap": 0.30231169208116726,
+                "bin_lower": 0.8,
+                "bin_upper": 0.9,
+                "count": 736,
+                "mean_predicted_probability": 0.8553008225159499,
+                "observed_positive_rate": 0.5529891304347826
+              },
+              {
+                "absolute_gap": 0.09940221427676521,
+                "bin_lower": 0.9,
+                "bin_upper": 1.0,
+                "count": 4085,
+                "mean_predicted_probability": 0.977492789552163,
+                "observed_positive_rate": 0.8780905752753978
+              }
+            ],
+            "curve_bins": 10,
+            "expected_calibration_error": 0.07880421606119085,
+            "n_bins": 10
+          },
           "confusion_matrix": [
             [
               3898,
@@ -2590,7 +4226,92 @@
               4755
             ]
           ],
+          "expected_calibration_error": 0.07880421606119085,
           "f1": 0.7848477345877692,
+          "intervention_policy": {
+            "configured": false,
+            "false_negative_cost": null,
+            "false_positive_cost": null,
+            "max_alert_rate": null,
+            "reason": "Supply reviewed capacity or error costs before deployment.",
+            "selected_threshold": null,
+            "selection_basis": null,
+            "status": "not_configured",
+            "validation_diagnostics": [
+              {
+                "alert_count": 6997,
+                "alert_rate": 1.0,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 0,
+                "false_positive_count": 3030,
+                "threshold": 0.01,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 6997,
+                "alert_rate": 1.0,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 0,
+                "false_positive_count": 3030,
+                "threshold": 0.02,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 6933,
+                "alert_rate": 0.9908532228097756,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 2,
+                "false_positive_count": 2968,
+                "threshold": 0.05,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 6303,
+                "alert_rate": 0.9008146348435043,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 54,
+                "false_positive_count": 2390,
+                "threshold": 0.1,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 5336,
+                "alert_rate": 0.7626125482349578,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 206,
+                "false_positive_count": 1575,
+                "threshold": 0.2,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 4600,
+                "alert_rate": 0.6574246105473774,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 410,
+                "false_positive_count": 1043,
+                "threshold": 0.3,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 3949,
+                "alert_rate": 0.5643847363155639,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 635,
+                "false_positive_count": 617,
+                "threshold": 0.4,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 3461,
+                "alert_rate": 0.4946405602401029,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 869,
+                "false_positive_count": 363,
+                "threshold": 0.5,
+                "within_capacity": true
+              }
+            ]
+          },
           "n_samples": 29949,
           "n_test": 11260,
           "n_train": 18689,
@@ -2862,6 +4583,93 @@
           "accuracy": 0.7303730017761989,
           "balanced_accuracy": 0.7275778286467627,
           "brier_score": 0.18172757804848266,
+          "calibration": {
+            "bins": [
+              {
+                "absolute_gap": 0.018520800314167307,
+                "bin_lower": 0.0,
+                "bin_upper": 0.1,
+                "count": 659,
+                "mean_predicted_probability": 0.057351733828473056,
+                "observed_positive_rate": 0.07587253414264036
+              },
+              {
+                "absolute_gap": 0.021360896740141994,
+                "bin_lower": 0.1,
+                "bin_upper": 0.2,
+                "count": 812,
+                "mean_predicted_probability": 0.14943971447413215,
+                "observed_positive_rate": 0.12807881773399016
+              },
+              {
+                "absolute_gap": 0.06486653516803895,
+                "bin_lower": 0.2,
+                "bin_upper": 0.30000000000000004,
+                "count": 954,
+                "mean_predicted_probability": 0.2504011263630075,
+                "observed_positive_rate": 0.18553459119496854
+              },
+              {
+                "absolute_gap": 0.07877878176343711,
+                "bin_lower": 0.30000000000000004,
+                "bin_upper": 0.4,
+                "count": 983,
+                "mean_predicted_probability": 0.3503962792202021,
+                "observed_positive_rate": 0.271617497456765
+              },
+              {
+                "absolute_gap": 0.04560257542363588,
+                "bin_lower": 0.4,
+                "bin_upper": 0.5,
+                "count": 1119,
+                "mean_predicted_probability": 0.4522156227873535,
+                "observed_positive_rate": 0.4066130473637176
+              },
+              {
+                "absolute_gap": 0.06650005621412403,
+                "bin_lower": 0.5,
+                "bin_upper": 0.6000000000000001,
+                "count": 1132,
+                "mean_predicted_probability": 0.5488322116911558,
+                "observed_positive_rate": 0.4823321554770318
+              },
+              {
+                "absolute_gap": 0.048037290540224764,
+                "bin_lower": 0.6000000000000001,
+                "bin_upper": 0.7000000000000001,
+                "count": 1288,
+                "mean_predicted_probability": 0.6520745576209701,
+                "observed_positive_rate": 0.6040372670807453
+              },
+              {
+                "absolute_gap": 0.04143254302051147,
+                "bin_lower": 0.7000000000000001,
+                "bin_upper": 0.8,
+                "count": 1420,
+                "mean_predicted_probability": 0.7491790218937509,
+                "observed_positive_rate": 0.7077464788732394
+              },
+              {
+                "absolute_gap": 0.04812817484775711,
+                "bin_lower": 0.8,
+                "bin_upper": 0.9,
+                "count": 1624,
+                "mean_predicted_probability": 0.8516996034191857,
+                "observed_positive_rate": 0.8035714285714286
+              },
+              {
+                "absolute_gap": 0.06560217742578889,
+                "bin_lower": 0.9,
+                "bin_upper": 1.0,
+                "count": 1269,
+                "mean_predicted_probability": 0.9450348015392641,
+                "observed_positive_rate": 0.8794326241134752
+              }
+            ],
+            "curve_bins": 10,
+            "expected_calibration_error": 0.05126957180535131,
+            "n_bins": 10
+          },
           "confusion_matrix": [
             [
               3474,
@@ -2872,7 +4680,92 @@
               4750
             ]
           ],
+          "expected_calibration_error": 0.05126957180535131,
           "f1": 0.7578174856413529,
+          "intervention_policy": {
+            "configured": false,
+            "false_negative_cost": null,
+            "false_positive_cost": null,
+            "max_alert_rate": null,
+            "reason": "Supply reviewed capacity or error costs before deployment.",
+            "selected_threshold": null,
+            "selection_basis": null,
+            "status": "not_configured",
+            "validation_diagnostics": [
+              {
+                "alert_count": 6995,
+                "alert_rate": 0.9997141632128055,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 0,
+                "false_positive_count": 3028,
+                "threshold": 0.01,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 6973,
+                "alert_rate": 0.9965699585536658,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 1,
+                "false_positive_count": 3007,
+                "threshold": 0.02,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 6866,
+                "alert_rate": 0.9812776904387595,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 3,
+                "false_positive_count": 2902,
+                "threshold": 0.05,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 6601,
+                "alert_rate": 0.9434043161354866,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 23,
+                "false_positive_count": 2657,
+                "threshold": 0.1,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 5986,
+                "alert_rate": 0.8555095040731742,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 115,
+                "false_positive_count": 2134,
+                "threshold": 0.2,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 5316,
+                "alert_rate": 0.7597541803630127,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 275,
+                "false_positive_count": 1624,
+                "threshold": 0.3,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 4685,
+                "alert_rate": 0.6695726740031442,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 490,
+                "false_positive_count": 1208,
+                "threshold": 0.4,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 3887,
+                "alert_rate": 0.555523795912534,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 900,
+                "false_positive_count": 820,
+                "threshold": 0.5,
+                "within_capacity": true
+              }
+            ]
+          },
           "n_samples": 29949,
           "n_test": 11260,
           "n_train": 18689,
@@ -3144,6 +5037,93 @@
           "accuracy": 0.7767317939609236,
           "balanced_accuracy": 0.7753899165158549,
           "brier_score": 0.14929930437171576,
+          "calibration": {
+            "bins": [
+              {
+                "absolute_gap": 0.019518820333721376,
+                "bin_lower": 0.0,
+                "bin_upper": 0.1,
+                "count": 859,
+                "mean_predicted_probability": 0.06313542879317036,
+                "observed_positive_rate": 0.08265424912689173
+              },
+              {
+                "absolute_gap": 0.028276899924755475,
+                "bin_lower": 0.1,
+                "bin_upper": 0.2,
+                "count": 1329,
+                "mean_predicted_probability": 0.147163280662152,
+                "observed_positive_rate": 0.11888638073739653
+              },
+              {
+                "absolute_gap": 0.051825396825396775,
+                "bin_lower": 0.2,
+                "bin_upper": 0.30000000000000004,
+                "count": 1050,
+                "mean_predicted_probability": 0.24896825396825392,
+                "observed_positive_rate": 0.19714285714285715
+              },
+              {
+                "absolute_gap": 0.05279036317871266,
+                "bin_lower": 0.30000000000000004,
+                "bin_upper": 0.4,
+                "count": 927,
+                "mean_predicted_probability": 0.3505249910104279,
+                "observed_positive_rate": 0.2977346278317152
+              },
+              {
+                "absolute_gap": 0.058565251572327004,
+                "bin_lower": 0.4,
+                "bin_upper": 0.5,
+                "count": 848,
+                "mean_predicted_probability": 0.44653694968553453,
+                "observed_positive_rate": 0.38797169811320753
+              },
+              {
+                "absolute_gap": 0.09501109631602317,
+                "bin_lower": 0.5,
+                "bin_upper": 0.6000000000000001,
+                "count": 751,
+                "mean_predicted_probability": 0.5490723479804706,
+                "observed_positive_rate": 0.4540612516644474
+              },
+              {
+                "absolute_gap": 0.13354166666666667,
+                "bin_lower": 0.6000000000000001,
+                "bin_upper": 0.7000000000000001,
+                "count": 720,
+                "mean_predicted_probability": 0.6529861111111112,
+                "observed_positive_rate": 0.5194444444444445
+              },
+              {
+                "absolute_gap": 0.21018731375053223,
+                "bin_lower": 0.7000000000000001,
+                "bin_upper": 0.8,
+                "count": 783,
+                "mean_predicted_probability": 0.7491400595998298,
+                "observed_positive_rate": 0.5389527458492975
+              },
+              {
+                "absolute_gap": 0.16690259525209183,
+                "bin_lower": 0.8,
+                "bin_upper": 0.9,
+                "count": 811,
+                "mean_predicted_probability": 0.8463107333532016,
+                "observed_positive_rate": 0.6794081381011098
+              },
+              {
+                "absolute_gap": 0.01780850618059915,
+                "bin_lower": 0.9,
+                "bin_upper": 1.0,
+                "count": 3182,
+                "mean_predicted_probability": 0.9838675885187512,
+                "observed_positive_rate": 0.9660590823381521
+              }
+            ],
+            "curve_bins": 10,
+            "expected_calibration_error": 0.06496163452481761,
+            "n_bins": 10
+          },
           "confusion_matrix": [
             [
               3993,
@@ -3154,7 +5134,92 @@
               4753
             ]
           ],
+          "expected_calibration_error": 0.06496163452481761,
           "f1": 0.7908485856905159,
+          "intervention_policy": {
+            "configured": false,
+            "false_negative_cost": null,
+            "false_positive_cost": null,
+            "max_alert_rate": null,
+            "reason": "Supply reviewed capacity or error costs before deployment.",
+            "selected_threshold": null,
+            "selection_basis": null,
+            "status": "not_configured",
+            "validation_diagnostics": [
+              {
+                "alert_count": 6991,
+                "alert_rate": 0.9991424896384165,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 0,
+                "false_positive_count": 3024,
+                "threshold": 0.01,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 6973,
+                "alert_rate": 0.9965699585536658,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 0,
+                "false_positive_count": 3006,
+                "threshold": 0.02,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 6896,
+                "alert_rate": 0.9855652422466772,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 6,
+                "false_positive_count": 2935,
+                "threshold": 0.05,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 6621,
+                "alert_rate": 0.9462626840074317,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 30,
+                "false_positive_count": 2684,
+                "threshold": 0.1,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 5868,
+                "alert_rate": 0.838645133628698,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 127,
+                "false_positive_count": 2028,
+                "threshold": 0.2,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 5175,
+                "alert_rate": 0.7396026868657997,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 257,
+                "false_positive_count": 1465,
+                "threshold": 0.3,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 4415,
+                "alert_rate": 0.6309847077318851,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 488,
+                "false_positive_count": 936,
+                "threshold": 0.4,
+                "within_capacity": true
+              },
+              {
+                "alert_count": 3730,
+                "alert_rate": 0.5330856081177647,
+                "expected_cost_per_observation": null,
+                "false_negative_count": 752,
+                "false_positive_count": 515,
+                "threshold": 0.5,
+                "within_capacity": true
+              }
+            ]
+          },
           "n_samples": 29949,
           "n_test": 11260,
           "n_train": 18689,
@@ -3433,10 +5498,11 @@
       ]
     }
   },
+  "evidence_type": "retrospective_historical_early_warning_benchmark",
   "provenance": {
     "data_sha256": "fc91eccbb94eb5e0a3865711d5200256aa7e766e2742c9aaae2f55e79e083af8",
     "feature_schema_version": "oulad-early-warning-v2-grouped-validation",
-    "git_commit": "abd700b9c6f52f69f3a85ac0fd7c713d5614fd1a",
+    "git_commit": "aa7151ef6e8a555b3e8d630346e0beecc27ee62f",
     "platform": "win32",
     "python_version": "3.12.14",
     "scikit_learn_version": "1.5.2"

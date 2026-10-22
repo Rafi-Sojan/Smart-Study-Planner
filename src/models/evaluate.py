@@ -2,6 +2,7 @@
 
 from typing import Any
 
+import numpy as np
 import pandas as pd
 from sklearn.metrics import (
     accuracy_score,
@@ -17,6 +18,64 @@ from sklearn.metrics import (
 
 
 DEFAULT_THRESHOLDS = (0.01, 0.02, 0.05, 0.10, 0.20, 0.30, 0.40, 0.50)
+
+
+def calibration_summary(
+    target: pd.Series,
+    probabilities: Any,
+    n_bins: int = 10,
+) -> dict[str, Any]:
+    """Summarize probability calibration without selecting a deployment policy.
+
+    The expected calibration error (ECE) is a descriptive statistic: it compares
+    average predicted probability with the observed positive fraction in each
+    probability bin. It must be recalculated on a representative validation or
+    prospective sample before displaying scores as probabilities.
+    """
+
+    if n_bins < 2:
+        raise ValueError("n_bins must be at least 2")
+    y_true = np.asarray(target, dtype=int)
+    y_prob = np.asarray(probabilities, dtype=float)
+    if len(y_true) != len(y_prob):
+        raise ValueError("target and probabilities must have equal length")
+    if np.any((y_prob < 0) | (y_prob > 1)):
+        raise ValueError("probabilities must lie between 0 and 1")
+    edges = np.linspace(0.0, 1.0, n_bins + 1)
+    bin_ids = np.minimum(np.digitize(y_prob, edges[1:-1], right=False), n_bins - 1)
+    counts = np.bincount(bin_ids, minlength=n_bins)
+    bins: list[dict[str, float | int | None]] = []
+    curve_index = 0
+    for index, count in enumerate(counts):
+        if count:
+            predicted_mean = float(y_prob[bin_ids == index].mean())
+            observed_rate = float(y_true[bin_ids == index].mean())
+            gap = abs(predicted_mean - observed_rate)
+            curve_index += 1
+        else:
+            predicted_mean = None
+            observed_rate = None
+            gap = None
+        bins.append(
+            {
+                "bin_lower": float(edges[index]),
+                "bin_upper": float(edges[index + 1]),
+                "count": int(count),
+                "mean_predicted_probability": predicted_mean,
+                "observed_positive_rate": observed_rate,
+                "absolute_gap": gap,
+            }
+        )
+    ece = float(
+        sum(float(row["count"]) * float(row["absolute_gap"]) for row in bins if row["count"])
+        / len(y_true)
+    ) if len(y_true) else None
+    return {
+        "n_bins": int(n_bins),
+        "expected_calibration_error": ece,
+        "bins": bins,
+        "curve_bins": int(curve_index),
+    }
 
 
 def threshold_diagnostics(
@@ -88,7 +147,12 @@ def evaluate_classifier(model: Any, features: pd.DataFrame, target: pd.Series) -
         metrics["roc_auc"] = float(roc_auc_score(target, probabilities))
         metrics["pr_auc"] = float(average_precision_score(target, probabilities))
         metrics["brier_score"] = float(brier_score_loss(target, probabilities))
+        calibration = calibration_summary(target, probabilities)
+        metrics["expected_calibration_error"] = calibration["expected_calibration_error"]
+        metrics["calibration"] = calibration
         metrics["threshold_diagnostics"] = threshold_diagnostics(target, probabilities)
     else:
         metrics["threshold_diagnostics"] = []
+        metrics["expected_calibration_error"] = None
+        metrics["calibration"] = None
     return metrics

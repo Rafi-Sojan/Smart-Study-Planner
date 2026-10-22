@@ -28,6 +28,7 @@ from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from src.data.provenance import build_provenance
 from src.features.synthetic_features import build_cutoff_features
 from src.models.evaluate import evaluate_at_threshold, select_threshold_by_validation_f1
+from src.models.policy import intervention_policy_summary
 
 
 MODEL_NAMES = (
@@ -244,6 +245,9 @@ def run_synthetic_baselines(
     data_dir: str | Path,
     cutoffs_days: Iterable[int] = (30, 60, 90),
     random_state: int = 42,
+    max_alert_rate: float | None = None,
+    false_negative_cost: float | None = None,
+    false_positive_cost: float | None = None,
 ) -> tuple[dict[str, Any], dict[int, dict[str, Pipeline]]]:
     """Train and compare all four synthetic baselines at each cutoff."""
 
@@ -280,6 +284,13 @@ def run_synthetic_baselines(
             validation_threshold = select_threshold_by_validation_f1(
                 y_validation, validation_probabilities
             )
+            intervention_policy = intervention_policy_summary(
+                y_validation,
+                validation_probabilities,
+                max_alert_rate=max_alert_rate,
+                false_negative_cost=false_negative_cost,
+                false_positive_cost=false_positive_cost,
+            )
             combined_x = pd.concat([x_train, x_validation], axis=0)
             combined_y = pd.concat([y_train, y_validation], axis=0)
             final_pipeline = make_pipeline(combined_x, random_state=random_state, model_name=model_name)
@@ -291,6 +302,7 @@ def run_synthetic_baselines(
                     "validation_balanced_accuracy": validation_metrics["balanced_accuracy"],
                     "validation_f1": validation_metrics["f1"],
                     "validation_selected_threshold": validation_threshold,
+                    "intervention_policy": intervention_policy,
                     "test_at_validation_threshold": evaluate_at_threshold(
                         y_test,
                         final_pipeline.predict_proba(x_test)[:, 1],
@@ -300,6 +312,12 @@ def run_synthetic_baselines(
                     "selection_split": "student_disjoint_validation",
                 }
             )
+            if intervention_policy["selected_threshold"] is not None:
+                result["test_at_intervention_policy_threshold"] = evaluate_at_threshold(
+                    y_test,
+                    final_pipeline.predict_proba(x_test)[:, 1],
+                    float(intervention_policy["selected_threshold"]),
+                )
             result.update({"n_samples": int(len(frame)), "n_train": int(len(combined_x)), "n_test": int(len(test))})
             model_results[model_name] = result
             fitted_models[cutoff][model_name] = final_pipeline

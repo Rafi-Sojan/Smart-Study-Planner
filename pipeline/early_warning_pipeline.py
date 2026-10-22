@@ -32,6 +32,9 @@ def run_early_warning(
     run_name: str | None = None,
     register_models: bool = False,
     pushgateway_url: str | None = None,
+    max_alert_rate: float | None = None,
+    false_negative_cost: float | None = None,
+    false_positive_cost: float | None = None,
 ) -> dict[str, Any]:
     """Evaluate full-course labels using only observations before each cutoff."""
 
@@ -53,6 +56,9 @@ def run_early_warning(
         best_name, models, model_results = train_time_aware_baselines(
             features,
             test_presentations=test_presentations,
+            max_alert_rate=max_alert_rate,
+            false_negative_cost=false_negative_cost,
+            false_positive_cost=false_positive_cost,
         )
         fitted_models[cutoff] = models
         train_features, test_features, _, _ = split_time_aware_data(
@@ -71,6 +77,8 @@ def run_early_warning(
         "task": "early_warning_enrollment_risk_classification",
         "target": "Fail/Withdrawn = 1; Pass/Distinction = 0",
         "evaluation": "time-aware presentation train-validation-locked-test",
+        "evidence_type": "retrospective_historical_early_warning_benchmark",
+        "deployment_claim": "not_prospective_intervention_evidence",
         "cutoffs_days": cutoffs,
         "provenance": build_provenance(data_dir, "oulad-early-warning-v2-grouped-validation"),
         "evaluations": evaluations,
@@ -122,6 +130,24 @@ def main() -> None:
         default=None,
         help="Push completed metrics to this Prometheus Pushgateway URL",
     )
+    parser.add_argument(
+        "--max-alert-rate",
+        type=float,
+        default=None,
+        help="Validation-only maximum share of learners that may receive an alert",
+    )
+    parser.add_argument(
+        "--false-negative-cost",
+        type=float,
+        default=None,
+        help="Reviewed relative cost of missing a risky learner",
+    )
+    parser.add_argument(
+        "--false-positive-cost",
+        type=float,
+        default=None,
+        help="Reviewed relative cost of an unnecessary alert",
+    )
     args = parser.parse_args()
     metrics = run_early_warning(
         args.data_dir,
@@ -133,6 +159,9 @@ def main() -> None:
         run_name=args.run_name,
         register_models=args.register_models,
         pushgateway_url=args.pushgateway_url,
+        max_alert_rate=args.max_alert_rate,
+        false_negative_cost=args.false_negative_cost,
+        false_positive_cost=args.false_positive_cost,
     )
     print(json.dumps(metrics, indent=2, sort_keys=True))
 

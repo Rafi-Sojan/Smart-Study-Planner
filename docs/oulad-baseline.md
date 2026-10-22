@@ -194,7 +194,8 @@ specified forms of leakage; they do not replace prospective validation.
 All models use the same student-grouped partitions with `random_state=42`.
 Model selection uses validation PR-AUC, then validation ROC-AUC, validation
 balanced accuracy, and validation F1. Final accuracy, recall, precision, F1,
-PR-AUC, ROC-AUC, Brier score, and confusion matrices are measured on the
+PR-AUC, ROC-AUC, Brier score, expected calibration error, reliability bins,
+and confusion matrices are measured on the
 locked test partition. Regenerate `models/metrics/metrics.json` after this
 evaluation-contract change before quoting numeric results.
 
@@ -236,9 +237,10 @@ All four models receive the same feature matrix, preprocessing, training
 partition, test partition, and random seed. Consequently, the comparison is
 intended to measure differences between model families rather than differences
 in data preparation. The result is a baseline comparison, not evidence that
-any one classifier is universally optimal. Time-aware validation, grouped
-validation by learner, calibration, and prospective intervention evaluation
-remain necessary before deployment.
+any one classifier is universally optimal. The reported calibration bins are
+diagnostic rather than a calibrated-probability guarantee. Time-aware
+validation, grouped validation by learner, reviewed intervention capacity,
+and prospective intervention evaluation remain necessary before deployment.
 
 ### Selected baseline
 
@@ -297,7 +299,8 @@ that decision requires prospective validation, calibration, operational
 capacity, and a cost-sensitive threshold analysis.
 Numeric early-warning results must be regenerated after this evaluation-contract
 change. The output records validation PR-AUC, validation ROC-AUC, locked-test
-metrics, Brier score, confusion matrices, subgroup audit results, and the
+metrics, Brier score, calibration diagnostics, confusion matrices, subgroup
+audit results, and the
 threshold selected on validation data. The model may differ by cutoff; no
 algorithm is assumed to be universally superior.
 
@@ -314,8 +317,11 @@ python -m pipeline.early_warning_pipeline `
 The early-warning results are not directly comparable to the full-course
 benchmark because the observation window and presentation split differ. They
 also remain retrospective discrimination measurements: the final outcome is
-used as the label. Prospective validation, calibration, threshold selection,
-and intervention-aware evaluation are still required before deployment.
+used as the label. Prospective validation, calibration-method review,
+capacity/cost-based threshold selection, and intervention-aware evaluation are
+still required before deployment. The policy utility can record a
+validation-only threshold when reviewed capacity or relative error costs are
+supplied; otherwise it marks the policy as `not_configured`.
 
 ### DagsHub model registration
 

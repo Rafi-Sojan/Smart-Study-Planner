@@ -7,6 +7,13 @@ stages:
       - src/simulation/simulator.py
     outs:
       - data/raw/synthetic
+  synthetic_validate:
+    cmd: python -m src.data.synthetic_validation --data-dir data/raw/synthetic --output models/validation/synthetic_data_validation.json
+    deps:
+      - data/raw/synthetic
+      - src/data/synthetic_validation.py
+    outs:
+      - models/validation/synthetic_data_validation.json
   clean:
     cmd: python -m src.data.cleaner --input-dir data/raw/oulad --output-dir data/processed/oulad
     deps:
@@ -23,6 +30,7 @@ stages:
       - src/features/feature_engineering.py
       - src/models/baseline.py
       - src/models/evaluate.py
+      - src/models/policy.py
     outs:
       - models/baseline.pkl
   early_warning:
@@ -33,6 +41,7 @@ stages:
       - src/features/feature_engineering.py
       - src/models/baseline.py
       - src/models/evaluate.py
+      - src/models/policy.py
   synthetic_baseline:
     cmd: python -m pipeline.synthetic_baseline_pipeline --data-dir data/raw/synthetic --metrics-output models/metrics/synthetic_baseline_metrics.json --model-dir models/synthetic_baseline --cutoffs-days 30 60 90
     deps:
@@ -40,6 +49,8 @@ stages:
       - pipeline/synthetic_baseline_pipeline.py
       - src/features/synthetic_features.py
       - src/models/synthetic_baseline.py
+      - src/models/evaluate.py
+      - src/models/policy.py
       - src/tracking/mlflow_tracking.py
     outs:
       - models/synthetic_baseline

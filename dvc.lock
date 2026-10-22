@@ -35,20 +35,24 @@ stages:
       nfiles: 8
     - path: pipeline/training_pipeline.py
       hash: md5
-      md5: 5e2838e508ba135b72a3afdbab89c37e
-      size: 4623
+      md5: 2c9c0f3c2abc51fe212850e5e6344071
+      size: 5715
     - path: src/features/feature_engineering.py
       hash: md5
       md5: d21dcc5b3ec5825f470bd448d5bf0476
       size: 4798
     - path: src/models/baseline.py
       hash: md5
-      md5: b7a94ec485f1144a0695178d48646b5a
-      size: 22249
+      md5: 6ca8f5ef29bbafc8231965259902fc4d
+      size: 23861
     - path: src/models/evaluate.py
       hash: md5
-      md5: 96c1e84bfb6eec01ec161598f5569c9a
-      size: 3769
+      md5: 1dca1026d7e440e8040c6614ab8c72ab
+      size: 6291
+    - path: src/models/policy.py
+      hash: md5
+      md5: a00d90f1f5785f8c7204510fa1d023b1
+      size: 4099
     outs:
     - path: models/baseline.pkl
       hash: md5
@@ -66,20 +70,24 @@ stages:
       nfiles: 8
     - path: pipeline/early_warning_pipeline.py
       hash: md5
-      md5: 1224fa6f2862c7f995c917803eb2e145
-      size: 5506
+      md5: b6b3627986f4c8c2bb3b04e8aa7bab8f
+      size: 6612
     - path: src/features/feature_engineering.py
       hash: md5
       md5: d21dcc5b3ec5825f470bd448d5bf0476
       size: 4798
     - path: src/models/baseline.py
       hash: md5
-      md5: b7a94ec485f1144a0695178d48646b5a
-      size: 22249
+      md5: 6ca8f5ef29bbafc8231965259902fc4d
+      size: 23861
     - path: src/models/evaluate.py
       hash: md5
-      md5: 96c1e84bfb6eec01ec161598f5569c9a
-      size: 3769
+      md5: 1dca1026d7e440e8040c6614ab8c72ab
+      size: 6291
+    - path: src/models/policy.py
+      hash: md5
+      md5: a00d90f1f5785f8c7204510fa1d023b1
+      size: 4099
   simulate:
     cmd: python -m src.simulation.simulator --config configs/simulation.yaml 
       --overwrite
@@ -115,16 +123,24 @@ stages:
       nfiles: 37
     - path: pipeline/synthetic_baseline_pipeline.py
       hash: md5
-      md5: 3f7f01796bbf4f9ae5b82d95e939b5ff
-      size: 4370
+      md5: 12a602c8eb63a92fd79692a4899c24f7
+      size: 5012
     - path: src/features/synthetic_features.py
       hash: md5
       md5: 41b9876d71268dad3e8171875b430995
       size: 13374
+    - path: src/models/evaluate.py
+      hash: md5
+      md5: 1dca1026d7e440e8040c6614ab8c72ab
+      size: 6291
+    - path: src/models/policy.py
+      hash: md5
+      md5: a00d90f1f5785f8c7204510fa1d023b1
+      size: 4099
     - path: src/models/synthetic_baseline.py
       hash: md5
-      md5: bc46d698ffe434cdd690f714143cde7f
-      size: 14697
+      md5: 458af4da4c4c572444c0819674513923
+      size: 15601
     - path: src/tracking/mlflow_tracking.py
       hash: md5
       md5: 646f684f1376e96e53551766577825cc
@@ -132,10 +148,28 @@ stages:
     outs:
     - path: models/metrics/synthetic_baseline_metrics.json
       hash: md5
-      md5: 8b420ab8ba19edd7e4b39113ce8135f4
-      size: 71866
+      md5: 401e5731bf97380735764922d4262c20
+      size: 109998
     - path: models/synthetic_baseline
       hash: md5
-      md5: cb62cb3d9a8e0a5ac532794a7f1f2ffc.dir
+      md5: 14a13960461509bcd249b3fe046b877e.dir
       size: 24285968
       nfiles: 3
+  synthetic_validate:
+    cmd: python -m src.data.synthetic_validation --data-dir data/raw/synthetic
+      --output models/validation/synthetic_data_validation.json
+    deps:
+    - path: data/raw/synthetic
+      hash: md5
+      md5: 72ef90109863794bc50e6d421cf6d123.dir
+      size: 173772971
+      nfiles: 37
+    - path: src/data/synthetic_validation.py
+      hash: md5
+      md5: 663ee979aea6942411aa1654c35d4db4
+      size: 6434
+    outs:
+    - path: models/validation/synthetic_data_validation.json
+      hash: md5
+      md5: f8d4bba40152da41f86d2788c113f7be
+      size: 10569

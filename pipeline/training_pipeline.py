@@ -25,17 +25,27 @@ def run_training(
     run_name: str | None = None,
     register_models: bool = False,
     pushgateway_url: str | None = None,
+    max_alert_rate: float | None = None,
+    false_negative_cost: float | None = None,
+    false_positive_cost: float | None = None,
 ) -> dict[str, Any]:
     raw_tables = load_oulad_tables(data_dir)
     cleaned_tables = clean_oulad_tables(raw_tables)
     validate_oulad_tables(cleaned_tables)
     features = build_oulad_features(cleaned_tables, clean=False)
-    best_name, models, model_results = train_baselines(features)
+    best_name, models, model_results = train_baselines(
+        features,
+        max_alert_rate=max_alert_rate,
+        false_negative_cost=false_negative_cost,
+        false_positive_cost=false_positive_cost,
+    )
     best_model = models[best_name]
     first_result = model_results[best_name]
     metrics = {
         "task": "enrollment_risk_classification",
         "target": "Fail/Withdrawn = 1; Pass/Distinction = 0",
+        "evidence_type": "retrospective_historical_benchmark",
+        "deployment_claim": "not_prospective_or_causal_evidence",
         "best_model": best_name,
         "n_samples": first_result["n_samples"],
         "n_train": first_result["n_train"],
@@ -108,6 +118,24 @@ def main() -> None:
         default=None,
         help="Push completed metrics to this Prometheus Pushgateway URL",
     )
+    parser.add_argument(
+        "--max-alert-rate",
+        type=float,
+        default=None,
+        help="Validation-only maximum share of learners that may receive an alert",
+    )
+    parser.add_argument(
+        "--false-negative-cost",
+        type=float,
+        default=None,
+        help="Reviewed relative cost of missing a risky learner",
+    )
+    parser.add_argument(
+        "--false-positive-cost",
+        type=float,
+        default=None,
+        help="Reviewed relative cost of an unnecessary alert",
+    )
     args = parser.parse_args()
     metrics = run_training(
         args.data_dir,
@@ -118,6 +146,9 @@ def main() -> None:
         run_name=args.run_name,
         register_models=args.register_models,
         pushgateway_url=args.pushgateway_url,
+        max_alert_rate=args.max_alert_rate,
+        false_negative_cost=args.false_negative_cost,
+        false_positive_cost=args.false_positive_cost,
     )
     print(json.dumps(metrics, indent=2, sort_keys=True))
 
