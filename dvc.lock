@@ -1,7 +1,7 @@
 schema: '2.0'
 stages:
   clean:
-    cmd: python -m src.data.cleaner --input-dir data/raw/oulad --output-dir
+    cmd: python -m src.data.cleaner --input-dir data/raw/oulad --output-dir 
       data/processed/oulad
     deps:
     - path: data/raw/oulad
@@ -24,8 +24,8 @@ stages:
       size: 334016008
       nfiles: 8
   train:
-    cmd: python -m pipeline.training_pipeline --data-dir data/processed/oulad
-      --metrics-output models/metrics/metrics.json --model-output
+    cmd: python -m pipeline.training_pipeline --data-dir data/processed/oulad 
+      --metrics-output models/metrics/metrics.json --model-output 
       models/baseline.pkl
     deps:
     - path: data/processed/oulad
@@ -35,28 +35,28 @@ stages:
       nfiles: 8
     - path: pipeline/training_pipeline.py
       hash: md5
-      md5: abe2eb96c0c990dc5ff9e26dc397cb20
-      size: 3917
+      md5: 5e2838e508ba135b72a3afdbab89c37e
+      size: 4623
     - path: src/features/feature_engineering.py
       hash: md5
       md5: d21dcc5b3ec5825f470bd448d5bf0476
       size: 4798
     - path: src/models/baseline.py
       hash: md5
-      md5: e91e51729b737cbe5017126b32415c7c
-      size: 11624
+      md5: b7a94ec485f1144a0695178d48646b5a
+      size: 22249
     - path: src/models/evaluate.py
       hash: md5
-      md5: a0773b56808ba96ebf706435de091ac7
-      size: 1066
+      md5: 96c1e84bfb6eec01ec161598f5569c9a
+      size: 3769
     outs:
     - path: models/baseline.pkl
       hash: md5
-      md5: 98e9a956813430d22ea64e3a2083cc1b
-      size: 560877
+      md5: 6878bf5f99a90cc972dcc0272b6bb4d9
+      size: 737657
   early_warning:
-    cmd: python -m pipeline.early_warning_pipeline --data-dir
-      data/processed/oulad --metrics-output
+    cmd: python -m pipeline.early_warning_pipeline --data-dir 
+      data/processed/oulad --metrics-output 
       models/metrics/early_warning_metrics.json --cutoffs-days 30 60 90
     deps:
     - path: data/processed/oulad
@@ -66,22 +66,22 @@ stages:
       nfiles: 8
     - path: pipeline/early_warning_pipeline.py
       hash: md5
-      md5: 2500eac3f4d7e181203ca83b74c6c40f
-      size: 4773
+      md5: 1224fa6f2862c7f995c917803eb2e145
+      size: 5506
     - path: src/features/feature_engineering.py
       hash: md5
       md5: d21dcc5b3ec5825f470bd448d5bf0476
       size: 4798
     - path: src/models/baseline.py
       hash: md5
-      md5: e91e51729b737cbe5017126b32415c7c
-      size: 11624
+      md5: b7a94ec485f1144a0695178d48646b5a
+      size: 22249
     - path: src/models/evaluate.py
       hash: md5
-      md5: a0773b56808ba96ebf706435de091ac7
-      size: 1066
+      md5: 96c1e84bfb6eec01ec161598f5569c9a
+      size: 3769
   simulate:
-    cmd: python -m src.simulation.simulator --config configs/simulation.yaml
+    cmd: python -m src.simulation.simulator --config configs/simulation.yaml 
       --overwrite
     deps:
     - path: configs/simulation.yaml
@@ -103,9 +103,9 @@ stages:
       size: 173772971
       nfiles: 37
   synthetic_baseline:
-    cmd: python -m pipeline.synthetic_baseline_pipeline --data-dir
-      data/raw/synthetic --metrics-output
-      models/metrics/synthetic_baseline_metrics.json --model-dir
+    cmd: python -m pipeline.synthetic_baseline_pipeline --data-dir 
+      data/raw/synthetic --metrics-output 
+      models/metrics/synthetic_baseline_metrics.json --model-dir 
       models/synthetic_baseline --cutoffs-days 30 60 90
     deps:
     - path: data/raw/synthetic

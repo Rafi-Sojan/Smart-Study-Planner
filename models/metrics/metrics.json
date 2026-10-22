@@ -1136,7 +1136,7 @@
   "provenance": {
     "data_sha256": "fc91eccbb94eb5e0a3865711d5200256aa7e766e2742c9aaae2f55e79e083af8",
     "feature_schema_version": "oulad-enrollment-v2-grouped-evaluation",
-    "git_commit": null,
+    "git_commit": "abd700b9c6f52f69f3a85ac0fd7c713d5614fd1a",
     "platform": "win32",
     "python_version": "3.12.14",
     "scikit_learn_version": "1.5.2"
