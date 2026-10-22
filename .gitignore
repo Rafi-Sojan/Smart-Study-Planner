@@ -49,13 +49,16 @@ htmlcov/
 
 # Raw and processed datasets
 /data/raw/oulad/
+/data/raw/synthetic/
 /data/processed/oulad/
+/data/processed/synthetic/
 data/simulated/*
 
 # Keep directory structure
 !data/raw/.gitkeep
 !data/processed/.gitkeep
 !data/simulated/.gitkeep
+!data/simulated/README.md
 
 # Track DVC pointer files, not the datasets themselves
 !data/raw/*.dvc

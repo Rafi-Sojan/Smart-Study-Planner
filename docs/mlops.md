@@ -150,6 +150,35 @@ model as a separate versioned MLflow model for days 30, 60, and 90. The
 registration path uses uploaded MLflow-format artifacts and a `runs:/` model
 URI, which is compatible with the connected DagsHub MLflow server.
 
+For the synthetic planner baseline pipeline, use the following local command:
+
+```powershell
+python -m pipeline.synthetic_baseline_pipeline `
+  --data-dir data/raw/synthetic `
+  --metrics-output models/metrics/synthetic_baseline_metrics.json `
+  --model-dir models/synthetic_baseline `
+  --cutoffs-days 30 60 90
+```
+
+To log the run and register all four candidate models at each cutoff:
+
+```powershell
+python -m pipeline.synthetic_baseline_pipeline `
+  --data-dir data/raw/synthetic `
+  --mlflow `
+  --register-models `
+  --experiment-name smart-study-planner-synthetic-baseline `
+  --run-name synthetic-baseline-registered-models
+```
+
+The registered names use the form
+`smart-study-planner-synthetic-baseline-day-<cutoff>-<model>`. This produces
+twelve registered versions per run: four candidate models for each of days
+30, 60, and 90. The selected model is recorded in the run parameters, while
+all candidate metrics and MLflow-format model artifacts are retained for
+comparison. These are synthetic development artifacts, not validated student
+support models.
+
 The code also supports the DagsHub client configuration. Instead of setting
 `MLFLOW_TRACKING_URI`, set `DAGSHUB_REPO_OWNER` and `DAGSHUB_REPO_NAME`; the
 tracking helper then calls `dagshub.init` when `--mlflow` is used.

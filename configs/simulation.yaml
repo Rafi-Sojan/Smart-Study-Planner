@@ -1,0 +1,7 @@
+dataset_name: synthetic_indian_university_smart_study_planner
+output_dir: data/raw/synthetic
+seed: 42
+students: 1000
+terms: 3
+weeks_per_term: 16
+start_date: 2025-07-01

@@ -5,9 +5,11 @@
 Smart Study Planner is an educational analytics project for enrollment-level
 academic-risk classification using the Open University Learning Analytics
 Dataset (OULAD). The current repository provides a reproducible data-to-model
-baseline and a leakage-controlled early-warning evaluation. The planner,
-application programming interface, simulation, and monitoring components remain
-future implementation areas.
+baseline and a leakage-controlled early-warning evaluation. A reproducible
+synthetic Indian-university data generator supports planner and recommendation
+development; its schema and limitations are documented in
+[data/simulated/README.md](data/simulated/README.md). The planner and
+application programming interface remain future implementation areas.
 
 The processing methodology, feature definitions, measured results, and
 limitations are documented in [docs/oulad-baseline.md](docs/oulad-baseline.md).
@@ -17,6 +19,12 @@ Data versioning and experiment tracking procedures are documented in
 [docs/mlops.md](docs/mlops.md).
 The EdNet exploratory analysis, scope, feature rationale, and limitations are
 documented in [docs/ednet.md](docs/ednet.md).
+The formal synthetic-data methodology, function reference, statistical
+definitions, and rationale for each generated field are documented in
+[docs/synthetic-data.md](docs/synthetic-data.md).
+The synthetic feature contract, baseline-model comparison, metric definitions,
+confusion-matrix interpretation, and model-selection rule are documented in
+[docs/synthetic-baseline.md](docs/synthetic-baseline.md).
 
 ## Analysis notebooks
 
@@ -25,6 +33,9 @@ documented in [docs/ednet.md](docs/ednet.md).
 - [03 — Full-course baseline comparison](notebooks/03_oulad_baseline_comparison.ipynb)
 - [04 — Leakage-safe early-warning evaluation](notebooks/04_oulad_early_warning_evaluation.ipynb)
 - [05 — EdNet exploratory analysis](notebooks/05_ednet_eda.ipynb)
+- [06 — Synthetic data exploration](notebooks/06_synthetic_data_exploration.ipynb)
+- [07 — Synthetic processing and feature extraction](notebooks/07_synthetic_processing_and_features.ipynb)
+- [08 — Synthetic baseline testing](notebooks/08_synthetic_baseline_testing.ipynb)
 
 The OULAD notebooks contain executed outputs, including tables, metric plots,
 and confusion matrices. The full-course notebook reports the retrospective
@@ -33,7 +44,10 @@ separate confusion matrices for the 30-, 60-, and 90-day observation cutoffs.
 Notebook 05 contains the existing EdNet exploratory outputs and formal
 interpretation of the activity, exposure, content, and metadata analyses. EdNet
 is documented as a TOEIC-specific complementary dataset rather than as a
-replacement for the OULAD academic-risk task.
+replacement for the OULAD academic-risk task. Notebooks 06–08 document the
+synthetic planner track: relational EDA, leakage-aware cutoff processing, and
+student-disjoint baseline model testing with confusion matrices. Synthetic
+metrics are development benchmarks only and are not real student evidence.
 
 ## Installation and data requirements
 
@@ -57,6 +71,31 @@ available, registration and activity aggregates are included in feature
 construction. VLE clicks represent recorded activity counts and must not be
 interpreted as direct measurements of study duration. Raw and processed data
 are excluded from Git and must be supplied locally.
+
+## Generate the synthetic planner dataset
+
+The synthetic generator creates relational CSV tables for a configurable
+Indian-university planning scenario. The records are simulated and must not be
+presented as real student observations. The default run creates 1,000 students
+across three academic terms and 16 weeks per term, with multiple course types,
+attendance and assessment records, study sessions, recommendations, sleep,
+screen-time, break, and wellbeing records. A formal description of the
+generation functions and required statistics is provided in
+[docs/synthetic-data.md](docs/synthetic-data.md).
+
+Run it from the repository root:
+
+```powershell
+python -m src.simulation.simulator --config configs/simulation.yaml --overwrite
+```
+
+The generated records are written to `data/raw/synthetic/`, which is
+intentionally ignored by Git and kept separate from the real OULAD archive in
+`data/raw/oulad/`. The same command is
+registered as the `simulate` stage in `dvc.yaml`; use `dvc repro simulate` in a
+normal writable checkout to reproduce and version the generated output with
+DVC. Use `--overwrite` only when deliberately regenerating an existing output
+directory.
 
 ## Statistical interpretation and methodological rationale
 
@@ -204,6 +243,39 @@ Run the same checks used by CI:
 ruff check src pipeline tests
 pytest -v
 ```
+
+Run the synthetic baseline pipeline locally:
+
+```powershell
+python -m pipeline.synthetic_baseline_pipeline `
+  --data-dir data/raw/synthetic `
+  --metrics-output models/metrics/synthetic_baseline_metrics.json `
+  --model-dir models/synthetic_baseline `
+  --cutoffs-days 30 60 90
+```
+
+The pipeline trains all four baseline models using the student-disjoint
+cutoff protocol, writes the measured comparison to
+`models/metrics/synthetic_baseline_metrics.json`, and saves the selected model
+for each cutoff under `models/synthetic_baseline/`. The local run does not
+contact DagsHub unless `--mlflow` or `--register-models` is supplied.
+
+Register every synthetic baseline model at every cutoff in DagsHub MLflow:
+
+```powershell
+python -m pipeline.synthetic_baseline_pipeline `
+  --data-dir data/raw/synthetic `
+  --mlflow `
+  --register-models `
+  --experiment-name smart-study-planner-synthetic-baseline `
+  --run-name synthetic-baseline-registered-models
+```
+
+This registers twelve models using names of the form
+`smart-study-planner-synthetic-baseline-day-30-logistic_regression`. The
+experiment records all four model comparisons for days 30, 60, and 90. The
+models remain synthetic development artifacts and must not be presented as
+validated production models.
 
 ## Grafana monitoring
 

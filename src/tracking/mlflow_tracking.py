@@ -204,3 +204,60 @@ def log_early_warning_run(
         if metrics_path is not None and Path(metrics_path).exists():
             mlflow.log_artifact(str(metrics_path))
         return active_run.info.run_id, registered
+
+
+def log_synthetic_baseline_run(
+    metrics: dict[str, Any],
+    fitted_models: dict[int, dict[str, Any]],
+    metrics_path: str | Path | None = None,
+    experiment_name: str = "smart-study-planner-synthetic-baseline",
+    run_name: str | None = None,
+    register_models: bool = False,
+    registered_model_prefix: str = "smart-study-planner-synthetic-baseline",
+) -> tuple[str, dict[int, dict[str, str]]]:
+    """Log and optionally register every synthetic model at every cutoff."""
+
+    mlflow = _configure_tracking()
+    mlflow.set_experiment(experiment_name)
+    registered: dict[int, dict[str, str]] = {}
+    with mlflow.start_run(run_name=run_name) as active_run:
+        mlflow.log_params(
+            {
+                "task": metrics["task"],
+                "data_source": metrics["data_source"],
+                "target": metrics["target"],
+                "evaluation": metrics["evaluation"],
+                "cutoffs_days": ",".join(str(value) for value in metrics["cutoffs_days"]),
+                "random_state": metrics["random_state"],
+            }
+        )
+        for cutoff_text, evaluation in metrics["evaluations"].items():
+            cutoff = int(cutoff_text)
+            mlflow.log_param(f"day_{cutoff}_best_model", evaluation["best_model"])
+            for model_name, model_metrics in evaluation["models"].items():
+                numeric_metrics = {
+                    f"day_{cutoff}.{model_name}.{key}": float(value)
+                    for key, value in model_metrics.items()
+                    if isinstance(value, (int, float))
+                    and key not in {"n_samples", "n_train", "n_test"}
+                }
+                mlflow.log_metrics(numeric_metrics)
+
+                artifact_path = f"models/day_{cutoff}/{model_name}"
+                registered_name = f"{registered_model_prefix}-day-{cutoff}-{model_name}"
+                with TemporaryDirectory(prefix="mlflow-model-") as temp_dir:
+                    model_dir = Path(temp_dir) / "model"
+                    mlflow.sklearn.save_model(
+                        fitted_models[cutoff][model_name],
+                        path=str(model_dir),
+                        serialization_format="pickle",
+                    )
+                    mlflow.log_artifacts(str(model_dir), artifact_path=artifact_path)
+                if register_models:
+                    model_uri = f"runs:/{active_run.info.run_id}/{artifact_path}"
+                    mlflow.register_model(model_uri, registered_name)
+                    registered.setdefault(cutoff, {})[model_name] = registered_name
+
+        if metrics_path is not None and Path(metrics_path).exists():
+            mlflow.log_artifact(str(metrics_path))
+        return active_run.info.run_id, registered

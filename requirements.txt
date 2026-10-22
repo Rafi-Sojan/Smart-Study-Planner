@@ -4,7 +4,11 @@ numpy==2.1.2
 pytest==8.3.3
 ruff==0.6.9
 matplotlib==3.9.2
+PyYAML==6.0.3
 dvc[s3]==3.67.1
 dagshub==0.7.2
 mlflow==3.17.1
 prometheus-client==0.21.1
+nbformat==5.10.4
+nbclient==0.10.2
+ipykernel==6.29.5

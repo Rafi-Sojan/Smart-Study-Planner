@@ -1,4 +1,12 @@
 stages:
+  simulate:
+    cmd: python -m src.simulation.simulator --config configs/simulation.yaml --overwrite
+    deps:
+      - configs/simulation.yaml
+      - src/simulation/scenarios.py
+      - src/simulation/simulator.py
+    outs:
+      - data/raw/synthetic
   clean:
     cmd: python -m src.data.cleaner --input-dir data/raw/oulad --output-dir data/processed/oulad
     deps:
@@ -25,3 +33,15 @@ stages:
       - src/features/feature_engineering.py
       - src/models/baseline.py
       - src/models/evaluate.py
+  synthetic_baseline:
+    cmd: python -m pipeline.synthetic_baseline_pipeline --data-dir data/raw/synthetic --metrics-output models/metrics/synthetic_baseline_metrics.json --model-dir models/synthetic_baseline --cutoffs-days 30 60 90
+    deps:
+      - data/raw/synthetic
+      - pipeline/synthetic_baseline_pipeline.py
+      - src/features/synthetic_features.py
+      - src/models/synthetic_baseline.py
+      - src/tracking/mlflow_tracking.py
+    outs:
+      - models/synthetic_baseline
+    metrics:
+      - models/metrics/synthetic_baseline_metrics.json
