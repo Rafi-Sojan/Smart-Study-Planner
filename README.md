@@ -31,6 +31,9 @@ The evidence classification, calibration diagnostics, intervention-policy
 thresholds, synthetic validity checks, and Git/DVC release sequence are
 documented in
 [docs/evaluation-and-release-policy.md](docs/evaluation-and-release-policy.md).
+Security scope, dependency remediation, CI auditing, and the unresolved DVC
+DiskCache advisory are documented in
+[docs/security-hardening.md](docs/security-hardening.md).
 The authorised real-world external evaluation is documented in
 [docs/kuleuven-external-validation.md](docs/kuleuven-external-validation.md).
 

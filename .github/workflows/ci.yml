@@ -39,6 +39,11 @@ jobs:
           pytest -v
           git diff --check
 
+      - name: Audit Python dependencies
+        run: |
+          python -m pip install pip-audit==2.10.1
+          pip-audit -r requirements.txt --ignore PYSEC-2026-2447
+
       - name: Generate synthetic smoke dataset
         run: |
           python -m src.simulation.simulator \
