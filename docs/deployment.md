@@ -42,6 +42,60 @@ localhost unless authentication and network controls are configured.
 
 ## Kubernetes deployment
 
+### Automated GitHub Actions deployment
+
+The supported release path is:
+
+1. Push the reviewed changes to `main`.
+2. Wait for the Docker workflow to publish the image to GitHub Container
+   Registry. It publishes both `latest` and the commit-SHA tag.
+3. Use the commit SHA as the deployment image tag. Do not deploy `latest`.
+4. In GitHub, open **Settings > Environments**, create or select the
+   `production` environment, and add the protected secret
+   `KUBE_CONFIG_DATA`.
+5. Generate the secret value locally with PowerShell:
+
+```powershell
+[Convert]::ToBase64String(
+  [IO.File]::ReadAllBytes("$env:USERPROFILE\.kube\config")
+)
+```
+
+The value is a base64-encoded kubeconfig and must not be committed to Git.
+Configure required reviewers on the `production` environment before using it.
+
+6. Open **Actions > Deploy inference service > Run workflow**.
+7. Enter the full commit SHA in the `image_tag` field and start the workflow.
+
+The workflow renders `deploy/kubernetes`, replaces the placeholder image with
+`ghcr.io/<owner>/<repository>:<image_tag>`, applies the manifests to the
+`smart-study-planner` namespace, and waits for the API rollout. The Kubernetes
+secret described below must already exist in that namespace; the GitHub
+workflow intentionally does not transmit application secrets.
+
+To find the current commit SHA:
+
+```powershell
+git rev-parse HEAD
+```
+
+After the workflow succeeds, verify the rollout:
+
+```powershell
+kubectl -n smart-study-planner get pods
+kubectl -n smart-study-planner get service smart-study-planner-api
+kubectl -n smart-study-planner rollout status deployment/smart-study-planner-api
+```
+
+For temporary local access to the service:
+
+```powershell
+kubectl -n smart-study-planner port-forward service/smart-study-planner-api 8000:8000
+```
+
+Then check `http://127.0.0.1:8000/healthz` and
+`http://127.0.0.1:8000/readyz`.
+
 Create the deployment secret outside Git. The MLflow URI should reference a
 registered model that has passed the applicable release gates.
 
