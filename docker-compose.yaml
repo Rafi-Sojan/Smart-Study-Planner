@@ -1,4 +1,29 @@
 services:
+  api:
+    build:
+      context: .
+    container_name: smart-study-planner-api
+    restart: unless-stopped
+    environment:
+      MODEL_PATH: ${MODEL_PATH:-}
+      MODEL_URI: ${MODEL_URI:-}
+      MODEL_VERSION: ${MODEL_VERSION:-local}
+      MODEL_SHA256: ${MODEL_SHA256:-}
+      ALLOW_TRUSTED_PICKLE_MODEL: ${ALLOW_TRUSTED_PICKLE_MODEL:-1}
+      API_KEY: ${API_KEY:-}
+      MLFLOW_TRACKING_URI: ${MLFLOW_TRACKING_URI:-}
+      MLFLOW_TRACKING_USERNAME: ${MLFLOW_TRACKING_USERNAME:-}
+      MLFLOW_TRACKING_PASSWORD: ${MLFLOW_TRACKING_PASSWORD:-}
+    volumes:
+      - ./models/pretrained:/models:ro
+    ports:
+      - "127.0.0.1:8000:8000"
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+
   prometheus:
     image: prom/prometheus:v2.55.1
     container_name: smart-study-planner-prometheus

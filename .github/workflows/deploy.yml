@@ -1,0 +1,45 @@
+name: Deploy inference service
+
+on:
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: "Immutable image tag to deploy, normally a commit SHA"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy to Kubernetes
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v4
+
+      - name: Configure cluster credentials
+        shell: bash
+        env:
+          KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
+        run: |
+          test -n "$KUBE_CONFIG_DATA"
+          mkdir -p "$HOME/.kube"
+          echo "$KUBE_CONFIG_DATA" | base64 --decode > "$HOME/.kube/config"
+          chmod 600 "$HOME/.kube/config"
+
+      - name: Apply manifests
+        env:
+          KUBE_NAMESPACE: ${{ secrets.KUBE_NAMESPACE }}
+          IMAGE_TAG: ${{ inputs.image_tag }}
+        run: |
+          test -n "$KUBE_NAMESPACE"
+          kubectl apply -k deploy/kubernetes
+          kubectl -n "$KUBE_NAMESPACE" set image deployment/smart-study-planner-api \
+            api="ghcr.io/${{ github.repository }}:${IMAGE_TAG}"
+          kubectl -n "$KUBE_NAMESPACE" rollout status deployment/smart-study-planner-api --timeout=180s

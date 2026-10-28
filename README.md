@@ -9,7 +9,8 @@ baseline and a leakage-controlled early-warning evaluation. A reproducible
 synthetic Indian-university data generator supports planner and recommendation
 development; its schema and limitations are documented in
 [data/simulated/README.md](data/simulated/README.md). The planner and
-application programming interface remain future implementation areas.
+application programming interface are research/deployment scaffolding rather
+than an approved student decision system.
 
 The processing methodology, feature definitions, measured results, and
 limitations are documented in [docs/oulad-baseline.md](docs/oulad-baseline.md).
@@ -36,6 +37,15 @@ DiskCache advisory are documented in
 [docs/security-hardening.md](docs/security-hardening.md).
 The authorised real-world external evaluation is documented in
 [docs/kuleuven-external-validation.md](docs/kuleuven-external-validation.md).
+The FastAPI inference service, model-registry loading, Docker Compose setup,
+Kubernetes template, and deployment rollback procedure are documented in
+[docs/deployment.md](docs/deployment.md).
+The formal model-risk and quality specification is documented in
+[docs/model-risk-quality.md](docs/model-risk-quality.md). The model lifecycle
+and registration policy are documented in
+[docs/model-registry.md](docs/model-registry.md). The inference endpoint
+contract is documented in [docs/inference-api.md](docs/inference-api.md), and
+the CI/CD and release procedure is documented in [docs/cicd.md](docs/cicd.md).
 
 ## Analysis notebooks
 

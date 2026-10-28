@@ -61,6 +61,13 @@ jobs:
             --model-dir .ci-output/models \
             --cutoffs-days 30
 
+      - name: Run model quality gate
+        run: |
+          python -m pipeline.model_quality \
+            --metrics .ci-output/synthetic_metrics.json \
+            --output .ci-output/model_quality.json \
+            --min-balanced-accuracy 0.5
+
       - name: Validate synthetic relational integrity
         run: |
           python -m src.data.synthetic_validation \

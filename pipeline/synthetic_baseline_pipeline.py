@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Any, Iterable
 
 from src.models.synthetic_baseline import run_synthetic_baselines
+from src.risk.model_risk import assess_model_quality
 from src.tracking.mlflow_tracking import log_synthetic_baseline_run
 
 
@@ -45,6 +46,7 @@ def run_synthetic_baseline_pipeline(
         false_negative_cost=false_negative_cost,
         false_positive_cost=false_positive_cost,
     )
+    metrics["quality_checks"] = assess_model_quality(metrics)
     def write_metrics() -> None:
         if metrics_output is not None:
             metrics_path = Path(metrics_output)

@@ -13,6 +13,9 @@ from tempfile import TemporaryDirectory
 from pathlib import Path
 from typing import Any
 
+from src.risk.model_risk import assess_model_quality
+from src.tracking.model_registry import register_model_version
+
 
 def _configure_console() -> None:
     """Prevent MLflow's Unicode completion message from breaking Windows runs."""
@@ -126,6 +129,7 @@ def log_baseline_models_run(
 
     mlflow = _configure_tracking()
     mlflow.set_experiment(experiment_name)
+    quality = assess_model_quality(metrics)
     registered: dict[str, str] = {}
     with mlflow.start_run(run_name=run_name) as active_run:
         mlflow.log_params(
@@ -137,6 +141,8 @@ def log_baseline_models_run(
                 "n_samples": metrics["n_samples"],
                 "n_train": metrics["n_train"],
                 "n_test": metrics["n_test"],
+                "quality_gate_passed": quality["passed"],
+                "deployment_eligible": quality["deployment_eligible"],
                 **_provenance_params(metrics),
             }
         )
@@ -165,7 +171,17 @@ def log_baseline_models_run(
                 )
                 mlflow.log_artifacts(str(model_dir), artifact_path=artifact_path)
             model_uri = f"runs:/{active_run.info.run_id}/{artifact_path}"
-            mlflow.register_model(model_uri, registered_name)
+            register_model_version(
+                mlflow,
+                model_uri,
+                registered_name,
+                tags={
+                    "quality_gate_passed": str(quality["passed"]).lower(),
+                    "deployment_eligible": str(quality["deployment_eligible"]).lower(),
+                    "evidence_type": str(metrics.get("evidence_type", "unknown")),
+                    "deployment_claim": str(metrics.get("deployment_claim", "unknown")),
+                },
+            )
             registered[model_name] = registered_name
 
         return active_run.info.run_id, registered
@@ -220,7 +236,16 @@ def log_early_warning_run(
                 mlflow.log_artifacts(str(model_dir), artifact_path=artifact_path)
             if register_models:
                 model_uri = f"runs:/{active_run.info.run_id}/{artifact_path}"
-                mlflow.register_model(model_uri, registered_name)
+                register_model_version(
+                    mlflow,
+                    model_uri,
+                    registered_name,
+                    tags={
+                        "development_only": "true",
+                        "cutoff_days": str(cutoff),
+                        "model_name": best_name,
+                    },
+                )
                 registered[cutoff] = registered_name
 
         if metrics_path is not None and Path(metrics_path).exists():
@@ -278,7 +303,16 @@ def log_synthetic_baseline_run(
                     mlflow.log_artifacts(str(model_dir), artifact_path=artifact_path)
                 if register_models:
                     model_uri = f"runs:/{active_run.info.run_id}/{artifact_path}"
-                    mlflow.register_model(model_uri, registered_name)
+                    register_model_version(
+                        mlflow,
+                        model_uri,
+                        registered_name,
+                        tags={
+                            "development_only": "true",
+                            "cutoff_days": str(cutoff),
+                            "model_name": model_name,
+                        },
+                    )
                     registered.setdefault(cutoff, {})[model_name] = registered_name
 
         if metrics_path is not None and Path(metrics_path).exists():

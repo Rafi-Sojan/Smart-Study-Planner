@@ -13,6 +13,7 @@ from src.data.validation import validate_oulad_tables
 from src.features.feature_engineering import build_oulad_features
 from src.models.baseline import train_baselines
 from src.monitoring.prometheus_exporter import push_training_metrics
+from src.risk.model_risk import assess_model_quality
 from src.tracking.mlflow_tracking import log_baseline_models_run, log_training_run
 
 
@@ -54,6 +55,7 @@ def run_training(
         "models": model_results,
         "provenance": build_provenance(data_dir, "oulad-enrollment-v2-grouped-evaluation"),
     }
+    metrics["quality_checks"] = assess_model_quality(metrics)
 
     def write_metrics() -> None:
         if metrics_output is not None:

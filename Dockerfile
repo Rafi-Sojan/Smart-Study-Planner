@@ -1,8 +1,9 @@
-FROM python:3.12.7-slim
+FROM python:3.12.14-slim-bookworm
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    ENABLE_API_DOCS=0
+    ENABLE_API_DOCS=0 \
+    MODEL_VERSION=container
 
 WORKDIR /app
 

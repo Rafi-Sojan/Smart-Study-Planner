@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: smart-study-planner-api
+  labels:
+    app.kubernetes.io/name: smart-study-planner-api
+    app.kubernetes.io/component: inference
+spec:
+  replicas: 2
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: smart-study-planner-api
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: smart-study-planner-api
+        app.kubernetes.io/component: inference
+    spec:
+      serviceAccountName: smart-study-planner-api
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: api
+          image: smart-study-planner-api
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8000
+          env:
+            - name: MODEL_URI
+              valueFrom:
+                secretKeyRef:
+                  name: smart-study-planner-secrets
+                  key: MODEL_URI
+            - name: MLFLOW_TRACKING_URI
+              valueFrom:
+                secretKeyRef:
+                  name: smart-study-planner-secrets
+                  key: MLFLOW_TRACKING_URI
+            - name: MLFLOW_TRACKING_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: smart-study-planner-secrets
+                  key: MLFLOW_TRACKING_USERNAME
+            - name: MLFLOW_TRACKING_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: smart-study-planner-secrets
+                  key: MLFLOW_TRACKING_PASSWORD
+            - name: API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: smart-study-planner-secrets
+                  key: API_KEY
+            - name: MODEL_VERSION
+              valueFrom:
+                secretKeyRef:
+                  name: smart-study-planner-secrets
+                  key: MODEL_VERSION
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 20
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 1000m
+              memory: 1Gi

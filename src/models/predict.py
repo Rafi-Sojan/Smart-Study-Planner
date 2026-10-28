@@ -47,6 +47,22 @@ def load_trusted_model(
         return pickle.load(handle)
 
 
+def load_registered_model(model_uri: str) -> Any:
+    """Load a model from an MLflow registry or run artifact URI.
+
+    The URI and credentials are supplied through deployment configuration;
+    no registry credentials or model artifacts are baked into the image.
+    """
+
+    if not model_uri or not model_uri.startswith(("models:/", "runs:/")):
+        raise ValueError("MODEL_URI must be an MLflow models:/ or runs:/ URI")
+    try:
+        import mlflow.sklearn
+    except ModuleNotFoundError as error:  # pragma: no cover - deployment path
+        raise RuntimeError("MLflow is required when MODEL_URI is configured") from error
+    return mlflow.sklearn.load_model(model_uri)
+
+
 def predict_risk(model: Any, features: dict[str, Any], threshold: float) -> dict[str, float | int]:
     """Predict one feature dictionary without accepting identifiers or raw paths."""
 

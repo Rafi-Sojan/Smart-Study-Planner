@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import os
+
 from fastapi import APIRouter, HTTPException, Request
 
 from src.api.schemas import RiskRequest, RiskResponse
@@ -25,6 +27,9 @@ def readyz(request: Request) -> dict[str, str]:
 
 @router.post("/v1/risk-score", response_model=RiskResponse)
 def risk_score(payload: RiskRequest, request: Request) -> RiskResponse:
+    expected_api_key = os.getenv("API_KEY")
+    if expected_api_key and request.headers.get("x-api-key") != expected_api_key:
+        raise HTTPException(status_code=401, detail="Invalid API key")
     model = getattr(request.app.state, "model", None)
     if model is None:
         raise HTTPException(status_code=503, detail="Trusted model is not loaded")
