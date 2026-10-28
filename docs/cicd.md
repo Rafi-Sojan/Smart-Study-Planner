@@ -18,13 +18,23 @@ or `develop`, and on manual dispatch. It performs:
 3. the complete PyTest suite;
 4. whitespace validation;
 5. Python dependency auditing with the documented DVC DiskCache exception;
-6. generation of a small synthetic smoke dataset;
-7. a synthetic baseline run;
-8. the model-quality gate for every generated cutoff; and
-9. synthetic relational-integrity validation.
+6. DVC graph validation;
+7. structural validation of all repository notebooks;
+8. generation of a small synthetic smoke dataset;
+9. a synthetic baseline run;
+10. the model-quality gate for every generated cutoff;
+11. a loaded-model FastAPI inference smoke request;
+12. execution of the synthetic analysis notebooks; and
+13. synthetic relational-integrity validation.
 
 The synthetic smoke run is a reproducibility and software-integrity check. It
 does not validate the synthetic data as real student evidence.
+
+The OULAD, EdNet, and KU Leuven notebooks are structurally validated in the
+ordinary CI checkout but are not executed there because their licensed raw
+inputs are intentionally absent. A data-qualified local or scheduled run can
+execute them with `python -m pipeline.validate_notebooks --execute` after the
+permitted data has been obtained.
 
 ## 3. Container verification and publication
 
@@ -44,12 +54,12 @@ through the registry or a read-only mounted artifact.
 input. It requires the protected environment secrets:
 
 - `KUBE_CONFIG_DATA`: base64-encoded kubeconfig;
-- `KUBE_NAMESPACE`: target namespace; and
 - the Kubernetes secret `smart-study-planner-secrets`, containing MLflow
   connection values, the model URI, API key, and model version.
 
-The workflow applies `deploy/kubernetes`, sets the deployment image to the
-requested tag, and waits for rollout completion. Configure the GitHub
+The workflow renders `deploy/kubernetes` with the requested image tag, applies
+the rendered manifest to the fixed `smart-study-planner` namespace, and waits
+for rollout completion. Configure the GitHub
 environment with required reviewers before allowing production deployment.
 
 ## 5. Required release evidence

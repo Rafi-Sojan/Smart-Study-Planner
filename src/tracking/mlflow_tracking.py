@@ -200,6 +200,7 @@ def log_early_warning_run(
 
     mlflow = _configure_tracking()
     mlflow.set_experiment(experiment_name)
+    quality = assess_model_quality(metrics)
     registered: dict[int, str] = {}
     with mlflow.start_run(run_name=run_name) as active_run:
         mlflow.log_params(
@@ -208,6 +209,8 @@ def log_early_warning_run(
                 "target": metrics["target"],
                 "evaluation": metrics["evaluation"],
                 "cutoffs_days": ",".join(str(value) for value in metrics["cutoffs_days"]),
+                "quality_gate_passed": quality["passed"],
+                "deployment_eligible": quality["deployment_eligible"],
             }
         )
         for cutoff_text, evaluation in metrics["evaluations"].items():
@@ -244,6 +247,8 @@ def log_early_warning_run(
                         "development_only": "true",
                         "cutoff_days": str(cutoff),
                         "model_name": best_name,
+                        "quality_gate_passed": str(quality["passed"]).lower(),
+                        "deployment_eligible": str(quality["deployment_eligible"]).lower(),
                     },
                 )
                 registered[cutoff] = registered_name
@@ -266,6 +271,7 @@ def log_synthetic_baseline_run(
 
     mlflow = _configure_tracking()
     mlflow.set_experiment(experiment_name)
+    quality = assess_model_quality(metrics)
     registered: dict[int, dict[str, str]] = {}
     with mlflow.start_run(run_name=run_name) as active_run:
         mlflow.log_params(
@@ -276,6 +282,8 @@ def log_synthetic_baseline_run(
                 "evaluation": metrics["evaluation"],
                 "cutoffs_days": ",".join(str(value) for value in metrics["cutoffs_days"]),
                 "random_state": metrics["random_state"],
+                "quality_gate_passed": quality["passed"],
+                "deployment_eligible": quality["deployment_eligible"],
                 **_provenance_params(metrics),
             }
         )
@@ -311,6 +319,8 @@ def log_synthetic_baseline_run(
                             "development_only": "true",
                             "cutoff_days": str(cutoff),
                             "model_name": model_name,
+                            "quality_gate_passed": str(quality["passed"]).lower(),
+                            "deployment_eligible": str(quality["deployment_eligible"]).lower(),
                         },
                     )
                     registered.setdefault(cutoff, {})[model_name] = registered_name

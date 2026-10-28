@@ -31,6 +31,8 @@ stages:
       - src/models/baseline.py
       - src/models/evaluate.py
       - src/models/policy.py
+      - src/risk/model_risk.py
+      - src/tracking/mlflow_tracking.py
     outs:
       - models/baseline.pkl
   early_warning:
@@ -42,6 +44,8 @@ stages:
       - src/models/baseline.py
       - src/models/evaluate.py
       - src/models/policy.py
+      - src/risk/model_risk.py
+      - src/tracking/mlflow_tracking.py
   kuleuven_external_validation:
     cmd: python -m pipeline.kuleuven_external_validation --data-path data/raw/external/kuleuven/dataset.zip --metrics-output models/metrics/kuleuven_external_metrics.json --cutoffs-days 30 60 90
     deps:
@@ -77,6 +81,7 @@ stages:
       - src/models/evaluate.py
       - src/models/policy.py
       - src/tracking/mlflow_tracking.py
+      - src/risk/model_risk.py
     outs:
       - models/synthetic_baseline
     metrics:

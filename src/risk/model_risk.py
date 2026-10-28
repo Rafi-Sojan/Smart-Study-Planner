@@ -63,6 +63,7 @@ def assess_model_quality(
     *,
     min_pr_auc: float | None = None,
     min_balanced_accuracy: float | None = None,
+    min_operating_point_recall: float | None = None,
     max_expected_calibration_error: float | None = None,
 ) -> dict[str, Any]:
     """Return structural, statistical, and deployment-readiness checks.
@@ -85,12 +86,21 @@ def assess_model_quality(
                     "checks": [{"name": "evaluation_structure", "passed": False}],
                 }
                 continue
+            evaluation_models = evaluation.get("models")
+            selected_evaluation_model = (
+                evaluation_models.get(evaluation.get("best_model"))
+                if isinstance(evaluation_models, dict)
+                else None
+            )
+            selected_evaluation_model = (
+                selected_evaluation_model if isinstance(selected_evaluation_model, dict) else {}
+            )
             normalized = {
                 "best_model": evaluation.get("best_model"),
                 "models": evaluation.get("models"),
-                "n_samples": evaluation.get("n_samples"),
-                "n_train": evaluation.get("n_train"),
-                "n_test": evaluation.get("n_test"),
+                "n_samples": evaluation.get("n_samples", selected_evaluation_model.get("n_samples")),
+                "n_train": evaluation.get("n_train", selected_evaluation_model.get("n_train")),
+                "n_test": evaluation.get("n_test", selected_evaluation_model.get("n_test")),
                 "target": metrics.get("target", "unknown"),
                 "evidence_type": metrics.get("evidence_type", "synthetic_development_only"),
                 "deployment_claim": metrics.get("deployment_claim", "development_only"),
@@ -99,6 +109,7 @@ def assess_model_quality(
                 normalized,
                 min_pr_auc=min_pr_auc,
                 min_balanced_accuracy=min_balanced_accuracy,
+                min_operating_point_recall=min_operating_point_recall,
                 max_expected_calibration_error=max_expected_calibration_error,
             )
         return {
@@ -166,6 +177,17 @@ def assess_model_quality(
                     minimum=min_balanced_accuracy,
                 )
             )
+        if min_operating_point_recall is not None:
+            operating_point = selected.get("test_at_validation_threshold")
+            operating_recall = operating_point.get("recall") if isinstance(operating_point, dict) else None
+            checks.append(
+                _metric_check(
+                    "operating_point_recall_gate",
+                    operating_recall,
+                    minimum=min_operating_point_recall,
+                    maximum=1.0,
+                )
+            )
         if max_expected_calibration_error is not None:
             checks.append(
                 _metric_check(
@@ -213,6 +235,7 @@ def main() -> None:
     parser.add_argument("--output", type=Path, default=None)
     parser.add_argument("--min-pr-auc", type=float, default=None)
     parser.add_argument("--min-balanced-accuracy", type=float, default=None)
+    parser.add_argument("--min-operating-point-recall", type=float, default=None)
     parser.add_argument("--max-expected-calibration-error", type=float, default=None)
     parser.add_argument("--require-deployment-eligibility", action="store_true")
     args = parser.parse_args()
@@ -221,6 +244,7 @@ def main() -> None:
         metrics,
         min_pr_auc=args.min_pr_auc,
         min_balanced_accuracy=args.min_balanced_accuracy,
+        min_operating_point_recall=args.min_operating_point_recall,
         max_expected_calibration_error=args.max_expected_calibration_error,
     )
     if args.output is not None:

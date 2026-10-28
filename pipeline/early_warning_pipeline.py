@@ -12,6 +12,7 @@ from src.data.validation import validate_oulad_tables
 from src.features.feature_engineering import build_oulad_features
 from src.models.baseline import split_time_aware_data, train_time_aware_baselines
 from src.monitoring.prometheus_exporter import push_early_warning_metrics
+from src.risk.model_risk import assess_model_quality
 from src.tracking.mlflow_tracking import log_early_warning_run
 
 
@@ -83,6 +84,7 @@ def run_early_warning(
         "provenance": build_provenance(data_dir, "oulad-early-warning-v2-grouped-validation"),
         "evaluations": evaluations,
     }
+    metrics["quality_checks"] = assess_model_quality(metrics)
     def write_metrics() -> None:
         if metrics_output is not None:
             path = Path(metrics_output)

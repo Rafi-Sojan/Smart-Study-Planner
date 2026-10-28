@@ -11,6 +11,9 @@ on:
 permissions:
   contents: read
 
+env:
+  DEPLOY_NAMESPACE: smart-study-planner
+
 jobs:
   deploy:
     name: Deploy to Kubernetes
@@ -35,11 +38,14 @@ jobs:
 
       - name: Apply manifests
         env:
-          KUBE_NAMESPACE: ${{ secrets.KUBE_NAMESPACE }}
           IMAGE_TAG: ${{ inputs.image_tag }}
         run: |
-          test -n "$KUBE_NAMESPACE"
-          kubectl apply -k deploy/kubernetes
-          kubectl -n "$KUBE_NAMESPACE" set image deployment/smart-study-planner-api \
-            api="ghcr.io/${{ github.repository }}:${IMAGE_TAG}"
-          kubectl -n "$KUBE_NAMESPACE" rollout status deployment/smart-study-planner-api --timeout=180s
+          case "$IMAGE_TAG" in
+            ''|*[!A-Za-z0-9._-]*) echo "Invalid image tag" >&2; exit 1 ;;
+          esac
+          rendered_manifest="$(mktemp)"
+          kubectl kustomize deploy/kubernetes \
+            | sed "s#ghcr.io/example/smart-study-planner:latest#ghcr.io/${GITHUB_REPOSITORY}:${IMAGE_TAG}#g" \
+            > "$rendered_manifest"
+          kubectl apply -f "$rendered_manifest"
+          kubectl -n "$DEPLOY_NAMESPACE" rollout status deployment/smart-study-planner-api --timeout=180s

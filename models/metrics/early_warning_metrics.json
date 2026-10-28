@@ -5499,19 +5499,311 @@
     }
   },
   "evidence_type": "retrospective_historical_early_warning_benchmark",
-  "mlflow_run_id": "c5e74d4b4d3d48d3bd5103c742061466",
   "provenance": {
     "data_sha256": "fc91eccbb94eb5e0a3865711d5200256aa7e766e2742c9aaae2f55e79e083af8",
     "feature_schema_version": "oulad-early-warning-v2-grouped-validation",
-    "git_commit": "5ea087ac9465e802259b0bc21835d791399320e7",
+    "git_commit": null,
     "platform": "win32",
     "python_version": "3.12.14",
     "scikit_learn_version": "1.5.2"
   },
-  "registered_models": {
-    "30": "smart-study-planner-oulad-early-warning-day-30",
-    "60": "smart-study-planner-oulad-early-warning-day-60",
-    "90": "smart-study-planner-oulad-early-warning-day-90"
+  "quality_checks": {
+    "cutoffs": {
+      "30": {
+        "checks": [
+          {
+            "missing": [],
+            "name": "required_top_level_fields",
+            "passed": true
+          },
+          {
+            "name": "selected_model_present",
+            "passed": true,
+            "value": "hist_gradient_boosting"
+          },
+          {
+            "missing": [],
+            "name": "required_selected_model_fields",
+            "passed": true
+          },
+          {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "name": "accuracy",
+            "passed": true,
+            "value": 0.730550621669627
+          },
+          {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "name": "balanced_accuracy",
+            "passed": true,
+            "value": 0.7306346729530905
+          },
+          {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "name": "f1",
+            "passed": true,
+            "value": 0.7357603205016547
+          },
+          {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "name": "precision",
+            "passed": true,
+            "value": 0.7437929212889594
+          },
+          {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "name": "recall",
+            "passed": true,
+            "value": 0.7278993623987593
+          },
+          {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "name": "roc_auc",
+            "passed": true,
+            "value": 0.8027537272194427
+          },
+          {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "name": "pr_auc",
+            "passed": true,
+            "value": 0.8255759288692645
+          },
+          {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "name": "brier_score",
+            "passed": true,
+            "value": 0.18624432321006978
+          },
+          {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "name": "expected_calibration_error",
+            "passed": true,
+            "value": 0.05230547359529918
+          },
+          {
+            "name": "confusion_matrix_integrity",
+            "passed": true
+          },
+          {
+            "name": "sample_counts_positive",
+            "passed": true
+          }
+        ],
+        "deployment_claim": "not_prospective_intervention_evidence",
+        "deployment_eligible": false,
+        "evidence_type": "retrospective_historical_early_warning_benchmark",
+        "intervention_policy_configured": false,
+        "passed": true,
+        "selected_model": "hist_gradient_boosting"
+      },
+      "60": {
+        "checks": [
+          {
+            "missing": [],
+            "name": "required_top_level_fields",
+            "passed": true
+          },
+          {
+            "name": "selected_model_present",
+            "passed": true,
+            "value": "hist_gradient_boosting"
+          },
+          {
+            "missing": [],
+            "name": "required_selected_model_fields",
+            "passed": true
+          },
+          {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "name": "accuracy",
+            "passed": true,
+            "value": 0.7624333925399644
+          },
+          {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "name": "balanced_accuracy",
+            "passed": true,
+            "value": 0.7613320358300135
+          },
+          {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "name": "f1",
+            "passed": true,
+            "value": 0.7757189569883458
+          },
+          {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "name": "precision",
+            "passed": true,
+            "value": 0.755388634879164
+          },
+          {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "name": "recall",
+            "passed": true,
+            "value": 0.7971738755815957
+          },
+          {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "name": "roc_auc",
+            "passed": true,
+            "value": 0.8461688678718278
+          },
+          {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "name": "pr_auc",
+            "passed": true,
+            "value": 0.8702238034564109
+          },
+          {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "name": "brier_score",
+            "passed": true,
+            "value": 0.16834842259547328
+          },
+          {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "name": "expected_calibration_error",
+            "passed": true,
+            "value": 0.0573877797245069
+          },
+          {
+            "name": "confusion_matrix_integrity",
+            "passed": true
+          },
+          {
+            "name": "sample_counts_positive",
+            "passed": true
+          }
+        ],
+        "deployment_claim": "not_prospective_intervention_evidence",
+        "deployment_eligible": false,
+        "evidence_type": "retrospective_historical_early_warning_benchmark",
+        "intervention_policy_configured": false,
+        "passed": true,
+        "selected_model": "hist_gradient_boosting"
+      },
+      "90": {
+        "checks": [
+          {
+            "missing": [],
+            "name": "required_top_level_fields",
+            "passed": true
+          },
+          {
+            "name": "selected_model_present",
+            "passed": true,
+            "value": "hist_gradient_boosting"
+          },
+          {
+            "missing": [],
+            "name": "required_selected_model_fields",
+            "passed": true
+          },
+          {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "name": "accuracy",
+            "passed": true,
+            "value": 0.7684724689165187
+          },
+          {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "name": "balanced_accuracy",
+            "passed": true,
+            "value": 0.7668578248295361
+          },
+          {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "name": "f1",
+            "passed": true,
+            "value": 0.7848477345877692
+          },
+          {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "name": "precision",
+            "passed": true,
+            "value": 0.7530883750395946
+          },
+          {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "name": "recall",
+            "passed": true,
+            "value": 0.8194037566775806
+          },
+          {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "name": "roc_auc",
+            "passed": true,
+            "value": 0.8646188800311845
+          },
+          {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "name": "pr_auc",
+            "passed": true,
+            "value": 0.8881216968922422
+          },
+          {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "name": "brier_score",
+            "passed": true,
+            "value": 0.1659726996574964
+          },
+          {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "name": "expected_calibration_error",
+            "passed": true,
+            "value": 0.07880421606119085
+          },
+          {
+            "name": "confusion_matrix_integrity",
+            "passed": true
+          },
+          {
+            "name": "sample_counts_positive",
+            "passed": true
+          }
+        ],
+        "deployment_claim": "not_prospective_intervention_evidence",
+        "deployment_eligible": false,
+        "evidence_type": "retrospective_historical_early_warning_benchmark",
+        "intervention_policy_configured": false,
+        "passed": true,
+        "selected_model": "hist_gradient_boosting"
+      }
+    },
+    "deployment_claim": "not_prospective_intervention_evidence",
+    "deployment_eligible": false,
+    "evidence_type": "retrospective_historical_early_warning_benchmark",
+    "intervention_policy_configured": false,
+    "passed": true,
+    "selected_model": null
   },
   "target": "Fail/Withdrawn = 1; Pass/Distinction = 0",
   "task": "early_warning_enrollment_risk_classification"

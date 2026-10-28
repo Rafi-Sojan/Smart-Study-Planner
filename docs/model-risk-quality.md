@@ -65,6 +65,7 @@ python -m pipeline.model_quality `
   --output models/metrics/model_quality.json `
   --min-pr-auc 0.20 `
   --min-balanced-accuracy 0.60 `
+  --min-operating-point-recall 0.10 `
   --max-expected-calibration-error 0.10
 ```
 
@@ -73,6 +74,12 @@ approved thresholds. Thresholds must be set from the intended support
 capacity, error costs, prevalence, calibration requirements, and institutional
 review. A universal threshold would be inappropriate across OULAD, synthetic,
 and future institutional data.
+
+`min-operating-point-recall` applies to the locked-test evaluation at the
+threshold selected on validation data. It is distinct from the default 0.5
+diagnostic threshold and is useful for detecting a degenerate smoke model that
+never produces a positive alert at its reviewed operating point. It remains a
+minimum engineering gate, not an approved intervention target.
 
 The command exits with a non-zero status when a structural check or supplied
 threshold fails. CI uses the same mechanism on the synthetic smoke report.

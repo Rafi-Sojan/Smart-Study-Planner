@@ -2,7 +2,6 @@
   "best_model": "hist_gradient_boosting",
   "deployment_claim": "not_prospective_or_causal_evidence",
   "evidence_type": "retrospective_historical_benchmark",
-  "mlflow_run_id": "338a6e6621954befb74fb90bfae00c13",
   "models": {
     "extra_trees": {
       "accuracy": 0.9346069066862601,
@@ -1827,18 +1826,108 @@
   "provenance": {
     "data_sha256": "fc91eccbb94eb5e0a3865711d5200256aa7e766e2742c9aaae2f55e79e083af8",
     "feature_schema_version": "oulad-enrollment-v2-grouped-evaluation",
-    "git_commit": "5ea087ac9465e802259b0bc21835d791399320e7",
+    "git_commit": null,
     "platform": "win32",
     "python_version": "3.12.14",
     "scikit_learn_version": "1.5.2"
   },
-  "random_state": 42,
-  "registered_models": {
-    "extra_trees": "smart-study-planner-oulad-baseline-extra_trees",
-    "hist_gradient_boosting": "smart-study-planner-oulad-baseline-hist_gradient_boosting",
-    "logistic_regression": "smart-study-planner-oulad-baseline-logistic_regression",
-    "random_forest": "smart-study-planner-oulad-baseline-random_forest"
+  "quality_checks": {
+    "checks": [
+      {
+        "missing": [],
+        "name": "required_top_level_fields",
+        "passed": true
+      },
+      {
+        "name": "selected_model_present",
+        "passed": true,
+        "value": "hist_gradient_boosting"
+      },
+      {
+        "missing": [],
+        "name": "required_selected_model_fields",
+        "passed": true
+      },
+      {
+        "maximum": 1.0,
+        "minimum": 0.0,
+        "name": "accuracy",
+        "passed": true,
+        "value": 0.9365662503061475
+      },
+      {
+        "maximum": 1.0,
+        "minimum": 0.0,
+        "name": "balanced_accuracy",
+        "passed": true,
+        "value": 0.9382316311574879
+      },
+      {
+        "maximum": 1.0,
+        "minimum": 0.0,
+        "name": "f1",
+        "passed": true,
+        "value": 0.9380530973451328
+      },
+      {
+        "maximum": 1.0,
+        "minimum": 0.0,
+        "name": "precision",
+        "passed": true,
+        "value": 0.9691129231529528
+      },
+      {
+        "maximum": 1.0,
+        "minimum": 0.0,
+        "name": "recall",
+        "passed": true,
+        "value": 0.9089223638470452
+      },
+      {
+        "maximum": 1.0,
+        "minimum": 0.0,
+        "name": "roc_auc",
+        "passed": true,
+        "value": 0.9815464403611588
+      },
+      {
+        "maximum": 1.0,
+        "minimum": 0.0,
+        "name": "pr_auc",
+        "passed": true,
+        "value": 0.9856850422420927
+      },
+      {
+        "maximum": 1.0,
+        "minimum": 0.0,
+        "name": "brier_score",
+        "passed": true,
+        "value": 0.04665943413300837
+      },
+      {
+        "maximum": 1.0,
+        "minimum": 0.0,
+        "name": "expected_calibration_error",
+        "passed": true,
+        "value": 0.004554917876222487
+      },
+      {
+        "name": "confusion_matrix_integrity",
+        "passed": true
+      },
+      {
+        "name": "sample_counts_positive",
+        "passed": true
+      }
+    ],
+    "deployment_claim": "not_prospective_or_causal_evidence",
+    "deployment_eligible": false,
+    "evidence_type": "retrospective_historical_benchmark",
+    "intervention_policy_configured": false,
+    "passed": true,
+    "selected_model": "hist_gradient_boosting"
   },
+  "random_state": 42,
   "target": "Fail/Withdrawn = 1; Pass/Distinction = 0",
   "task": "enrollment_risk_classification"
 }

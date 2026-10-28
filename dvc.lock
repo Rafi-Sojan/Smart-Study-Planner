@@ -35,8 +35,8 @@ stages:
       nfiles: 8
     - path: pipeline/training_pipeline.py
       hash: md5
-      md5: 2c9c0f3c2abc51fe212850e5e6344071
-      size: 5715
+      md5: 2df3fdc34a41217e418b8d4984f863ed
+      size: 5830
     - path: src/features/feature_engineering.py
       hash: md5
       md5: d21dcc5b3ec5825f470bd448d5bf0476
@@ -53,6 +53,14 @@ stages:
       hash: md5
       md5: a00d90f1f5785f8c7204510fa1d023b1
       size: 4099
+    - path: src/risk/model_risk.py
+      hash: md5
+      md5: 2066c6903ff1334d6b3e7694e32132a1
+      size: 10513
+    - path: src/tracking/mlflow_tracking.py
+      hash: md5
+      md5: 0c62c3e148e40c4449640bb68536afce
+      size: 13816
     outs:
     - path: models/baseline.pkl
       hash: md5
@@ -70,8 +78,8 @@ stages:
       nfiles: 8
     - path: pipeline/early_warning_pipeline.py
       hash: md5
-      md5: b6b3627986f4c8c2bb3b04e8aa7bab8f
-      size: 6612
+      md5: 096a8af762c3e3b511aa2083d642ce71
+      size: 6727
     - path: src/features/feature_engineering.py
       hash: md5
       md5: d21dcc5b3ec5825f470bd448d5bf0476
@@ -88,6 +96,14 @@ stages:
       hash: md5
       md5: a00d90f1f5785f8c7204510fa1d023b1
       size: 4099
+    - path: src/risk/model_risk.py
+      hash: md5
+      md5: 2066c6903ff1334d6b3e7694e32132a1
+      size: 10513
+    - path: src/tracking/mlflow_tracking.py
+      hash: md5
+      md5: 0c62c3e148e40c4449640bb68536afce
+      size: 13816
   simulate:
     cmd: python -m src.simulation.simulator --config configs/simulation.yaml 
       --overwrite
@@ -123,8 +139,8 @@ stages:
       nfiles: 37
     - path: pipeline/synthetic_baseline_pipeline.py
       hash: md5
-      md5: 12a602c8eb63a92fd79692a4899c24f7
-      size: 5012
+      md5: 969da67f1a01e4dce47ac5d62d0a9ccc
+      size: 5127
     - path: src/features/synthetic_features.py
       hash: md5
       md5: 41b9876d71268dad3e8171875b430995
@@ -141,18 +157,22 @@ stages:
       hash: md5
       md5: 458af4da4c4c572444c0819674513923
       size: 15601
+    - path: src/risk/model_risk.py
+      hash: md5
+      md5: 2066c6903ff1334d6b3e7694e32132a1
+      size: 10513
     - path: src/tracking/mlflow_tracking.py
       hash: md5
-      md5: 646f684f1376e96e53551766577825cc
-      size: 11497
+      md5: 0c62c3e148e40c4449640bb68536afce
+      size: 13816
     outs:
     - path: models/metrics/synthetic_baseline_metrics.json
       hash: md5
-      md5: 401e5731bf97380735764922d4262c20
-      size: 109998
+      md5: a1954dd3be3f07dc96c190f50306cd20
+      size: 117370
     - path: models/synthetic_baseline
       hash: md5
-      md5: 14a13960461509bcd249b3fe046b877e.dir
+      md5: 5a5ee100ba2986bb089786fe85355128.dir
       size: 24285968
       nfiles: 3
   synthetic_validate:

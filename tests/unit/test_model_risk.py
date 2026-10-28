@@ -47,6 +47,20 @@ def test_quality_gate_rejects_missing_confusion_matrix() -> None:
     assert report["passed"] is False
 
 
+def test_quality_gate_checks_validation_threshold_operating_point() -> None:
+    metrics = _metrics()
+    metrics["models"]["logistic_regression"]["test_at_validation_threshold"] = {
+        "recall": 0.4,
+        "confusion_matrix": [[10, 5], [6, 4]],
+    }
+    report = assess_model_quality(metrics, min_operating_point_recall=0.5)
+    assert report["passed"] is False
+    assert any(
+        check["name"] == "operating_point_recall_gate" and not check["passed"]
+        for check in report["checks"]
+    )
+
+
 def test_quality_gate_checks_each_cutoff_in_nested_evaluation() -> None:
     metrics = {
         "target": "risk",

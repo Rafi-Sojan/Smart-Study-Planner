@@ -43,6 +43,11 @@ finding in this document. DVC cache directories must not be shared with
 untrusted users or populated from untrusted artifacts. Any future patched
 DiskCache release must replace this exception and remove the CI ignore.
 
+The serving image uses the API-only `requirements-api.txt` dependency set and
+does not install DVC or its storage adapters. The full `requirements.txt` set
+remains necessary for local data pipelines and CI, so its residual advisory is
+still audited and explicitly documented rather than hidden.
+
 Reference: [GitHub Advisory GHSA-w8v5-vhqr-4h9v](https://github.com/advisories/GHSA-w8v5-vhqr-4h9v).
 
 ## Operational controls

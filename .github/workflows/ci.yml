@@ -42,12 +42,24 @@ jobs:
       - name: Audit Python dependencies
         run: |
           python -m pip install pip-audit==2.10.1
+          pip-audit -r requirements-api.txt
           pip-audit -r requirements.txt --ignore PYSEC-2026-2447
+
+      - name: Validate DVC pipeline graph
+        env:
+          DVC_SITE_CACHE_DIR: ${{ runner.temp }}/dvc-site-cache
+        run: |
+          mkdir -p "$DVC_SITE_CACHE_DIR"
+          dvc dag
+
+      - name: Validate notebook structure
+        run: |
+          python -m pipeline.validate_notebooks notebooks
 
       - name: Generate synthetic smoke dataset
         run: |
           python -m src.simulation.simulator \
-            --output-dir .ci-data/synthetic \
+            --output-dir data/raw/synthetic \
             --students 100 \
             --terms 2 \
             --weeks-per-term 8 \
@@ -56,7 +68,7 @@ jobs:
       - name: Run synthetic baseline smoke test
         run: |
           python -m pipeline.synthetic_baseline_pipeline \
-            --data-dir .ci-data/synthetic \
+            --data-dir data/raw/synthetic \
             --metrics-output .ci-output/synthetic_metrics.json \
             --model-dir .ci-output/models \
             --cutoffs-days 30
@@ -66,10 +78,37 @@ jobs:
           python -m pipeline.model_quality \
             --metrics .ci-output/synthetic_metrics.json \
             --output .ci-output/model_quality.json \
-            --min-balanced-accuracy 0.5
+            --min-pr-auc 0.05 \
+            --min-balanced-accuracy 0.5 \
+            --min-operating-point-recall 0.10
+
+      - name: Run loaded-model API smoke test
+        run: |
+          python -m pipeline.api_smoke \
+            --data-dir data/raw/synthetic \
+            --metrics .ci-output/synthetic_metrics.json \
+            --model-dir .ci-output/models \
+            --cutoff 30
+
+      - name: Execute synthetic notebooks
+        run: |
+          python -m pipeline.validate_notebooks \
+            --execute \
+            --output-dir .ci-output/executed-notebooks \
+            notebooks/06_synthetic_data_exploration.ipynb \
+            notebooks/07_synthetic_processing_and_features.ipynb \
+            notebooks/08_synthetic_baseline_testing.ipynb
 
       - name: Validate synthetic relational integrity
         run: |
           python -m src.data.synthetic_validation \
-            --data-dir .ci-data/synthetic \
+            --data-dir data/raw/synthetic \
             --output .ci-output/synthetic_validation.json
+
+      - name: Upload notebook and quality artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-analysis-artifacts
+          path: .ci-output/
+          if-no-files-found: ignore
