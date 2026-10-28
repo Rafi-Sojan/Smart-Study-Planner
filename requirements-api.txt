@@ -2,7 +2,7 @@
 # DVC and its storage adapters remain in requirements.txt for data pipelines
 # and CI, but are intentionally excluded from the serving container.
 pandas==2.2.3
-scikit-learn==1.5.2
+scikit-learn==1.9.1
 numpy==2.1.2
 mlflow==3.17.1
 prometheus-client==0.21.1
