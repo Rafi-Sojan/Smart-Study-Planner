@@ -1,7 +1,7 @@
 # Runtime dependencies for the FastAPI inference image.
 # DVC and its storage adapters remain in requirements.txt for data pipelines
 # and CI, but are intentionally excluded from the serving container.
-pandas==2.2.3
+pandas==3.1.0
 scikit-learn==1.5.2
 numpy==2.1.2
 mlflow==3.17.1
