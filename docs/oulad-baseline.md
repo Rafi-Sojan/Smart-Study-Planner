@@ -385,6 +385,11 @@ metric curves for days 30, 60, and 90, and displays separate confusion-matrix
 figures for each cutoff. It calls the same feature and model functions as the
 scripted pipeline rather than maintaining a second implementation.
 
+Notebook 11 adds formal temporal-shift tests and a real-world comparison with
+the KU Leuven 2021 locked cohort. The statistical protocol and interpretation
+boundary are documented in
+[`docs/statistical-validation.md`](statistical-validation.md).
+
 The notebook includes these visualizations:
 
 - **Enrollment outcomes:** counts of Distinction, Pass, Fail, and Withdrawn

@@ -30,11 +30,13 @@ or `develop`, and on manual dispatch. It performs:
 The synthetic smoke run is a reproducibility and software-integrity check. It
 does not validate the synthetic data as real student evidence.
 
-The OULAD, EdNet, and KU Leuven notebooks are structurally validated in the
-ordinary CI checkout but are not executed there because their licensed raw
-inputs are intentionally absent. A data-qualified local or scheduled run can
-execute them with `python -m pipeline.validate_notebooks --execute` after the
-permitted data has been obtained.
+The OULAD, EdNet, KU Leuven, and cross-dataset statistical-validation notebooks
+are structurally validated in the ordinary CI checkout but are not executed
+there because their licensed raw inputs are intentionally absent. Notebook 12
+also requires the full synthetic release and real-world comparison inputs. A
+data-qualified local or scheduled run can execute them with
+`python -m pipeline.validate_notebooks --execute` after the permitted data has
+been obtained.
 
 ## 3. Container verification and publication
 

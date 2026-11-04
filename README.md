@@ -37,6 +37,9 @@ DiskCache advisory are documented in
 [docs/security-hardening.md](docs/security-hardening.md).
 The authorised real-world external evaluation is documented in
 [docs/kuleuven-external-validation.md](docs/kuleuven-external-validation.md).
+The separate OULAD and synthetic statistical-validation protocol, including
+Holm-adjusted distribution tests and real-world comparisons, is documented in
+[docs/statistical-validation.md](docs/statistical-validation.md).
 The FastAPI inference service, model-registry loading, Docker Compose setup,
 Kubernetes template, and deployment rollback procedure are documented in
 [docs/deployment.md](docs/deployment.md).
@@ -58,6 +61,9 @@ the CI/CD and release procedure is documented in [docs/cicd.md](docs/cicd.md).
 - [07 — Synthetic processing and feature extraction](notebooks/07_synthetic_processing_and_features.ipynb)
 - [08 — Synthetic baseline testing](notebooks/08_synthetic_baseline_testing.ipynb)
 - [09 — KU Leuven external validation](notebooks/09_kuleuven_external_validation.ipynb)
+- [10 — KU Leuven-to-synthetic transfer stress test](notebooks/10_cross_dataset_transfer.ipynb)
+- [11 — OULAD statistical validation and real-world comparison](notebooks/11_oulad_statistical_validation.ipynb)
+- [12 — Synthetic statistical validation and real-world comparison](notebooks/12_synthetic_statistical_validation.ipynb)
 
 The OULAD notebooks contain executed outputs, including tables, metric plots,
 and confusion matrices. The full-course notebook reports the retrospective
@@ -75,6 +81,13 @@ The KU Leuven external-validation track is kept separate from the synthetic
 planner track. It tests early LMS activity against a later real academic-year
 outcome and does not validate synthetic sleep, break, screen-time, wellbeing,
 CGPA, or Indian-university attributes.
+
+Notebooks 11 and 12 add the statistical-validation layer. Notebook 11 audits
+temporal stability within OULAD and compares OULAD with KU Leuven. Notebook 12
+audits synthetic integrity, simulated feature associations, student-disjoint
+composition, and synthetic-to-real measurement differences. Their saved JSON
+reports are under `models/validation/`; they do not turn synthetic results into
+real-student evidence.
 
 The controlled cross-dataset transfer stress test is documented in
 [docs/cross-dataset-transfer.md](docs/cross-dataset-transfer.md) and in

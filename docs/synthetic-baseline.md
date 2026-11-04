@@ -218,6 +218,13 @@ for days 30, 60, and 90. Therefore the selected algorithm may differ by cutoff.
 The decision should be reported with the measured table and not reduced to a
 claim that random forest, or any other model, is always superior.
 
+Notebook 12 extends this development benchmark with relational-integrity
+checks, Holm-adjusted statistical association tests, student-disjoint
+train/test composition tests, and real-world comparisons against OULAD and the
+KU Leuven 2021 locked cohort. The comparison is limited to the common
+engagement contract and cannot validate synthetic sleep, wellbeing, screen-time,
+CGPA, or Indian-university attributes.
+
 In the current executed seed-42 snapshot, 152 of 12,000 enrollment rows are
 risky, and the locked test partition contains 3,000 rows. At the default 0.5
 threshold, the candidates predict almost all rows as low risk, so locked-test

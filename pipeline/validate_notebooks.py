@@ -1,10 +1,11 @@
 """Validate notebook structure and optionally execute selected notebooks.
 
 Dataset-dependent notebooks are not all executable in a clean CI checkout:
-OULAD, EdNet, and KU Leuven files are external, licensed inputs. CI therefore
-parses every notebook and executes the synthetic notebooks against a generated
-fixture. A local or scheduled data-qualified run can execute the remaining
-notebooks by passing their paths explicitly.
+OULAD, EdNet, and KU Leuven files are external, licensed inputs. The
+statistical-validation notebooks also compare multiple data sources. CI
+therefore parses every notebook and executes the synthetic baseline notebooks
+against a generated fixture. A local or scheduled data-qualified run can
+execute the remaining notebooks by passing their paths explicitly.
 """
 
 from __future__ import annotations
