@@ -87,7 +87,7 @@ jobs:
           echo "APP_SECRET_NAME=smart-study-planner-release-${IMAGE_TAG:0:12}" >> "$GITHUB_ENV"
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: "3.12"
           cache: pip
