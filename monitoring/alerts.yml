@@ -1,0 +1,66 @@
+groups:
+  - name: smart-study-planner-api
+    rules:
+      - alert: SmartStudyPlannerApiUnavailable
+        expr: up{job="risk-api"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: Smart Study Planner API is unavailable
+          description: Prometheus has been unable to scrape the risk API for two minutes.
+
+      - alert: SmartStudyPlannerHighServerErrorRate
+        expr: |
+          sum(rate(smart_study_planner_http_requests_total{status=~"5.."}[5m]))
+          /
+          clamp_min(sum(rate(smart_study_planner_http_requests_total[5m])), 0.001)
+          > 0.05
+        for: 10m
+        labels:
+          severity: critical
+        annotations:
+          summary: Smart Study Planner server-error rate is above 5 percent
+          description: Investigate application logs, model-registry connectivity, and recent releases.
+
+      - alert: SmartStudyPlannerHighP95Latency
+        expr: |
+          histogram_quantile(
+            0.95,
+            sum by (le) (rate(smart_study_planner_http_request_duration_seconds_bucket[5m]))
+          ) > 1
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: Smart Study Planner p95 latency is above one second
+          description: Review API saturation, registry/model behavior, and cluster resource limits.
+
+  - name: smart-study-planner-batch
+    rules:
+      - alert: SmartStudyPlannerTrainingMetricsMissing
+        expr: absent(oulad_pipeline_last_success_timestamp{job="smart-study-planner-training"})
+        for: 24h
+        labels:
+          severity: warning
+        annotations:
+          summary: No training-pipeline heartbeat is available
+          description: Confirm the scheduled data-validation workflow and Pushgateway are operating.
+
+      - alert: SmartStudyPlannerTrainingMetricsStale
+        expr: time() - oulad_pipeline_last_success_timestamp{job="smart-study-planner-training"} > 172800
+        for: 30m
+        labels:
+          severity: warning
+        annotations:
+          summary: Training-pipeline metrics are more than 48 hours old
+          description: Review the scheduled pipeline and delete obsolete Pushgateway series after investigation.
+
+      - alert: SmartStudyPlannerDataDriftWarning
+        expr: smart_study_planner_drift_status{job="smart-study-planner-drift"} > 0
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: Feature snapshot drift exceeded a configured tolerance
+          description: Review the privacy-preserving drift artifact before retraining or promoting a model.

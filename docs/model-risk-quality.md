@@ -84,6 +84,22 @@ minimum engineering gate, not an approved intervention target.
 The command exits with a non-zero status when a structural check or supplied
 threshold fails. CI uses the same mechanism on the synthetic smoke report.
 
+The gate can also require the formal subgroup report:
+
+```powershell
+python -m pipeline.model_quality `
+  --metrics models/metrics/early_warning_metrics.json `
+  --require-fairness `
+  --min-fairness-group-size 30 `
+  --max-equal-opportunity-gap 0.20 `
+  --max-false-positive-rate-gap 0.20 `
+  --max-selection-rate-gap 0.20
+```
+
+These gap limits are documented engineering defaults, not universal ethical
+or legal approval criteria. Their definitions, Wilson intervals, and
+insufficient-group treatment are specified in `docs/fairness-validation.md`.
+
 ## 5. Deployment eligibility
 
 `passed: true` and `deployment_eligible: true` are intentionally different.
@@ -92,7 +108,8 @@ following evidence fields:
 
 - `evidence_type: prospective_institutional_validation`;
 - `deployment_claim: prospective_validated`; and
-- a selected model whose `intervention_policy.status` is `configured`.
+- a selected model whose `intervention_policy.status` is `configured`; and
+- a passing formal fairness report with at least one evaluable attribute.
 
 The current OULAD retrospective and synthetic development tracks therefore
 remain ineligible by design. This is a safety control, not a statement that

@@ -18,7 +18,9 @@ The application is defined in `src/api/main.py`, with routes in
 | GET | `/healthz` | Process liveness | Returns while the process is serving |
 | GET | `/readyz` | Model readiness | Returns 200 only when a model is loaded |
 | GET | `/metrics` | Prometheus metrics | Exposes request count and latency metrics |
+| GET | `/v1/model-metadata` | Resolved version, threshold, and fitted feature contract | Requires a loaded model and API key when configured |
 | POST | `/v1/risk-score` | Score one feature dictionary | Requires a loaded model and, when configured, a valid API key |
+| POST | `/v1/study-plan` | Score risk and generate a reviewable task schedule | Requires the risk endpoint controls plus valid tasks and availability |
 
 Example request shape:
 
@@ -31,10 +33,11 @@ Example request shape:
 }
 ```
 
-The request contains a non-empty feature mapping with no undeclared top-level
-fields. Identifiers and raw file paths are not accepted as separate request
-fields. The feature names and preprocessing contract must match the selected
-model; schema validation cannot guarantee semantic compatibility.
+The request contains a non-empty mapping of scalar strings, integers, floats,
+booleans, or nulls. Nested values, non-finite numbers, invalid names,
+identifiers, labels, and post-outcome fields are rejected. Supplied names must
+exactly equal the fitted model's ordered raw feature contract; missing and
+unexpected names return 422 rather than being silently imputed or discarded.
 
 Example response shape:
 
@@ -43,7 +46,9 @@ Example response shape:
   "risk_score": 0.42,
   "threshold": 0.50,
   "alert": false,
-  "model_version": "candidate"
+  "model_version": "registered-name/7",
+  "feature_contract_sha256": "<64-character digest>",
+  "threshold_source": "mlflow_registry_tag"
 }
 ```
 
@@ -67,13 +72,15 @@ to serve predictions.
 
 The service supports two mutually exclusive loading paths:
 
-1. `MODEL_URI=models:/...` or `runs:/...`, loaded through MLflow; or
+1. `MODEL_URI=models:/...`, loaded through MLflow; or
 2. `MODEL_PATH=...`, loaded as a pickle only when explicit trust is enabled.
 
 For local pickle artifacts, `MODEL_SHA256` provides an integrity check. Pickle
 is executable serialization, so the artifact source and checksum must be
 independently verified. Registry credentials and model artifacts are supplied
-at runtime and are not baked into the container image.
+at runtime and are not baked into the container image. Production accepts only
+an immutable numeric registered-model URI and validates its release tags,
+threshold, and fitted feature digest before readiness can succeed.
 
 ## 5. Authentication and privacy
 
@@ -91,18 +98,25 @@ metrics expose aggregate request counts and latency, not request payloads.
 
 | Variable | Required | Meaning |
 |---|---:|---|
-| `MODEL_URI` | Conditional | MLflow `models:/` or `runs:/` URI |
+| `APP_ENV` | Production | `production` activates strict registry, secret, and host checks |
+| `MODEL_URI` | Conditional | MLflow `models:/` URI; production requires a numeric version |
 | `MODEL_PATH` | Conditional | Trusted local model path |
 | `ALLOW_TRUSTED_PICKLE_MODEL` | For pickle | Must be `1` for local pickle loading |
 | `MODEL_SHA256` | Recommended for pickle | Expected SHA-256 digest |
-| `MODEL_THRESHOLD` | No | Numeric operating threshold; default `0.5` |
+| `MODEL_THRESHOLD` | Production | Must match the registered version's approved threshold tag |
 | `MODEL_VERSION` | No | Version label returned by the API |
 | `API_KEY` | Recommended | Expected `X-API-Key` value |
+| `ALLOWED_HOSTS` | Production | Comma-separated trusted HTTP hostnames |
 | `ENABLE_API_DOCS` | No | Enables `/docs` only when set to `1` |
 
-The threshold is an operating configuration, not a validated intervention
-policy. It must be reviewed using capacity, error costs, calibration, and
-human-support procedures.
+The 0.5 fallback exists only for local development without a registry model.
+A registered model must supply its validation-selected operating threshold;
+production additionally requires the deployment value to match it exactly.
+Threshold approval still requires capacity, error-cost, calibration, and
+human-support review.
+
+The study-planner calculation and safety boundary are specified in
+`docs/planner-service.md`.
 
 ## 7. Observability
 

@@ -244,6 +244,19 @@ regenerated synthetic pipeline and must be regenerated if the dataset, seed, or
 feature contract changes. The selection is a synthetic development comparison,
 not a production model recommendation.
 
+The corresponding locked-test accuracy is 0.9870 at every cutoff, but balanced
+accuracy is 0.5000 and risky-class recall is 0.0000. This is the majority-class
+effect described above: the accuracy value is not evidence that the models can
+identify students who need support. Under the 0.20 subgroup-gap policy, the
+30- and 60-day fairness summaries pass their measured gap limits, while the
+90-day model fails because its maximum equal-opportunity gap is 0.2857. The
+overall synthetic release consequently fails the fairness gate. Even the two
+cutoff summaries that pass cannot establish real-world fairness because the
+protected attributes and outcomes are simulated. Exact reports, confidence
+intervals, eligibility rules, and excluded small groups are retained in
+`models/metrics/synthetic_baseline_metrics.json` and documented in
+[`docs/fairness-validation.md`](fairness-validation.md).
+
 ## 8. Confusion matrices and operational interpretation
 
 Each selected model produces a 2 × 2 confusion matrix with actual class on the

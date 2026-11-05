@@ -78,3 +78,25 @@ def test_quality_gate_checks_each_cutoff_in_nested_evaluation() -> None:
     assert report["passed"] is True
     assert report["deployment_eligible"] is False
     assert report["cutoffs"]["30"]["selected_model"] == "logistic_regression"
+
+
+def test_quality_gate_can_require_formal_fairness_evidence() -> None:
+    metrics = _metrics()
+    metrics["models"]["logistic_regression"]["fairness_report"] = {
+        "methodology": {"min_group_size": 30},
+        "summary": {
+            "evaluated_attribute_count": 2,
+            "max_equal_opportunity_gap": 0.10,
+            "max_false_positive_rate_gap": 0.08,
+            "max_selection_rate_gap": 0.12,
+        },
+    }
+    report = assess_model_quality(metrics, require_fairness=True)
+    assert report["passed"] is True
+    assert report["fairness_gate_passed"] is True
+
+
+def test_required_fairness_gate_fails_when_report_is_missing() -> None:
+    report = assess_model_quality(_metrics(), require_fairness=True)
+    assert report["passed"] is False
+    assert report["fairness_gate_passed"] is False

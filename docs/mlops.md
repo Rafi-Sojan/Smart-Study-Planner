@@ -240,6 +240,15 @@ and numeric-quantile drift checks. They report aggregates and do not write
 student identifiers or row-level values. Monitoring does not replace a review
 of calibration, subgroup performance, intervention outcomes, or data quality.
 
+Prometheus evaluates the rules in `monitoring/alerts.yml`, and Alertmanager
+groups active API, latency, error, stale-pipeline, and drift alerts. The
+production health workflow runs every 15 minutes, while the credentialed data
+validation workflow runs weekly. Drift metrics remain opt-in because a current
+feature snapshot must be supplied by an authorised data process. Configure an
+institution-approved external Alertmanager receiver before relying on paging;
+the repository default exposes alerts in the local UI only. Operational and
+recovery procedures are specified in `docs/monitoring-and-recovery.md`.
+
 ## 6. Initial setup sequence
 
 ```powershell

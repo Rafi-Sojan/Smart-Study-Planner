@@ -5,12 +5,17 @@ services:
     container_name: smart-study-planner-api
     restart: unless-stopped
     environment:
+      APP_ENV: ${APP_ENV:-development}
       MODEL_PATH: ${MODEL_PATH:-}
       MODEL_URI: ${MODEL_URI:-}
       MODEL_VERSION: ${MODEL_VERSION:-local}
+      MODEL_THRESHOLD: ${MODEL_THRESHOLD:-0.5}
       MODEL_SHA256: ${MODEL_SHA256:-}
       ALLOW_TRUSTED_PICKLE_MODEL: ${ALLOW_TRUSTED_PICKLE_MODEL:-1}
+      HOME: /tmp
+      XDG_CACHE_HOME: /tmp/.cache
       API_KEY: ${API_KEY:-}
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS:-localhost,127.0.0.1,api}
       MLFLOW_TRACKING_URI: ${MLFLOW_TRACKING_URI:-}
       MLFLOW_TRACKING_USERNAME: ${MLFLOW_TRACKING_USERNAME:-}
       MLFLOW_TRACKING_PASSWORD: ${MLFLOW_TRACKING_PASSWORD:-}
@@ -32,7 +37,20 @@ services:
       - "127.0.0.1:9090:9090"
     volumes:
       - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./monitoring/alerts.yml:/etc/prometheus/alerts.yml:ro
       - prometheus_data:/prometheus
+    depends_on:
+      - alertmanager
+
+  alertmanager:
+    image: prom/alertmanager:v0.28.1
+    container_name: smart-study-planner-alertmanager
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:9093:9093"
+    volumes:
+      - ./monitoring/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+      - alertmanager_data:/alertmanager
 
   pushgateway:
     image: prom/pushgateway:v1.11.1
@@ -60,3 +78,4 @@ services:
 volumes:
   prometheus_data:
   grafana_data:
+  alertmanager_data:

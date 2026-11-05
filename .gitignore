@@ -98,6 +98,9 @@ logs/*
 .ci-data/
 .ci-output/
 
+# DVC-owned validation reports (tracked through dvc.lock, not Git)
+/artifacts/validation/
+
 # Local MLflow tracking store
 mlruns/
 

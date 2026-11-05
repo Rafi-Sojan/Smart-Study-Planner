@@ -24,8 +24,10 @@ or `develop`, and on manual dispatch. It performs:
 9. a synthetic baseline run;
 10. the model-quality gate for every generated cutoff;
 11. a loaded-model FastAPI inference smoke request;
-12. execution of the synthetic analysis notebooks; and
-13. synthetic relational-integrity validation.
+12. formal fairness calculations and gate behavior through controlled tests;
+13. deployment and monitoring YAML plus Compose validation;
+14. execution of the synthetic analysis notebooks; and
+15. synthetic relational-integrity validation.
 
 The synthetic smoke run is a reproducibility and software-integrity check. It
 does not validate the synthetic data as real student evidence.
@@ -42,7 +44,7 @@ been obtained.
 
 `.github/workflows/docker.yml` builds the container on pull requests and on
 pushes to `main`. Pull requests build without publishing. A push to `main`
-publishes image tags for `latest` and the commit SHA to GitHub Container
+publishes image tags for `latest`, a short SHA, and the full commit SHA to GitHub Container
 Registry.
 
 The deployment should use the immutable commit-SHA tag or an image digest,
@@ -52,17 +54,12 @@ through the registry or a read-only mounted artifact.
 
 ## 4. Manual deployment
 
-`.github/workflows/deploy.yml` is triggered manually with an `image_tag`
-input. It requires the protected environment secrets:
-
-- `KUBE_CONFIG_DATA`: base64-encoded kubeconfig;
-- the Kubernetes secret `smart-study-planner-secrets`, containing MLflow
-  connection values, the model URI, API key, and model version.
-
-The workflow renders `deploy/kubernetes` with the requested image tag, applies
-the rendered manifest to the fixed `smart-study-planner` namespace, and waits
-for rollout completion. Configure the GitHub
-environment with required reviewers before allowing production deployment.
+`.github/workflows/deploy.yml` is triggered manually with the full 40-character
+commit SHA. It verifies and downloads the immutable numeric MLflow version,
+checks its deployment, fairness, threshold, and feature-contract tags, creates
+private-GHCR and release-specific application secrets, applies the TLS ingress
+and workload controls, verifies public readiness, and retains deployment
+evidence. Required protected values are listed in `docs/deployment.md`.
 
 ## 5. Required release evidence
 
@@ -80,10 +77,22 @@ Before dispatching deployment, retain:
 If any item is unavailable, the release is not reproducible and must remain a
 research or candidate artifact.
 
-## 6. Rollback
+## 6. Scheduled validation and monitoring
 
-Kubernetes retains deployment revisions. Operators can inspect history and
-roll back with:
+`.github/workflows/data-validation.yml` performs a credentialed weekly DVC
+restore and reproduces OULAD/synthetic statistical evidence. The separate
+`.github/workflows/monitoring.yml` checks production HTTPS liveness, readiness,
+threshold metadata, and feature-contract metadata every 15 minutes. These
+jobs require protected DagsHub and production configuration; they do not place
+restricted data in Git.
+
+## 7. Rollback
+
+Kubernetes retains deployment revisions and their release-specific model
+configuration. The supported path is the protected
+`.github/workflows/recovery.yml` workflow, which requires explicit confirmation
+for mutation and uploads before/after evidence. Operators may inspect history
+locally with:
 
 ```powershell
 kubectl -n smart-study-planner rollout history deployment/smart-study-planner-api
@@ -94,7 +103,7 @@ After rollback, verify `/readyz`, inspect Prometheus error and latency metrics,
 confirm the loaded model version, and record the incident. A rollback does not
 replace investigation of the model, data, or intervention failure.
 
-## 7. Current verification boundary
+## 8. Current verification boundary
 
 The repository can validate source code, tests, quality reports, workflow YAML,
 and manifest syntax locally. A real Docker build, registry push, Kubernetes

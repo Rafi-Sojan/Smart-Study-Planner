@@ -4,48 +4,221 @@ on:
   workflow_dispatch:
     inputs:
       image_tag:
-        description: "Immutable image tag to deploy, normally a commit SHA"
+        description: "Immutable 40-character Git commit SHA published to GHCR"
         required: true
         type: string
 
 permissions:
   contents: read
+  packages: read
+
+concurrency:
+  group: production-deployment
+  cancel-in-progress: false
 
 env:
   DEPLOY_NAMESPACE: smart-study-planner
+  MODEL_URI: ${{ vars.MODEL_URI }}
+  MODEL_THRESHOLD: ${{ vars.MODEL_THRESHOLD }}
+  APP_HOST: ${{ vars.APP_HOST }}
+  INGRESS_CLASS_NAME: ${{ vars.INGRESS_CLASS_NAME }}
+  CERT_MANAGER_CLUSTER_ISSUER: ${{ vars.CERT_MANAGER_CLUSTER_ISSUER }}
+  TLS_SECRET_NAME: ${{ vars.TLS_SECRET_NAME }}
+  MLFLOW_TRACKING_URI: ${{ secrets.MLFLOW_TRACKING_URI }}
+  MLFLOW_TRACKING_USERNAME: ${{ secrets.MLFLOW_TRACKING_USERNAME }}
+  MLFLOW_TRACKING_PASSWORD: ${{ secrets.MLFLOW_TRACKING_PASSWORD }}
+  API_KEY: ${{ secrets.API_KEY }}
+  GHCR_USERNAME: ${{ secrets.GHCR_USERNAME }}
+  GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
 
 jobs:
   deploy:
-    name: Deploy to Kubernetes
+    name: Verify and deploy to Kubernetes
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     environment: production
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Validate immutable release configuration
+        shell: bash
+        env:
+          IMAGE_TAG: ${{ inputs.image_tag }}
+          KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
+        run: |
+          set -euo pipefail
+          [[ "$IMAGE_TAG" =~ ^[0-9a-f]{40}$ ]] || {
+            echo "image_tag must be the full lowercase 40-character commit SHA" >&2
+            exit 1
+          }
+          for name in KUBE_CONFIG_DATA MODEL_URI MODEL_THRESHOLD APP_HOST TLS_SECRET_NAME \
+            MLFLOW_TRACKING_URI MLFLOW_TRACKING_USERNAME MLFLOW_TRACKING_PASSWORD \
+            API_KEY GHCR_USERNAME GHCR_TOKEN; do
+            if [[ -z "${!name:-}" ]]; then
+              echo "Required production value is missing: $name" >&2
+              exit 1
+            fi
+          done
+          [[ "$MODEL_URI" =~ ^models:/[^/@]+/[0-9]+$ ]] || {
+            echo "MODEL_URI must pin an immutable numeric registry version" >&2
+            exit 1
+          }
+          [[ "$APP_HOST" =~ ^[A-Za-z0-9.-]+$ ]] || {
+            echo "APP_HOST is not a valid DNS hostname" >&2
+            exit 1
+          }
+          [[ "$TLS_SECRET_NAME" =~ ^[a-z0-9]([-a-z0-9.]*[a-z0-9])?$ ]] || {
+            echo "TLS_SECRET_NAME is not a valid Kubernetes name" >&2
+            exit 1
+          }
+          ingress_class="${INGRESS_CLASS_NAME:-nginx}"
+          cluster_issuer="${CERT_MANAGER_CLUSTER_ISSUER:-letsencrypt-prod}"
+          for value_name in ingress_class cluster_issuer; do
+            value="${!value_name}"
+            [[ "$value" =~ ^[a-z0-9]([-a-z0-9.]*[a-z0-9])?$ ]] || {
+              echo "$value_name is not a valid Kubernetes name" >&2
+              exit 1
+            }
+          done
+          echo "INGRESS_CLASS_NAME=$ingress_class" >> "$GITHUB_ENV"
+          echo "CERT_MANAGER_CLUSTER_ISSUER=$cluster_issuer" >> "$GITHUB_ENV"
+          echo "IMAGE_REPOSITORY=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_ENV"
+          echo "APP_SECRET_NAME=smart-study-planner-release-${IMAGE_TAG:0:12}" >> "$GITHUB_ENV"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install registry verification dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-api.txt
+
+      - name: Verify registered model and artifact
+        run: |
+          mkdir -p deployment-evidence
+          python -m pipeline.verify_registered_model \
+            --model-uri "$MODEL_URI" \
+            --expected-threshold "$MODEL_THRESHOLD" \
+            --output deployment-evidence/registry-verification.json
+          resolved_version="$(python -c 'import json; r=json.load(open("deployment-evidence/registry-verification.json", encoding="utf-8")); print(r["name"] + "/" + str(r["version"]))')"
+          echo "RESOLVED_MODEL_VERSION=$resolved_version" >> "$GITHUB_ENV"
+
       - name: Set up kubectl
         uses: azure/setup-kubectl@v4
 
-      - name: Configure cluster credentials
+      - name: Configure and validate cluster credentials
         shell: bash
         env:
           KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
         run: |
-          test -n "$KUBE_CONFIG_DATA"
+          set -euo pipefail
           mkdir -p "$HOME/.kube"
-          echo "$KUBE_CONFIG_DATA" | base64 --decode > "$HOME/.kube/config"
+          printf '%s' "$KUBE_CONFIG_DATA" | base64 --decode > "$HOME/.kube/config"
           chmod 600 "$HOME/.kube/config"
+          kubectl cluster-info
+          kubectl get namespace "$DEPLOY_NAMESPACE" >/dev/null
+          for permission in \
+            "create deployments.apps" "patch deployments.apps" \
+            "create secrets" "patch secrets" \
+            "create services" "patch services" \
+            "create ingresses.networking.k8s.io" "patch ingresses.networking.k8s.io" \
+            "create horizontalpodautoscalers.autoscaling" "patch horizontalpodautoscalers.autoscaling" \
+            "create poddisruptionbudgets.policy" "patch poddisruptionbudgets.policy" \
+            "create networkpolicies.networking.k8s.io" "patch networkpolicies.networking.k8s.io" \
+            "create serviceaccounts" "patch serviceaccounts"; do
+            read -r verb resource <<< "$permission"
+            kubectl auth can-i "$verb" "$resource" --namespace "$DEPLOY_NAMESPACE" | grep -qx yes
+          done
 
-      - name: Apply manifests
+      - name: Synchronize production secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          kubectl -n "$DEPLOY_NAMESPACE" create secret docker-registry ghcr-pull-secret \
+            --docker-server=ghcr.io \
+            --docker-username="$GHCR_USERNAME" \
+            --docker-password="$GHCR_TOKEN" \
+            --dry-run=client -o yaml | kubectl apply -f -
+          kubectl -n "$DEPLOY_NAMESPACE" create secret generic "$APP_SECRET_NAME" \
+            --from-literal=MODEL_URI="$MODEL_URI" \
+            --from-literal=MODEL_THRESHOLD="$MODEL_THRESHOLD" \
+            --from-literal=MODEL_VERSION="$RESOLVED_MODEL_VERSION" \
+            --from-literal=MLFLOW_TRACKING_URI="$MLFLOW_TRACKING_URI" \
+            --from-literal=MLFLOW_TRACKING_USERNAME="$MLFLOW_TRACKING_USERNAME" \
+            --from-literal=MLFLOW_TRACKING_PASSWORD="$MLFLOW_TRACKING_PASSWORD" \
+            --from-literal=API_KEY="$API_KEY" \
+            --from-literal=ALLOWED_HOSTS="$APP_HOST" \
+            --dry-run=client -o json \
+            | python -c 'import json,sys; secret=json.load(sys.stdin); secret["immutable"]=True; json.dump(secret,sys.stdout)' \
+            | kubectl apply -f -
+
+      - name: Render and apply production manifests
+        shell: bash
         env:
           IMAGE_TAG: ${{ inputs.image_tag }}
         run: |
-          case "$IMAGE_TAG" in
-            ''|*[!A-Za-z0-9._-]*) echo "Invalid image tag" >&2; exit 1 ;;
-          esac
-          rendered_manifest="$(mktemp)"
+          set -euo pipefail
+          rendered_manifest="deployment-evidence/rendered-manifest.yaml"
           kubectl kustomize deploy/kubernetes \
-            | sed "s#ghcr.io/example/smart-study-planner:latest#ghcr.io/${GITHUB_REPOSITORY}:${IMAGE_TAG}#g" \
+            | sed \
+                -e "s#ghcr.io/example/smart-study-planner:latest#${IMAGE_REPOSITORY}:${IMAGE_TAG}#g" \
+                -e "s#planner.example.edu#${APP_HOST}#g" \
+                -e "s#TLS_SECRET_PLACEHOLDER#${TLS_SECRET_NAME}#g" \
+                -e "s#INGRESS_CLASS_PLACEHOLDER#${INGRESS_CLASS_NAME}#g" \
+                -e "s#CLUSTER_ISSUER_PLACEHOLDER#${CERT_MANAGER_CLUSTER_ISSUER}#g" \
+                -e "s#APP_SECRET_PLACEHOLDER#${APP_SECRET_NAME}#g" \
             > "$rendered_manifest"
           kubectl apply -f "$rendered_manifest"
-          kubectl -n "$DEPLOY_NAMESPACE" rollout status deployment/smart-study-planner-api --timeout=180s
+          kubectl -n "$DEPLOY_NAMESPACE" annotate deployment/smart-study-planner-api \
+            deployment.smart-study-planner/model-version="$RESOLVED_MODEL_VERSION" \
+            deployment.smart-study-planner/model-threshold="$MODEL_THRESHOLD" \
+            deployment.smart-study-planner/image-tag="$IMAGE_TAG" \
+            --overwrite
+          kubectl -n "$DEPLOY_NAMESPACE" rollout status \
+            deployment/smart-study-planner-api --timeout=300s
+
+      - name: Verify TLS and public readiness
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 60); do
+            if kubectl -n "$DEPLOY_NAMESPACE" get secret "$TLS_SECRET_NAME" >/dev/null 2>&1; then
+              break
+            fi
+            sleep 5
+          done
+          kubectl -n "$DEPLOY_NAMESPACE" get secret "$TLS_SECRET_NAME" >/dev/null
+          if kubectl -n "$DEPLOY_NAMESPACE" get certificate "$TLS_SECRET_NAME" >/dev/null 2>&1; then
+            kubectl -n "$DEPLOY_NAMESPACE" wait \
+              --for=condition=Ready "certificate/${TLS_SECRET_NAME}" --timeout=300s
+          fi
+          curl --fail --show-error --silent \
+            --retry 12 --retry-delay 10 --retry-all-errors \
+            "https://${APP_HOST}/readyz"
+
+      - name: Capture deployment evidence
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p deployment-evidence
+          kubectl -n "$DEPLOY_NAMESPACE" get deployment,replicaset,pod,service,ingress,hpa,pdb \
+            -o wide > deployment-evidence/resource-status.txt 2>&1 || true
+          kubectl -n "$DEPLOY_NAMESPACE" rollout history deployment/smart-study-planner-api \
+            > deployment-evidence/rollout-history.txt 2>&1 || true
+          kubectl -n "$DEPLOY_NAMESPACE" get pods \
+            -l app.kubernetes.io/name=smart-study-planner-api \
+            -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.status.containerStatuses[0].imageID}{"\n"}{end}' \
+            > deployment-evidence/image-digests.txt 2>&1 || true
+
+      - name: Upload deployment evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-deployment-evidence-${{ inputs.image_tag }}
+          path: deployment-evidence/
+          if-no-files-found: error
+          retention-days: 90

@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: smart-study-planner-api
+  annotations:
+    cert-manager.io/cluster-issuer: CLUSTER_ISSUER_PLACEHOLDER
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: 1m
+    nginx.ingress.kubernetes.io/limit-rps: "10"
+    nginx.ingress.kubernetes.io/limit-burst-multiplier: "3"
+spec:
+  ingressClassName: INGRESS_CLASS_PLACEHOLDER
+  tls:
+    - hosts:
+        - planner.example.edu
+      secretName: TLS_SECRET_PLACEHOLDER
+  rules:
+    - host: planner.example.edu
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: smart-study-planner-api
+                port:
+                  name: http

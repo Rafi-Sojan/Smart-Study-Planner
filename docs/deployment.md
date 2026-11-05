@@ -1,129 +1,119 @@
 # Deployment and inference operations
 
-## Scope
+## Release boundary
 
-The repository now contains a containerized FastAPI inference service and a
-Kubernetes deployment template. These files are deployment mechanics, not
-evidence that the student-risk model is approved for live use. The release
-policy in `docs/risk-register.md` still requires prospective validation,
-calibration, fairness review, institutional approval, and a documented human
-intervention process.
+The repository contains deployable mechanics, but the current retrospective
+OULAD and synthetic models are not production eligible. The production
+workflow requires prospective institutional evidence, a configured
+intervention policy, and a passing formal fairness gate. Registration or high
+benchmark accuracy is not approval.
 
-## Model source
+## Local container verification
 
-The API accepts exactly one model source:
-
-- `MODEL_URI=models:/<registered-name>@candidate` loads a model from the
-  configured MLflow/DagsHub registry. This is the preferred deployment path.
-- `MODEL_PATH=/models/model.pkl` loads a trusted local pickle only when
-  `ALLOW_TRUSTED_PICKLE_MODEL=1`. Set `MODEL_SHA256` to verify the artifact.
-
-The two variables must not be configured together. A registry alias such as
-`candidate` is not production approval; promotion requires the quality and
-governance gates documented in the risk register.
-
-## Local Docker Compose
-
-The compose file starts the API, Prometheus, Pushgateway, and Grafana. The
-local fallback auto-discovers `models/pretrained/model.pkl`; alternatively,
-set `MODEL_URI` and MLflow credentials in a machine-local `.env` file. If a
-different local artifact is required, set `MODEL_PATH` explicitly.
+For local research, the API can load a trusted pickle from the read-only model
+mount. An explicit threshold is recommended:
 
 ```powershell
-$env:GRAFANA_ADMIN_PASSWORD = "change-this-locally"
+$env:GRAFANA_ADMIN_PASSWORD = "replace-with-a-local-secret"
+$env:MODEL_PATH = "/models/model.pkl"
+$env:MODEL_THRESHOLD = "0.35"
 $env:ALLOW_TRUSTED_PICKLE_MODEL = "1"
 docker compose up --build
 ```
 
-Useful endpoints are `http://127.0.0.1:8000/healthz`,
-`http://127.0.0.1:8000/readyz`, and `http://127.0.0.1:8000/metrics`.
-Prometheus is at port 9090 and Grafana is at port 3000. Keep these ports on
-localhost unless authentication and network controls are configured.
+Compose starts the API, Prometheus, Pushgateway, Alertmanager, and Grafana on
+localhost-only ports 8000, 9090, 9091, 9093, and 3000. Local pickle loading is
+disabled when `APP_ENV=production`. The serving container uses a read-only root
+filesystem and redirects runtime home/cache writes to its temporary `/tmp`
+mount, which is size-limited in Kubernetes.
 
-## Kubernetes deployment
+## Production prerequisites
 
-### Automated GitHub Actions deployment
+Create a protected GitHub `production` environment with required reviewers.
+Configure these environment variables:
 
-The supported release path is:
+| Variable | Purpose |
+|---|---|
+| `MODEL_URI` | Immutable `models:/<name>/<numeric-version>` URI |
+| `MODEL_THRESHOLD` | Must exactly match the registry `operating_threshold` tag |
+| `APP_HOST` | DNS hostname served through HTTPS |
+| `PRODUCTION_BASE_URL` | HTTPS origin used by scheduled monitoring |
+| `TLS_SECRET_NAME` | Kubernetes TLS secret/cert-manager certificate name |
+| `INGRESS_CLASS_NAME` | Ingress class; defaults to `nginx` |
+| `CERT_MANAGER_CLUSTER_ISSUER` | Cluster issuer; defaults to `letsencrypt-prod` |
 
-1. Push the reviewed changes to `main`.
-2. Wait for the Docker workflow to publish the image to GitHub Container
-   Registry. It publishes both `latest` and the commit-SHA tag.
-3. Use the commit SHA as the deployment image tag. Do not deploy `latest`.
-4. In GitHub, open **Settings > Environments**, create or select the
-   `production` environment, and add the protected secret
-   `KUBE_CONFIG_DATA`.
-5. Generate the secret value locally with PowerShell:
+Configure these protected secrets:
+
+| Secret | Purpose |
+|---|---|
+| `KUBE_CONFIG_DATA` | Base64-encoded least-privilege kubeconfig |
+| `MLFLOW_TRACKING_URI` | DagsHub/MLflow tracking endpoint |
+| `MLFLOW_TRACKING_USERNAME` | Registry account |
+| `MLFLOW_TRACKING_PASSWORD` | Registry token |
+| `API_KEY` | Long random API credential |
+| `GHCR_USERNAME` | Account allowed to read the private image |
+| `GHCR_TOKEN` | Fine-grained or classic token with `read:packages` |
+
+The cluster must have an ingress controller, a metrics server for the HPA,
+cert-manager or a pre-provisioned TLS secret, and a network-policy provider.
+If the ingress or monitoring namespaces differ from `ingress-nginx` and
+`monitoring`, review `deploy/kubernetes/networkpolicy.yaml` before deployment.
+Before the first release, a platform administrator must create the namespace
+with `kubectl apply -f deploy/kubernetes/namespace.yaml`. The deployment
+credential is then limited to namespaced resources and does not need permission
+to create or modify cluster-scoped namespaces.
+
+## Controlled deployment
+
+1. Push the reviewed commit and wait for CI and the Docker workflow.
+2. Confirm GHCR contains the full 40-character commit-SHA tag.
+3. Confirm the numeric model version has all required registry tags.
+4. Open **Actions > Deploy inference service** and enter the full lowercase
+   commit SHA.
+
+The workflow then:
+
+1. validates every required protected value;
+2. downloads the registered model and verifies quality, deployment,
+   fairness, threshold, and feature-contract metadata;
+3. validates cluster permissions;
+4. creates or rotates the GHCR pull secret;
+5. creates an immutable release-specific application secret;
+6. renders and applies TLS, workload, availability, and network manifests;
+7. waits for rollout and certificate readiness;
+8. verifies public HTTPS readiness; and
+9. uploads registry, manifest, image-digest, and rollout evidence.
+
+The release-specific secret binds model URI and threshold to the Kubernetes
+deployment revision. This prevents an image rollback from silently retaining a
+newer model configuration.
+
+## Verification
 
 ```powershell
-[Convert]::ToBase64String(
-  [IO.File]::ReadAllBytes("$env:USERPROFILE\.kube\config")
-)
-```
-
-The value is a base64-encoded kubeconfig and must not be committed to Git.
-Configure required reviewers on the `production` environment before using it.
-
-6. Open **Actions > Deploy inference service > Run workflow**.
-7. Enter the full commit SHA in the `image_tag` field and start the workflow.
-
-The workflow renders `deploy/kubernetes`, replaces the placeholder image with
-`ghcr.io/<owner>/<repository>:<image_tag>`, applies the manifests to the
-`smart-study-planner` namespace, and waits for the API rollout. The Kubernetes
-secret described below must already exist in that namespace; the GitHub
-workflow intentionally does not transmit application secrets.
-
-To find the current commit SHA:
-
-```powershell
-git rev-parse HEAD
-```
-
-After the workflow succeeds, verify the rollout:
-
-```powershell
-kubectl -n smart-study-planner get pods
-kubectl -n smart-study-planner get service smart-study-planner-api
+kubectl -n smart-study-planner get deployment,pod,service,ingress,hpa,pdb
 kubectl -n smart-study-planner rollout status deployment/smart-study-planner-api
+curl.exe https://<production-host>/healthz
+curl.exe https://<production-host>/readyz
+curl.exe -H "x-api-key: <api-key>" https://<production-host>/v1/model-metadata
 ```
 
-For temporary local access to the service:
+The metadata response must show the approved model version, registry threshold,
+non-zero feature count, and 64-character contract hash.
 
-```powershell
-kubectl -n smart-study-planner port-forward service/smart-study-planner-api 8000:8000
-```
+## Recovery
 
-Then check `http://127.0.0.1:8000/healthz` and
-`http://127.0.0.1:8000/readyz`.
+Use **Actions > Production recovery and rollback**. `status` is read-only;
+`rollback` and `restart` require protected-environment approval and the exact
+confirmation `RECOVER`. Provide a Kubernetes revision when a specific release
+is required. The workflow verifies HTTPS readiness and uploads before/after
+evidence. Full policy and backup boundaries are documented in
+`docs/monitoring-and-recovery.md`.
 
-Create the deployment secret outside Git. The MLflow URI should reference a
-registered model that has passed the applicable release gates.
+## What remains external
 
-```powershell
-kubectl create namespace smart-study-planner
-kubectl -n smart-study-planner create secret generic smart-study-planner-secrets `
-  --from-literal=MODEL_URI="models:/smart-study-planner-oulad-baseline-hist_gradient_boosting@candidate" `
-  --from-literal=MLFLOW_TRACKING_URI="https://dagshub.com/<owner>/<repo>.mlflow" `
-  --from-literal=MLFLOW_TRACKING_USERNAME="<username>" `
-  --from-literal=MLFLOW_TRACKING_PASSWORD="<token>" `
-  --from-literal=API_KEY="<long-random-api-key>" `
-  --from-literal=MODEL_VERSION="candidate"
-kubectl apply -k deploy/kubernetes
-kubectl -n smart-study-planner rollout status deployment/smart-study-planner-api
-```
-
-The manifests use two replicas, non-root execution, a read-only root
-filesystem, dropped Linux capabilities, resource limits, readiness/liveness
-probes, and a service account without an automatically mounted token. Put a
-TLS-capable ingress and an authenticated gateway in front of the service
-before exposing it outside the cluster.
-
-## Rollback
-
-```powershell
-kubectl -n smart-study-planner rollout history deployment/smart-study-planner-api
-kubectl -n smart-study-planner rollout undo deployment/smart-study-planner-api
-```
-
-Record the image digest, model registry version, metrics artifact, Git commit,
-DVC revision, and deployment approval together for every release.
+The source repository cannot create institutional approval, DNS, a production
+cluster, valid credentials, prospective evidence, or a successful restore
+drill. Do not report deployment as complete until external workflow logs,
+resource identifiers, certificate state, image digest, model version, and
+approval evidence exist.

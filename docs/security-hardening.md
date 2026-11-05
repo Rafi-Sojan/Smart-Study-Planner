@@ -19,12 +19,13 @@ The following confirmed findings were remediated:
 | `pytest` | 8.3.3 | Pinned to 9.0.3, which contains the reported fix |
 | `fastapi` | 0.115.6 | Upgraded to 0.161.1 |
 | `starlette` | 0.41.3 | Explicitly pinned to 1.9.0, compatible with the upgraded FastAPI release |
+| `mlflow` | 3.17.1 | Upgraded to 3.17.2 for CVE-2026-53995 |
 
 The repository CI now runs:
 
 ```powershell
 python -m pip install pip-audit==2.10.1
-pip-audit -r requirements.txt --ignore PYSEC-2026-2447
+pip-audit -r requirements.txt --ignore-vuln PYSEC-2026-2447
 ```
 
 ## Remaining transitive risk: DiskCache
@@ -57,6 +58,12 @@ Reference: [GitHub Advisory GHSA-w8v5-vhqr-4h9v](https://github.com/advisories/G
 - Keep DVC credentials in local configuration or CI secrets; never commit
   access tokens.
 - Keep the FastAPI documentation endpoints disabled by default in deployment.
+- Permit production loading only from an immutable numeric MLflow version;
+  verify release, fairness, threshold, and feature-contract tags before load.
+- Store registry, API, cluster, and private-GHCR credentials only in protected
+  environment secrets and rotate them after suspected exposure.
+- Require TLS, trusted-host validation, ingress rate/body limits, and the
+  Kubernetes NetworkPolicy before public exposure.
 - Run the dependency audit on every CI build and after dependency changes.
 - Re-evaluate the DiskCache exception whenever DVC or `dvc-data` releases a
   newer version.
@@ -67,7 +74,7 @@ From the repository root:
 
 ```powershell
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
-.\.venv\Scripts\pip-audit.exe -r requirements.txt --ignore PYSEC-2026-2447
+.\.venv\Scripts\pip-audit.exe -r requirements.txt --ignore-vuln PYSEC-2026-2447
 .\.venv\Scripts\ruff.exe check src pipeline tests
 .\.venv\Scripts\python.exe -m pytest -q
 ```

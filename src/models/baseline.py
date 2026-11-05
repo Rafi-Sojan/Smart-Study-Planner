@@ -14,6 +14,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 from src.models.evaluate import evaluate_at_threshold, evaluate_classifier, select_threshold_by_validation_f1
+from src.models.fairness import evaluate_binary_fairness
 from src.models.policy import intervention_policy_summary
 
 
@@ -436,6 +437,11 @@ def train_baselines(
             false_negative_cost=false_negative_cost,
             false_positive_cost=false_positive_cost,
         )
+        fairness_threshold = (
+            float(intervention_policy["selected_threshold"])
+            if intervention_policy["selected_threshold"] is not None
+            else validation_threshold
+        )
 
         combined_features = pd.concat([train_features, validation_features], axis=0)
         combined_target = pd.concat([train_target, validation_target], axis=0)
@@ -447,6 +453,13 @@ def train_baselines(
             test_target,
             final_model.predict(test_features),
             frame,
+        )
+        metrics["fairness_report"] = evaluate_binary_fairness(
+            test_target,
+            (test_probabilities >= fairness_threshold).astype(int),
+            frame,
+            sorted(AUDIT_ONLY_COLUMNS),
+            decision_threshold=fairness_threshold,
         )
         metrics.update(
             {
@@ -527,6 +540,11 @@ def train_time_aware_baselines(
             false_negative_cost=false_negative_cost,
             false_positive_cost=false_positive_cost,
         )
+        fairness_threshold = (
+            float(intervention_policy["selected_threshold"])
+            if intervention_policy["selected_threshold"] is not None
+            else validation_threshold
+        )
         combined_features = pd.concat([train_features, validation_features], axis=0)
         combined_target = pd.concat([train_target, validation_target], axis=0)
         final_model = _make_comparison_pipeline(combined_features, model_name, random_state)
@@ -537,6 +555,13 @@ def train_time_aware_baselines(
             test_target,
             final_model.predict(test_features),
             frame,
+        )
+        metrics["fairness_report"] = evaluate_binary_fairness(
+            test_target,
+            (test_probabilities >= fairness_threshold).astype(int),
+            frame,
+            sorted(AUDIT_ONLY_COLUMNS),
+            decision_threshold=fairness_threshold,
         )
         metrics.update(
             {

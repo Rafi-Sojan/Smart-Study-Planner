@@ -1,0 +1,143 @@
+name: Production recovery and rollback
+
+on:
+  workflow_dispatch:
+    inputs:
+      operation:
+        description: "Read status, roll back a release, or restart the current release"
+        required: true
+        type: choice
+        options:
+          - status
+          - rollback
+          - restart
+      revision:
+        description: "Optional Kubernetes revision for rollback; blank selects the previous revision"
+        required: false
+        type: string
+      confirmation:
+        description: "Enter RECOVER for rollback or restart; leave blank for status"
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-deployment
+  cancel-in-progress: false
+
+env:
+  DEPLOY_NAMESPACE: smart-study-planner
+  APP_HOST: ${{ vars.APP_HOST }}
+
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: production
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate recovery request
+        shell: bash
+        env:
+          OPERATION: ${{ inputs.operation }}
+          REVISION: ${{ inputs.revision }}
+          CONFIRMATION: ${{ inputs.confirmation }}
+        run: |
+          set -euo pipefail
+          if [[ "$OPERATION" != "status" && "$CONFIRMATION" != "RECOVER" ]]; then
+            echo "Rollback and restart require the exact confirmation RECOVER" >&2
+            exit 1
+          fi
+          if [[ -n "$REVISION" && ! "$REVISION" =~ ^[0-9]+$ ]]; then
+            echo "revision must be a positive Kubernetes revision number" >&2
+            exit 1
+          fi
+          if [[ "$OPERATION" == "rollback" && "$REVISION" == "0" ]]; then
+            echo "revision must be greater than zero" >&2
+            exit 1
+          fi
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v4
+
+      - name: Configure cluster credentials
+        shell: bash
+        env:
+          KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
+        run: |
+          set -euo pipefail
+          test -n "$KUBE_CONFIG_DATA"
+          mkdir -p "$HOME/.kube"
+          printf '%s' "$KUBE_CONFIG_DATA" | base64 --decode > "$HOME/.kube/config"
+          chmod 600 "$HOME/.kube/config"
+          kubectl cluster-info
+
+      - name: Capture pre-recovery state
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p recovery-evidence
+          kubectl -n "$DEPLOY_NAMESPACE" get deployment/smart-study-planner-api -o yaml \
+            > recovery-evidence/deployment-before.yaml
+          kubectl -n "$DEPLOY_NAMESPACE" rollout history deployment/smart-study-planner-api \
+            > recovery-evidence/history-before.txt
+          kubectl -n "$DEPLOY_NAMESPACE" get pods,service,ingress,hpa,pdb -o wide \
+            > recovery-evidence/resources-before.txt
+
+      - name: Execute requested recovery operation
+        if: inputs.operation != 'status'
+        shell: bash
+        env:
+          OPERATION: ${{ inputs.operation }}
+          REVISION: ${{ inputs.revision }}
+        run: |
+          set -euo pipefail
+          if [[ "$OPERATION" == "rollback" ]]; then
+            if [[ -n "$REVISION" ]]; then
+              kubectl -n "$DEPLOY_NAMESPACE" rollout undo \
+                deployment/smart-study-planner-api --to-revision="$REVISION"
+            else
+              kubectl -n "$DEPLOY_NAMESPACE" rollout undo deployment/smart-study-planner-api
+            fi
+          else
+            kubectl -n "$DEPLOY_NAMESPACE" rollout restart deployment/smart-study-planner-api
+          fi
+          kubectl -n "$DEPLOY_NAMESPACE" rollout status \
+            deployment/smart-study-planner-api --timeout=300s
+
+      - name: Verify recovered service
+        if: inputs.operation != 'status'
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$APP_HOST" =~ ^[A-Za-z0-9.-]+$ ]]
+          curl --fail --show-error --silent \
+            --retry 12 --retry-delay 10 --retry-all-errors \
+            "https://${APP_HOST}/readyz" > recovery-evidence/readyz.json
+
+      - name: Capture post-recovery evidence
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p recovery-evidence
+          kubectl -n "$DEPLOY_NAMESPACE" get deployment/smart-study-planner-api -o yaml \
+            > recovery-evidence/deployment-after.yaml 2>&1 || true
+          kubectl -n "$DEPLOY_NAMESPACE" rollout history deployment/smart-study-planner-api \
+            > recovery-evidence/history-after.txt 2>&1 || true
+          kubectl -n "$DEPLOY_NAMESPACE" get pods,service,ingress,hpa,pdb -o wide \
+            > recovery-evidence/resources-after.txt 2>&1 || true
+          kubectl -n "$DEPLOY_NAMESPACE" get events --sort-by=.lastTimestamp \
+            > recovery-evidence/events.txt 2>&1 || true
+
+      - name: Upload recovery evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: recovery-${{ inputs.operation }}-${{ github.run_id }}
+          path: recovery-evidence/
+          if-no-files-found: error
+          retention-days: 90

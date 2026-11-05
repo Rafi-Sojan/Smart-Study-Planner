@@ -9,8 +9,9 @@ baseline and a leakage-controlled early-warning evaluation. A reproducible
 synthetic Indian-university data generator supports planner and recommendation
 development; its schema and limitations are documented in
 [data/simulated/README.md](data/simulated/README.md). The planner and
-application programming interface are research/deployment scaffolding rather
-than an approved student decision system.
+application programming interface now provide a tested, deterministic service
+path, but remain a research candidate rather than an approved student decision
+system.
 
 The processing methodology, feature definitions, measured results, and
 limitations are documented in [docs/oulad-baseline.md](docs/oulad-baseline.md).
@@ -49,6 +50,13 @@ and registration policy are documented in
 [docs/model-registry.md](docs/model-registry.md). The inference endpoint
 contract is documented in [docs/inference-api.md](docs/inference-api.md), and
 the CI/CD and release procedure is documented in [docs/cicd.md](docs/cicd.md).
+The formal confidence-interval fairness gate is documented in
+[docs/fairness-validation.md](docs/fairness-validation.md), the planner formula
+and scheduling contract in [docs/planner-service.md](docs/planner-service.md),
+monitoring and recovery operations in
+[docs/monitoring-and-recovery.md](docs/monitoring-and-recovery.md), and the
+remaining external production prerequisites in
+[docs/production-readiness.md](docs/production-readiness.md).
 
 ## Analysis notebooks
 
@@ -346,8 +354,9 @@ cutoff protocol, writes the measured comparison to
 for each cutoff under `models/synthetic_baseline/`. The local run does not
 contact DagsHub unless `--mlflow` or `--register-models` is supplied.
 
-The metrics file also stores fixed-threshold diagnostics and subgroup audit
-metrics. Threshold diagnostics are descriptive test-set comparisons, not a
+The metrics file also stores fixed-threshold diagnostics and formal subgroup
+audit reports with Wilson intervals and minimum-group rules. Threshold
+diagnostics are descriptive test-set comparisons, not a
 production threshold-selection procedure; any deployment threshold must be
 chosen using training/validation data, intervention capacity, and reviewed
 false-negative and false-positive costs.
@@ -376,8 +385,9 @@ validated production models.
 ## Grafana monitoring
 
 The repository includes an optional Grafana stack for visualizing completed
-training and early-warning runs. It uses Prometheus as the Grafana data source
-and Pushgateway as the intermediary for the short-lived batch pipelines.
+training and early-warning runs. It uses Prometheus as the Grafana data source,
+Pushgateway for short-lived batch pipelines, and Alertmanager for active alert
+grouping.
 
 Start the stack with Docker Desktop running:
 
@@ -385,7 +395,8 @@ Start the stack with Docker Desktop running:
 docker compose up -d
 ```
 
-Open Grafana at `http://localhost:3000`. The Prometheus data source and the
+Open Grafana at `http://localhost:3000`; Prometheus and Alertmanager are at
+`http://localhost:9090` and `http://localhost:9093`. The Prometheus data source and the
 `Smart Study Planner — OULAD Monitoring` dashboard are provisioned
 automatically. To publish a completed pipeline run, pass the Pushgateway URL:
 

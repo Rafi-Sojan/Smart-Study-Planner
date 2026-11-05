@@ -151,3 +151,51 @@ def push_early_warning_metrics(
                 _set_if_numeric(gauge, model_metrics.get(key), labels)
 
     push_to_gateway(url, job=job, registry=registry)
+
+
+def push_drift_metrics(
+    report: dict[str, Any],
+    pushgateway_url: str | None = None,
+    job: str = "smart-study-planner-drift",
+) -> None:
+    """Push aggregate drift counts without exposing row-level feature data."""
+
+    url = _configured_url(pushgateway_url)
+    if not url:
+        return
+    registry = CollectorRegistry()
+    status = Gauge(
+        "smart_study_planner_drift_status",
+        "One when the latest drift report has warning status, otherwise zero.",
+        ["job"],
+        registry=registry,
+    )
+    changed = Gauge(
+        "smart_study_planner_drift_changed_columns",
+        "Aggregate number of columns changed by drift category.",
+        ["job", "category"],
+        registry=registry,
+    )
+    last_success = Gauge(
+        "smart_study_planner_drift_last_success_timestamp",
+        "Unix timestamp of the latest completed drift comparison.",
+        ["job"],
+        registry=registry,
+    )
+    status.labels(job=job).set(1.0 if report.get("status") == "warning" else 0.0)
+    schema = report.get("schema", {})
+    changed.labels(job=job, category="missing_columns").set(
+        float(len(schema.get("missing_columns", [])))
+    )
+    changed.labels(job=job, category="unexpected_columns").set(
+        float(len(schema.get("unexpected_columns", [])))
+    )
+    changed.labels(job=job, category="dtype_changes").set(
+        float(len(schema.get("dtype_changes", {})))
+    )
+    for category in ("missingness", "numeric_quantiles"):
+        changed.labels(job=job, category=category).set(
+            float(len(report.get(category, {}).get("changed_columns", [])))
+        )
+    last_success.labels(job=job).set(time.time())
+    push_to_gateway(url, job=job, registry=registry)

@@ -131,6 +131,23 @@ The reports are generated from local data and are not fabricated. They must be
 regenerated after changing the source data, feature contract, statistical
 library version, or cutoffs.
 
+The same commands are registered as the DVC stages
+`oulad_statistical_validation` and `synthetic_statistical_validation`. Their
+DVC-owned outputs are written under `artifacts/validation/`; the formally
+reviewed notebook snapshots under `models/validation/` remain Git-tracked
+documentation artifacts.
+
+```powershell
+dvc repro oulad_statistical_validation synthetic_statistical_validation
+```
+
+`.github/workflows/data-validation.yml` restores the DagsHub DVC cache and
+reproduces the model, fairness-integrity, and statistical-validation evidence
+each week and on manual dispatch. It requires `DAGSHUB_USERNAME` and
+`DAGSHUB_TOKEN` repository secrets. The workflow uploads reports and fails if
+the committed DVC lock no longer reproduces. Ordinary pull-request CI validates
+the DVC graph and statistical functions without downloading restricted data.
+
 ## Interpretation boundary
 
 These reports establish measured distribution and association diagnostics under

@@ -7,7 +7,7 @@ metadata:
     app.kubernetes.io/component: inference
 spec:
   replicas: 2
-  revisionHistoryLimit: 3
+  revisionHistoryLimit: 10
   selector:
     matchLabels:
       app.kubernetes.io/name: smart-study-planner-api
@@ -16,8 +16,15 @@ spec:
       labels:
         app.kubernetes.io/name: smart-study-planner-api
         app.kubernetes.io/component: inference
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: /metrics
+        prometheus.io/port: "8000"
     spec:
       serviceAccountName: smart-study-planner-api
+      imagePullSecrets:
+        - name: ghcr-pull-secret
+      terminationGracePeriodSeconds: 30
       securityContext:
         runAsNonRoot: true
         seccompProfile:
@@ -30,46 +37,81 @@ spec:
             - name: http
               containerPort: 8000
           env:
+            - name: APP_ENV
+              value: production
+            - name: ENABLE_API_DOCS
+              value: "0"
+            - name: ALLOW_TRUSTED_PICKLE_MODEL
+              value: "0"
+            - name: HOME
+              value: /tmp
+            - name: XDG_CACHE_HOME
+              value: /tmp/.cache
             - name: MODEL_URI
               valueFrom:
                 secretKeyRef:
-                  name: smart-study-planner-secrets
+                  name: APP_SECRET_PLACEHOLDER
                   key: MODEL_URI
             - name: MLFLOW_TRACKING_URI
               valueFrom:
                 secretKeyRef:
-                  name: smart-study-planner-secrets
+                  name: APP_SECRET_PLACEHOLDER
                   key: MLFLOW_TRACKING_URI
             - name: MLFLOW_TRACKING_USERNAME
               valueFrom:
                 secretKeyRef:
-                  name: smart-study-planner-secrets
+                  name: APP_SECRET_PLACEHOLDER
                   key: MLFLOW_TRACKING_USERNAME
             - name: MLFLOW_TRACKING_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: smart-study-planner-secrets
+                  name: APP_SECRET_PLACEHOLDER
                   key: MLFLOW_TRACKING_PASSWORD
             - name: API_KEY
               valueFrom:
                 secretKeyRef:
-                  name: smart-study-planner-secrets
+                  name: APP_SECRET_PLACEHOLDER
                   key: API_KEY
             - name: MODEL_VERSION
               valueFrom:
                 secretKeyRef:
-                  name: smart-study-planner-secrets
+                  name: APP_SECRET_PLACEHOLDER
                   key: MODEL_VERSION
+            - name: MODEL_THRESHOLD
+              valueFrom:
+                secretKeyRef:
+                  name: APP_SECRET_PLACEHOLDER
+                  key: MODEL_THRESHOLD
+            - name: ALLOWED_HOSTS
+              valueFrom:
+                secretKeyRef:
+                  name: APP_SECRET_PLACEHOLDER
+                  key: ALLOWED_HOSTS
+          startupProbe:
+            httpGet:
+              path: /healthz
+              port: http
+              httpHeaders:
+                - name: Host
+                  value: planner.example.edu
+            failureThreshold: 30
+            periodSeconds: 10
           readinessProbe:
             httpGet:
               path: /readyz
               port: http
+              httpHeaders:
+                - name: Host
+                  value: planner.example.edu
             initialDelaySeconds: 10
             periodSeconds: 10
           livenessProbe:
             httpGet:
               path: /healthz
               port: http
+              httpHeaders:
+                - name: Host
+                  value: planner.example.edu
             initialDelaySeconds: 20
             periodSeconds: 20
           securityContext:
@@ -84,3 +126,10 @@ spec:
             limits:
               cpu: 1000m
               memory: 1Gi
+          volumeMounts:
+            - name: temporary-files
+              mountPath: /tmp
+      volumes:
+        - name: temporary-files
+          emptyDir:
+            sizeLimit: 1Gi

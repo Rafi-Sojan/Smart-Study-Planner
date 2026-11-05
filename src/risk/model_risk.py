@@ -58,6 +58,71 @@ def _metric_check(
     }
 
 
+def _fairness_gate(
+    selected: dict[str, Any] | None,
+    *,
+    min_group_size: int,
+    max_equal_opportunity_gap: float,
+    max_false_positive_rate_gap: float,
+    max_selection_rate_gap: float,
+) -> tuple[bool, list[dict[str, Any]]]:
+    """Evaluate the formal fairness report against explicit release limits."""
+
+    report = selected.get("fairness_report") if isinstance(selected, dict) else None
+    report_present = isinstance(report, dict)
+    checks: list[dict[str, Any]] = [
+        {"name": "fairness_report_present", "passed": report_present}
+    ]
+    if not report_present:
+        return False, checks
+    summary = report.get("summary")
+    methodology = report.get("methodology")
+    summary = summary if isinstance(summary, dict) else {}
+    methodology = methodology if isinstance(methodology, dict) else {}
+    evaluated_count = summary.get("evaluated_attribute_count")
+    checks.append(
+        {
+            "name": "fairness_evaluable_attribute_count",
+            "value": evaluated_count,
+            "minimum": 1,
+            "passed": isinstance(evaluated_count, int) and evaluated_count >= 1,
+        }
+    )
+    configured_minimum = methodology.get("min_group_size")
+    checks.append(
+        {
+            "name": "fairness_minimum_group_rule",
+            "value": configured_minimum,
+            "minimum": min_group_size,
+            "passed": isinstance(configured_minimum, int)
+            and configured_minimum >= min_group_size,
+        }
+    )
+    checks.extend(
+        [
+            _metric_check(
+                "equal_opportunity_gap_gate",
+                summary.get("max_equal_opportunity_gap"),
+                minimum=0.0,
+                maximum=max_equal_opportunity_gap,
+            ),
+            _metric_check(
+                "false_positive_rate_gap_gate",
+                summary.get("max_false_positive_rate_gap"),
+                minimum=0.0,
+                maximum=max_false_positive_rate_gap,
+            ),
+            _metric_check(
+                "selection_rate_gap_gate",
+                summary.get("max_selection_rate_gap"),
+                minimum=0.0,
+                maximum=max_selection_rate_gap,
+            ),
+        ]
+    )
+    return all(bool(check.get("passed")) for check in checks), checks
+
+
 def assess_model_quality(
     metrics: dict[str, Any],
     *,
@@ -65,6 +130,11 @@ def assess_model_quality(
     min_balanced_accuracy: float | None = None,
     min_operating_point_recall: float | None = None,
     max_expected_calibration_error: float | None = None,
+    require_fairness: bool = False,
+    min_fairness_group_size: int = 30,
+    max_equal_opportunity_gap: float = 0.20,
+    max_false_positive_rate_gap: float = 0.20,
+    max_selection_rate_gap: float = 0.20,
 ) -> dict[str, Any]:
     """Return structural, statistical, and deployment-readiness checks.
 
@@ -111,14 +181,31 @@ def assess_model_quality(
                 min_balanced_accuracy=min_balanced_accuracy,
                 min_operating_point_recall=min_operating_point_recall,
                 max_expected_calibration_error=max_expected_calibration_error,
+                require_fairness=require_fairness,
+                min_fairness_group_size=min_fairness_group_size,
+                max_equal_opportunity_gap=max_equal_opportunity_gap,
+                max_false_positive_rate_gap=max_false_positive_rate_gap,
+                max_selection_rate_gap=max_selection_rate_gap,
             )
+        nested_passed = bool(cutoff_reports) and all(
+            report["passed"] for report in cutoff_reports.values()
+        )
+        nested_deployment_eligible = bool(cutoff_reports) and all(
+            report["deployment_eligible"] for report in cutoff_reports.values()
+        )
         return {
-            "passed": bool(cutoff_reports) and all(report["passed"] for report in cutoff_reports.values()),
-            "deployment_eligible": False,
+            "passed": nested_passed,
+            "deployment_eligible": nested_deployment_eligible,
             "selected_model": None,
             "evidence_type": str(metrics.get("evidence_type", "synthetic_development_only")),
             "deployment_claim": str(metrics.get("deployment_claim", "development_only")),
-            "intervention_policy_configured": False,
+            "intervention_policy_configured": bool(cutoff_reports)
+            and all(
+                report["intervention_policy_configured"]
+                for report in cutoff_reports.values()
+            ),
+            "fairness_gate_passed": bool(cutoff_reports)
+            and all(report["fairness_gate_passed"] for report in cutoff_reports.values()),
             "cutoffs": cutoff_reports,
         }
 
@@ -197,6 +284,16 @@ def assess_model_quality(
                 )
             )
 
+    fairness_gate_passed, fairness_checks = _fairness_gate(
+        selected if isinstance(selected, dict) else None,
+        min_group_size=min_fairness_group_size,
+        max_equal_opportunity_gap=max_equal_opportunity_gap,
+        max_false_positive_rate_gap=max_false_positive_rate_gap,
+        max_selection_rate_gap=max_selection_rate_gap,
+    )
+    if require_fairness:
+        checks.extend(fairness_checks)
+
     sample_counts_ok = all(
         isinstance(metrics.get(name), int) and metrics[name] > 0
         for name in ("n_samples", "n_train", "n_test")
@@ -213,6 +310,7 @@ def assess_model_quality(
         and evidence_type == "prospective_institutional_validation"
         and deployment_claim == "prospective_validated"
         and policy_configured
+        and fairness_gate_passed
     )
     return {
         "passed": structural_passed,
@@ -221,6 +319,8 @@ def assess_model_quality(
         "evidence_type": evidence_type,
         "deployment_claim": deployment_claim,
         "intervention_policy_configured": policy_configured,
+        "fairness_gate_passed": fairness_gate_passed,
+        "fairness_checks": fairness_checks,
         "checks": checks,
     }
 
@@ -237,6 +337,11 @@ def main() -> None:
     parser.add_argument("--min-balanced-accuracy", type=float, default=None)
     parser.add_argument("--min-operating-point-recall", type=float, default=None)
     parser.add_argument("--max-expected-calibration-error", type=float, default=None)
+    parser.add_argument("--require-fairness", action="store_true")
+    parser.add_argument("--min-fairness-group-size", type=int, default=30)
+    parser.add_argument("--max-equal-opportunity-gap", type=float, default=0.20)
+    parser.add_argument("--max-false-positive-rate-gap", type=float, default=0.20)
+    parser.add_argument("--max-selection-rate-gap", type=float, default=0.20)
     parser.add_argument("--require-deployment-eligibility", action="store_true")
     args = parser.parse_args()
     metrics = json.loads(args.metrics.read_text(encoding="utf-8"))
@@ -246,6 +351,11 @@ def main() -> None:
         min_balanced_accuracy=args.min_balanced_accuracy,
         min_operating_point_recall=args.min_operating_point_recall,
         max_expected_calibration_error=args.max_expected_calibration_error,
+        require_fairness=args.require_fairness,
+        min_fairness_group_size=args.min_fairness_group_size,
+        max_equal_opportunity_gap=args.max_equal_opportunity_gap,
+        max_false_positive_rate_gap=args.max_false_positive_rate_gap,
+        max_selection_rate_gap=args.max_selection_rate_gap,
     )
     if args.output is not None:
         args.output.parent.mkdir(parents=True, exist_ok=True)

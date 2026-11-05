@@ -80,3 +80,29 @@ def test_early_warning_metrics_include_cutoff_labels(monkeypatch):
 
     assert 'cutoff_days="30"' in captured["payload"]
     assert 'oulad_early_warning_roc_auc{cutoff_days="30",job="smart-study-planner-early-warning",model="random_forest"} 0.81' in captured["payload"]
+
+
+def test_drift_metrics_export_only_aggregate_counts(monkeypatch):
+    captured = {}
+
+    def capture(url, job, registry):
+        captured.update(payload=generate_latest(registry).decode())
+
+    monkeypatch.setattr(prometheus_exporter, "push_to_gateway", capture)
+    prometheus_exporter.push_drift_metrics(
+        {
+            "status": "warning",
+            "schema": {
+                "missing_columns": ["a"],
+                "unexpected_columns": [],
+                "dtype_changes": {"b": {"reference": "int", "current": "float"}},
+            },
+            "missingness": {"changed_columns": [{"column": "c"}]},
+            "numeric_quantiles": {"changed_columns": []},
+        },
+        pushgateway_url="http://localhost:9091",
+    )
+
+    assert 'smart_study_planner_drift_status{job="smart-study-planner-drift"} 1.0' in captured["payload"]
+    assert 'category="missing_columns"' in captured["payload"]
+    assert "reference" not in captured["payload"]

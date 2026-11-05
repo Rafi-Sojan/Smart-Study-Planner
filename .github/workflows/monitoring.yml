@@ -1,0 +1,68 @@
+name: Production health monitoring
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-health-monitoring
+  cancel-in-progress: true
+
+jobs:
+  health:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    environment: production
+    env:
+      PRODUCTION_BASE_URL: ${{ vars.PRODUCTION_BASE_URL }}
+      API_KEY: ${{ secrets.API_KEY }}
+    steps:
+      - name: Validate monitoring configuration
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$PRODUCTION_BASE_URL" =~ ^https://[^/]+/?$ ]] || {
+            echo "PRODUCTION_BASE_URL must be an HTTPS origin" >&2
+            exit 1
+          }
+          test -n "$API_KEY"
+
+      - name: Check liveness readiness and model contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p monitoring-evidence
+          base="${PRODUCTION_BASE_URL%/}"
+          curl --fail --show-error --silent --retry 3 --retry-all-errors \
+            "$base/healthz" > monitoring-evidence/healthz.json
+          curl --fail --show-error --silent --retry 3 --retry-all-errors \
+            "$base/readyz" > monitoring-evidence/readyz.json
+          curl --fail --show-error --silent --retry 3 --retry-all-errors \
+            -H "x-api-key: $API_KEY" \
+            "$base/v1/model-metadata" > monitoring-evidence/model-metadata.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          health = json.loads(Path("monitoring-evidence/healthz.json").read_text())
+          ready = json.loads(Path("monitoring-evidence/readyz.json").read_text())
+          model = json.loads(Path("monitoring-evidence/model-metadata.json").read_text())
+          assert health == {"status": "ok"}
+          assert ready == {"status": "ready"}
+          assert 0 < float(model["threshold"]) < 1
+          assert int(model["feature_count"]) > 0
+          assert len(model["feature_contract_sha256"]) == 64
+          PY
+
+      - name: Upload health evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-health-${{ github.run_id }}
+          path: monitoring-evidence/
+          if-no-files-found: ignore
+          retention-days: 14

@@ -13,6 +13,7 @@ from tempfile import TemporaryDirectory
 from pathlib import Path
 from typing import Any
 
+from src.models.predict import feature_contract
 from src.risk.model_risk import assess_model_quality
 from src.tracking.model_registry import register_model_version
 
@@ -70,6 +71,52 @@ def _provenance_params(metrics: dict[str, Any]) -> dict[str, str]:
         for key, value in provenance.items()
         if value is not None
     }
+
+
+def _model_release_tags(
+    model: Any,
+    model_metrics: dict[str, Any],
+    metrics: dict[str, Any],
+    quality: dict[str, Any],
+    selected_for_release: bool,
+    **extra: str,
+) -> dict[str, str]:
+    """Build the immutable metadata required by deployment verification."""
+
+    policy = model_metrics.get("intervention_policy")
+    policy_threshold = policy.get("selected_threshold") if isinstance(policy, dict) else None
+    threshold = (
+        policy_threshold
+        if policy_threshold is not None
+        else model_metrics.get("validation_selected_threshold")
+    )
+    threshold_source = (
+        "validation_intervention_policy"
+        if policy_threshold is not None
+        else "validation_f1"
+    )
+    fairness = model_metrics.get("fairness_report")
+    fairness_summary = fairness.get("summary") if isinstance(fairness, dict) else None
+    fairness_passed = bool(
+        isinstance(fairness_summary, dict) and fairness_summary.get("passed") is True
+    )
+    contract = feature_contract(model)
+    tags = {
+        "quality_gate_passed": str(quality["passed"]).lower(),
+        "deployment_eligible": str(
+            bool(quality["deployment_eligible"] and selected_for_release and fairness_passed)
+        ).lower(),
+        "fairness_gate_passed": str(fairness_passed).lower(),
+        "selected_for_release": str(selected_for_release).lower(),
+        "evidence_type": str(metrics.get("evidence_type", "unknown")),
+        "deployment_claim": str(metrics.get("deployment_claim", "unknown")),
+        "operating_threshold": str(threshold) if threshold is not None else "",
+        "threshold_source": threshold_source if threshold is not None else "not_configured",
+        "feature_contract_sha256": str(contract["sha256"]),
+        "feature_count": str(contract["feature_count"]),
+    }
+    tags.update({key: str(value) for key, value in extra.items()})
+    return tags
 
 
 def log_training_run(
@@ -175,12 +222,14 @@ def log_baseline_models_run(
                 mlflow,
                 model_uri,
                 registered_name,
-                tags={
-                    "quality_gate_passed": str(quality["passed"]).lower(),
-                    "deployment_eligible": str(quality["deployment_eligible"]).lower(),
-                    "evidence_type": str(metrics.get("evidence_type", "unknown")),
-                    "deployment_claim": str(metrics.get("deployment_claim", "unknown")),
-                },
+                tags=_model_release_tags(
+                    model,
+                    metrics["models"][model_name],
+                    metrics,
+                    quality,
+                    selected_for_release=model_name == metrics["best_model"],
+                    model_name=model_name,
+                ),
             )
             registered[model_name] = registered_name
 
@@ -216,6 +265,7 @@ def log_early_warning_run(
         for cutoff_text, evaluation in metrics["evaluations"].items():
             cutoff = int(cutoff_text)
             best_name = evaluation["best_model"]
+            cutoff_quality = quality.get("cutoffs", {}).get(cutoff_text, quality)
             mlflow.log_param(f"cutoff_{cutoff}_best_model", best_name)
             for model_name, model_metrics in evaluation["models"].items():
                 numeric_metrics = {
@@ -243,13 +293,16 @@ def log_early_warning_run(
                     mlflow,
                     model_uri,
                     registered_name,
-                    tags={
-                        "development_only": "true",
-                        "cutoff_days": str(cutoff),
-                        "model_name": best_name,
-                        "quality_gate_passed": str(quality["passed"]).lower(),
-                        "deployment_eligible": str(quality["deployment_eligible"]).lower(),
-                    },
+                    tags=_model_release_tags(
+                        selected_model,
+                        evaluation["models"][best_name],
+                        metrics,
+                        cutoff_quality,
+                        selected_for_release=True,
+                        development_only="true",
+                        cutoff_days=str(cutoff),
+                        model_name=best_name,
+                    ),
                 )
                 registered[cutoff] = registered_name
 
@@ -289,6 +342,7 @@ def log_synthetic_baseline_run(
         )
         for cutoff_text, evaluation in metrics["evaluations"].items():
             cutoff = int(cutoff_text)
+            cutoff_quality = quality.get("cutoffs", {}).get(cutoff_text, quality)
             mlflow.log_param(f"day_{cutoff}_best_model", evaluation["best_model"])
             for model_name, model_metrics in evaluation["models"].items():
                 numeric_metrics = {
@@ -315,13 +369,16 @@ def log_synthetic_baseline_run(
                         mlflow,
                         model_uri,
                         registered_name,
-                        tags={
-                            "development_only": "true",
-                            "cutoff_days": str(cutoff),
-                            "model_name": model_name,
-                            "quality_gate_passed": str(quality["passed"]).lower(),
-                            "deployment_eligible": str(quality["deployment_eligible"]).lower(),
-                        },
+                        tags=_model_release_tags(
+                            fitted_models[cutoff][model_name],
+                            model_metrics,
+                            metrics,
+                            cutoff_quality,
+                            selected_for_release=model_name == evaluation["best_model"],
+                            development_only="true",
+                            cutoff_days=str(cutoff),
+                            model_name=model_name,
+                        ),
                     )
                     registered.setdefault(cutoff, {})[model_name] = registered_name
 

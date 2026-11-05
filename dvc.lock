@@ -43,8 +43,8 @@ stages:
       size: 4798
     - path: src/models/baseline.py
       hash: md5
-      md5: 6ca8f5ef29bbafc8231965259902fc4d
-      size: 23861
+      md5: 69dfd4b59e9662ee1228128895be1efa
+      size: 24888
     - path: src/models/evaluate.py
       hash: md5
       md5: 1dca1026d7e440e8040c6614ab8c72ab
@@ -55,12 +55,12 @@ stages:
       size: 4099
     - path: src/risk/model_risk.py
       hash: md5
-      md5: 2066c6903ff1334d6b3e7694e32132a1
-      size: 10513
+      md5: 100bdcec8b57fe044d7f988c61bc1279
+      size: 15111
     - path: src/tracking/mlflow_tracking.py
       hash: md5
-      md5: 0c62c3e148e40c4449640bb68536afce
-      size: 13816
+      md5: bf620fa3b8914badd11535765c6a677a
+      size: 16041
     outs:
     - path: models/baseline.pkl
       hash: md5
@@ -86,8 +86,8 @@ stages:
       size: 4798
     - path: src/models/baseline.py
       hash: md5
-      md5: 6ca8f5ef29bbafc8231965259902fc4d
-      size: 23861
+      md5: 69dfd4b59e9662ee1228128895be1efa
+      size: 24888
     - path: src/models/evaluate.py
       hash: md5
       md5: 1dca1026d7e440e8040c6614ab8c72ab
@@ -98,12 +98,12 @@ stages:
       size: 4099
     - path: src/risk/model_risk.py
       hash: md5
-      md5: 2066c6903ff1334d6b3e7694e32132a1
-      size: 10513
+      md5: 100bdcec8b57fe044d7f988c61bc1279
+      size: 15111
     - path: src/tracking/mlflow_tracking.py
       hash: md5
-      md5: 0c62c3e148e40c4449640bb68536afce
-      size: 13816
+      md5: bf620fa3b8914badd11535765c6a677a
+      size: 16041
   simulate:
     cmd: python -m src.simulation.simulator --config configs/simulation.yaml 
       --overwrite
@@ -155,24 +155,24 @@ stages:
       size: 4099
     - path: src/models/synthetic_baseline.py
       hash: md5
-      md5: 458af4da4c4c572444c0819674513923
-      size: 15601
+      md5: 8ce557eb95be9d0c219b607772af9550
+      size: 16354
     - path: src/risk/model_risk.py
       hash: md5
-      md5: 2066c6903ff1334d6b3e7694e32132a1
-      size: 10513
+      md5: 100bdcec8b57fe044d7f988c61bc1279
+      size: 15111
     - path: src/tracking/mlflow_tracking.py
       hash: md5
-      md5: 0c62c3e148e40c4449640bb68536afce
-      size: 13816
+      md5: bf620fa3b8914badd11535765c6a677a
+      size: 16041
     outs:
     - path: models/metrics/synthetic_baseline_metrics.json
       hash: md5
-      md5: a1954dd3be3f07dc96c190f50306cd20
-      size: 117370
+      md5: f9f96a221f770dba46c04a9b2b111cee
+      size: 475455
     - path: models/synthetic_baseline
       hash: md5
-      md5: 5a5ee100ba2986bb089786fe85355128.dir
+      md5: 55737e24bdea83a2f834a8820d76a73d.dir
       size: 24285968
       nfiles: 3
   synthetic_validate:
@@ -212,8 +212,8 @@ stages:
       size: 7432
     - path: src/models/baseline.py
       hash: md5
-      md5: 6ca8f5ef29bbafc8231965259902fc4d
-      size: 23861
+      md5: 69dfd4b59e9662ee1228128895be1efa
+      size: 24888
     - path: src/models/evaluate.py
       hash: md5
       md5: 1dca1026d7e440e8040c6614ab8c72ab
@@ -260,8 +260,8 @@ stages:
       size: 3648
     - path: src/models/baseline.py
       hash: md5
-      md5: 6ca8f5ef29bbafc8231965259902fc4d
-      size: 23861
+      md5: 69dfd4b59e9662ee1228128895be1efa
+      size: 24888
     - path: src/models/evaluate.py
       hash: md5
       md5: 1dca1026d7e440e8040c6614ab8c72ab
@@ -275,3 +275,114 @@ stages:
       hash: md5
       md5: 43e18aa216901dd218cf5891a317e59d
       size: 19497
+  oulad_statistical_validation:
+    cmd: python -m pipeline.statistical_validation oulad --data-dir
+      data/processed/oulad --kuleuven-path
+      data/raw/external/kuleuven/dataset.zip --early-warning-metrics
+      models/metrics/early_warning_metrics.json --kuleuven-metrics
+      models/metrics/kuleuven_external_metrics.json --output
+      artifacts/validation/oulad_statistical_validation.json --cutoffs 30 60 90
+    deps:
+    - path: data/processed/oulad
+      hash: md5
+      md5: 6ca7ed713177da595e0e3a6e534e8d4a.dir
+      size: 334016008
+      nfiles: 8
+    - path: data/raw/external/kuleuven/dataset.zip
+      hash: md5
+      md5: 9f559e96d91f6a4c447ba41a783ff277
+      size: 78409206
+    - path: models/metrics/early_warning_metrics.json
+      hash: md5
+      md5: 4456ae20179ee320bb76fe36748939c0
+      size: 1257685
+    - path: models/metrics/kuleuven_external_metrics.json
+      hash: md5
+      md5: dcd2f082b905cab5d5c6bb642622bf8b
+      size: 134290
+    - path: pipeline/statistical_validation.py
+      hash: md5
+      md5: 76cefac715cf3e1cdac2b926d6f57ebb
+      size: 22427
+    - path: src/data/kuleuven.py
+      hash: md5
+      md5: 3125bda76d2b0fc136fde9ef0e5c0102
+      size: 7432
+    - path: src/features/feature_engineering.py
+      hash: md5
+      md5: d21dcc5b3ec5825f470bd448d5bf0476
+      size: 4798
+    - path: src/validation/statistical.py
+      hash: md5
+      md5: 86a16976672945bcd6a8356ab2a6599a
+      size: 13990
+    outs:
+    - path: artifacts/validation/oulad_statistical_validation.json
+      hash: md5
+      md5: 854bb782f1c3417ac9bd583aabe2bbea
+      size: 44900
+  synthetic_statistical_validation:
+    cmd: python -m pipeline.statistical_validation synthetic --data-dir
+      data/raw/synthetic --oulad-dir data/processed/oulad --kuleuven-path
+      data/raw/external/kuleuven/dataset.zip --synthetic-metrics
+      models/metrics/synthetic_baseline_metrics.json --oulad-metrics
+      models/metrics/early_warning_metrics.json --kuleuven-metrics
+      models/metrics/kuleuven_external_metrics.json --output
+      artifacts/validation/synthetic_statistical_validation.json --cutoffs 30 60
+      90
+    deps:
+    - path: data/processed/oulad
+      hash: md5
+      md5: 6ca7ed713177da595e0e3a6e534e8d4a.dir
+      size: 334016008
+      nfiles: 8
+    - path: data/raw/external/kuleuven/dataset.zip
+      hash: md5
+      md5: 9f559e96d91f6a4c447ba41a783ff277
+      size: 78409206
+    - path: data/raw/synthetic
+      hash: md5
+      md5: 72ef90109863794bc50e6d421cf6d123.dir
+      size: 173772971
+      nfiles: 37
+    - path: models/metrics/early_warning_metrics.json
+      hash: md5
+      md5: 4456ae20179ee320bb76fe36748939c0
+      size: 1257685
+    - path: models/metrics/kuleuven_external_metrics.json
+      hash: md5
+      md5: dcd2f082b905cab5d5c6bb642622bf8b
+      size: 134290
+    - path: models/metrics/synthetic_baseline_metrics.json
+      hash: md5
+      md5: f9f96a221f770dba46c04a9b2b111cee
+      size: 475455
+    - path: pipeline/statistical_validation.py
+      hash: md5
+      md5: 76cefac715cf3e1cdac2b926d6f57ebb
+      size: 22427
+    - path: src/data/kuleuven.py
+      hash: md5
+      md5: 3125bda76d2b0fc136fde9ef0e5c0102
+      size: 7432
+    - path: src/data/synthetic_validation.py
+      hash: md5
+      md5: 663ee979aea6942411aa1654c35d4db4
+      size: 6434
+    - path: src/data/transfer.py
+      hash: md5
+      md5: 6e0bb9d4471b91491c728898d6759e0f
+      size: 3648
+    - path: src/features/synthetic_features.py
+      hash: md5
+      md5: 41b9876d71268dad3e8171875b430995
+      size: 13374
+    - path: src/validation/statistical.py
+      hash: md5
+      md5: 86a16976672945bcd6a8356ab2a6599a
+      size: 13990
+    outs:
+    - path: artifacts/validation/synthetic_statistical_validation.json
+      hash: md5
+      md5: 0b36babb3ed94f0ff2cc3ae13f5cc832
+      size: 127198

@@ -27,18 +27,19 @@ prospective intervention benefit.
 | R-04 | Synthetic labels are generated from simulator logic. | Critical | Synthetic results are labelled development-only; reproducible relational-integrity validation is now reported separately. | Validate external validity against authorised aggregate or consented institutional data before making performance claims. |
 | R-05 | Rare risk cases make accuracy misleading. | High | PR-AUC, ROC-AUC, balanced accuracy, confusion matrices, threshold diagnostics, and validation thresholds are recorded. | Select thresholds from intervention capacity and reviewed false-positive/false-negative costs. |
 | R-06 | Model probabilities may be poorly calibrated. | High | Brier score, expected calibration error, and reliability bins are recorded. | Fit and validate a calibration method on representative data before displaying probabilities to users. |
-| R-07 | Protected or socioeconomic variables may create disparate errors. | High | Audit-only fields are excluded from default predictors and subgroup error rates are recorded. | Add equal-opportunity analysis, uncertainty intervals, minimum group sizes, and a human fairness review. |
+| R-07 | Protected or socioeconomic variables may create disparate errors. | High | Audit-only fields are excluded from predictors. Equal-opportunity, false-positive, and selection-rate gaps include Wilson intervals, minimum-group rules, and an automated gate. | Complete a prospective, institution-specific human fairness and impact review; collect evidence for unevaluable groups. |
 | R-08 | Missingness may be informative or not-at-random. | High | Missing values are not fabricated as zero; missingness and drift utilities exist. | Validate missingness mechanisms on institutional data and monitor missingness by subgroup. |
 | R-09 | OULAD identifiers and wellbeing fields may be sensitive. | Critical | Raw data is excluded from Git; API requests forbid arbitrary identifiers; logs redact identifiers and credentials. | Confirm dataset licence, institutional approval, retention, access control, deletion, and consent requirements. |
-| R-10 | A pickle artifact can execute code when loaded. | Critical | Model loading is opt-in and supports SHA-256 verification. | Load only trusted registry artifacts, restrict registry permissions, and review serialization alternatives. |
+| R-10 | A pickle artifact can execute code when loaded. | Critical | Local loading is opt-in with SHA-256 support; production rejects local pickle paths and verifies an immutable registered version before loading. | Restrict registry permissions, retain artifact provenance, and review non-executable serialization alternatives. |
 | R-11 | MLflow/DVC provenance can be incomplete. | High | Metrics include data hash, schema version, runtime, platform, and Git commit when available. | Push DVC cache, record the exact commit in CI, and require provenance fields before registration. |
-| R-12 | Drift or stale batch metrics can go unnoticed. | High | Schema, missingness, and numeric drift checks are available; monitoring remains opt-in. | Schedule monitoring, configure alerts, manage Pushgateway stale series, and track calibration and subgroup metrics. |
-| R-13 | The API or planner could be mistaken for a production decision system. | Critical | The API is not ready until a trusted model is explicitly configured; readiness fails otherwise. | Add authentication, authorization, rate limits, audit logs, human review, notice, appeal, and intervention safeguards. |
+| R-12 | Drift or stale batch metrics can go unnoticed. | High | Scheduled HTTPS checks, Prometheus rules, Alertmanager, stale-pipeline alerts, and aggregate drift gauges are configured. | Configure an external receiver and incident owner; add outcome, calibration, and subgroup monitoring after labels become available. |
+| R-13 | The API or planner could be mistaken for a production decision system. | Critical | Production requires registry approval, API key, trusted host, TLS/rate-limited ingress, exact feature schema, and human-review planner output. | Add institutional identity/RBAC, tamper-evident audit logs, learner notice, appeal, and approved intervention procedures. |
 | R-14 | Container and dependency supply-chain risk exists. | High | Container runs as non-root and images are version-pinned. | Pin image digests, scan dependencies/images, and review GitHub Actions provenance. |
 | R-15 | Notebook outputs can become stale. | Medium | Reusable pipeline functions remain the source of truth. | Execute notebooks in CI with controlled fixtures and fail on execution errors. |
 | R-16 | Multiple alerts may overload advisers or students. | High | Threshold diagnostics expose alert volume; validation-only capacity and cost policy selection is available. | Supply reviewed capacity/cost inputs, deduplicate at student level, and measure support outcomes. |
 | R-17 | Fail and withdrawal outcomes may require different support. | High | Original outcome categories remain available for analysis. | Evaluate separate targets or a multi-task approach before prescribing interventions. |
 | R-18 | Sleep, screen time, fatigue, and wellbeing fields may be intrusive. | High | The synthetic track is explicitly synthetic and API inputs are schema-validated. | Apply data minimization, consent, opt-out, access controls, and explainable support policies. |
+| R-19 | A failed image, model, threshold, or secret rotation may require recovery. | Critical | Releases use immutable image/model references and release-specific secrets; a guarded workflow captures evidence and rolls back a coherent deployment revision. | Define institutional RTO/RPO, external-system retention, incident ownership, and complete a measured restore drill in a non-production cluster. |
 
 ## Release policy
 
@@ -63,9 +64,10 @@ candidate until the following are complete:
   or logs.
 - Keep DVC credentials in machine-local configuration only.
 - Keep MLflow credentials in environment variables or a secret manager.
+- Use only immutable numeric MLflow model versions in production.
 - Do not log raw student identifiers or row-level wellbeing data.
 - Set `GRAFANA_ADMIN_PASSWORD` before starting the monitoring stack.
-- Set `ALLOW_TRUSTED_PICKLE_MODEL=1` only when the artifact source and checksum
-  have been independently verified.
+- Set `ALLOW_TRUSTED_PICKLE_MODEL=1` only for local research after independent
+  source and checksum verification; production rejects this path.
 - Keep the monitoring ports bound to localhost unless authentication and network
   controls are configured.

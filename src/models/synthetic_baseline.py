@@ -28,6 +28,7 @@ from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from src.data.provenance import build_provenance
 from src.features.synthetic_features import build_cutoff_features
 from src.models.evaluate import evaluate_at_threshold, select_threshold_by_validation_f1
+from src.models.fairness import evaluate_binary_fairness
 from src.models.policy import intervention_policy_summary
 
 
@@ -291,10 +292,23 @@ def run_synthetic_baselines(
                 false_negative_cost=false_negative_cost,
                 false_positive_cost=false_positive_cost,
             )
+            fairness_threshold = (
+                float(intervention_policy["selected_threshold"])
+                if intervention_policy["selected_threshold"] is not None
+                else validation_threshold
+            )
             combined_x = pd.concat([x_train, x_validation], axis=0)
             combined_y = pd.concat([y_train, y_validation], axis=0)
             final_pipeline = make_pipeline(combined_x, random_state=random_state, model_name=model_name)
             result = _evaluate(final_pipeline, combined_x, combined_y, x_test, y_test, audit_frame=test)
+            test_probabilities = final_pipeline.predict_proba(x_test)[:, 1]
+            result["fairness_report"] = evaluate_binary_fairness(
+                y_test,
+                (test_probabilities >= fairness_threshold).astype(int),
+                test,
+                ("category", "residence_type", "employment_status", "study_mode"),
+                decision_threshold=fairness_threshold,
+            )
             result.update(
                 {
                     "validation_pr_auc": validation_metrics["pr_auc"],
@@ -305,7 +319,7 @@ def run_synthetic_baselines(
                     "intervention_policy": intervention_policy,
                     "test_at_validation_threshold": evaluate_at_threshold(
                         y_test,
-                        final_pipeline.predict_proba(x_test)[:, 1],
+                        test_probabilities,
                         validation_threshold,
                     ),
                     "n_validation": int(len(validation)),
@@ -315,7 +329,7 @@ def run_synthetic_baselines(
             if intervention_policy["selected_threshold"] is not None:
                 result["test_at_intervention_policy_threshold"] = evaluate_at_threshold(
                     y_test,
-                    final_pipeline.predict_proba(x_test)[:, 1],
+                    test_probabilities,
                     float(intervention_policy["selected_threshold"]),
                 )
             result.update({"n_samples": int(len(frame)), "n_train": int(len(combined_x)), "n_test": int(len(test))})
@@ -353,6 +367,8 @@ def run_synthetic_baselines(
         "data_source": "synthetic_indian_university_planner",
         "target": "simulated failed/withdrawn = 1; simulated passed = 0",
         "evaluation": "student-disjoint train-validation-locked-test",
+        "evidence_type": "synthetic_development_only",
+        "deployment_claim": "development_only",
         "cutoffs_days": cutoffs,
         "random_state": random_state,
         "provenance": build_provenance(data_dir, "synthetic-planner-enrollment-v2-student-grouped"),

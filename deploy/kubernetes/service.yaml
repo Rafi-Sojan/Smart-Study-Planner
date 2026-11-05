@@ -4,6 +4,10 @@ metadata:
   name: smart-study-planner-api
   labels:
     app.kubernetes.io/name: smart-study-planner-api
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/path: /metrics
+    prometheus.io/port: "80"
 spec:
   type: ClusterIP
   selector:

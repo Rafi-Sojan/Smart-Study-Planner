@@ -1,0 +1,86 @@
+name: Scheduled data and statistical validation
+
+on:
+  schedule:
+    - cron: "30 2 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: scheduled-data-validation
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      DAGSHUB_USERNAME: ${{ secrets.DAGSHUB_USERNAME }}
+      DAGSHUB_TOKEN: ${{ secrets.DAGSHUB_TOKEN }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Configure authenticated DVC remote
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$DAGSHUB_USERNAME"
+          test -n "$DAGSHUB_TOKEN"
+          dvc remote modify --local origin access_key_id "$DAGSHUB_USERNAME"
+          dvc remote modify --local origin secret_access_key "$DAGSHUB_TOKEN"
+
+      - name: Restore versioned datasets and stage outputs
+        run: dvc pull
+
+      - name: Reproduce model and statistical validation stages
+        run: |
+          dvc repro early_warning synthetic_baseline
+          dvc repro oulad_statistical_validation synthetic_statistical_validation
+
+      - name: Validate formal fairness report integrity
+        run: |
+          python -m pipeline.model_quality \
+            --metrics models/metrics/early_warning_metrics.json \
+            --output artifacts/validation/oulad_fairness_quality.json \
+            --require-fairness \
+            --min-fairness-group-size 30 \
+            --max-equal-opportunity-gap 1.0 \
+            --max-false-positive-rate-gap 1.0 \
+            --max-selection-rate-gap 1.0
+          python -m pipeline.model_quality \
+            --metrics models/metrics/synthetic_baseline_metrics.json \
+            --output artifacts/validation/synthetic_fairness_quality.json \
+            --require-fairness \
+            --min-fairness-group-size 30 \
+            --max-equal-opportunity-gap 1.0 \
+            --max-false-positive-rate-gap 1.0 \
+            --max-selection-rate-gap 1.0
+
+      - name: Verify committed DVC metadata is reproducible
+        run: git diff --exit-code -- dvc.lock
+
+      - name: Upload validation evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: scheduled-validation-${{ github.run_id }}
+          path: |
+            artifacts/validation/
+            models/metrics/early_warning_metrics.json
+            models/metrics/synthetic_baseline_metrics.json
+          if-no-files-found: error
+          retention-days: 90

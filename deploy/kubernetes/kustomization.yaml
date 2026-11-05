@@ -3,10 +3,13 @@ kind: Kustomization
 namespace: smart-study-planner
 
 resources:
-  - namespace.yaml
   - serviceaccount.yaml
   - deployment.yaml
   - service.yaml
+  - ingress.yaml
+  - poddisruptionbudget.yaml
+  - horizontalpodautoscaler.yaml
+  - networkpolicy.yaml
 
 images:
   - name: smart-study-planner-api
