@@ -62,7 +62,7 @@ jobs:
           fi
 
       - name: Set up kubectl
-        uses: azure/setup-kubectl@v4
+        uses: azure/setup-kubectl@v5
 
       - name: Configure cluster credentials
         shell: bash

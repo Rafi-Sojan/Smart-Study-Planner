@@ -108,7 +108,7 @@ jobs:
           echo "RESOLVED_MODEL_VERSION=$resolved_version" >> "$GITHUB_ENV"
 
       - name: Set up kubectl
-        uses: azure/setup-kubectl@v4
+        uses: azure/setup-kubectl@v5
 
       - name: Configure and validate cluster credentials
         shell: bash
