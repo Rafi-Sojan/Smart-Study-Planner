@@ -26,8 +26,11 @@ or `develop`, and on manual dispatch. It performs:
 11. a loaded-model FastAPI inference smoke request;
 12. formal fairness calculations and gate behavior through controlled tests;
 13. deployment and monitoring YAML plus Compose validation;
-14. execution of the synthetic analysis notebooks; and
-15. synthetic relational-integrity validation.
+14. execution of the synthetic analysis notebooks;
+15. synthetic relational-integrity validation;
+16. locked React dependency installation and npm security audit;
+17. TypeScript checking and React unit tests; and
+18. a production Vite bundle build.
 
 The synthetic smoke run is a reproducibility and software-integrity check. It
 does not validate the synthetic data as real student evidence.
@@ -42,10 +45,11 @@ been obtained.
 
 ## 3. Container verification and publication
 
-`.github/workflows/docker.yml` builds the container on pull requests and on
-pushes to `main`. Pull requests build without publishing. A push to `main`
-publishes image tags for `latest`, a short SHA, and the full commit SHA to GitHub Container
-Registry.
+`.github/workflows/docker.yml` builds both the FastAPI image and the
+React/Nginx image on pull requests and pushes to `main`. Pull requests build
+without publishing. A push to `main` publishes `latest`, short-SHA, and full
+commit-SHA tags for the repository image and its `-web` companion in GitHub
+Container Registry.
 
 The deployment should use the immutable commit-SHA tag or an image digest,
 not `latest`. The Dockerfile runs as a non-root user and does not copy raw
@@ -56,10 +60,12 @@ through the registry or a read-only mounted artifact.
 
 `.github/workflows/deploy.yml` is triggered manually with the full 40-character
 commit SHA. It verifies and downloads the immutable numeric MLflow version,
-checks its deployment, fairness, threshold, and feature-contract tags, creates
-private-GHCR and release-specific application secrets, applies the TLS ingress
-and workload controls, verifies public readiness, and retains deployment
-evidence. Required protected values are listed in `docs/deployment.md`.
+or every version in `MODEL_CATALOG_JSON`, checks deployment, fairness,
+threshold, feature-contract, and serving-policy controls, creates
+private-GHCR and release-specific application/session secrets, applies the TLS
+ingress and both workload controls, verifies public readiness through the web
+gateway, and retains deployment evidence. Required protected values are listed
+in `docs/deployment.md`.
 
 ## 5. Required release evidence
 

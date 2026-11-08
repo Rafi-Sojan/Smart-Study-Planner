@@ -83,8 +83,12 @@ jobs:
           mkdir -p recovery-evidence
           kubectl -n "$DEPLOY_NAMESPACE" get deployment/smart-study-planner-api -o yaml \
             > recovery-evidence/deployment-before.yaml
+          kubectl -n "$DEPLOY_NAMESPACE" get deployment/smart-study-planner-web -o yaml \
+            > recovery-evidence/web-deployment-before.yaml
           kubectl -n "$DEPLOY_NAMESPACE" rollout history deployment/smart-study-planner-api \
             > recovery-evidence/history-before.txt
+          kubectl -n "$DEPLOY_NAMESPACE" rollout history deployment/smart-study-planner-web \
+            > recovery-evidence/web-history-before.txt
           kubectl -n "$DEPLOY_NAMESPACE" get pods,service,ingress,hpa,pdb -o wide \
             > recovery-evidence/resources-before.txt
 
@@ -100,14 +104,20 @@ jobs:
             if [[ -n "$REVISION" ]]; then
               kubectl -n "$DEPLOY_NAMESPACE" rollout undo \
                 deployment/smart-study-planner-api --to-revision="$REVISION"
+              kubectl -n "$DEPLOY_NAMESPACE" rollout undo \
+                deployment/smart-study-planner-web --to-revision="$REVISION"
             else
               kubectl -n "$DEPLOY_NAMESPACE" rollout undo deployment/smart-study-planner-api
+              kubectl -n "$DEPLOY_NAMESPACE" rollout undo deployment/smart-study-planner-web
             fi
           else
             kubectl -n "$DEPLOY_NAMESPACE" rollout restart deployment/smart-study-planner-api
+            kubectl -n "$DEPLOY_NAMESPACE" rollout restart deployment/smart-study-planner-web
           fi
           kubectl -n "$DEPLOY_NAMESPACE" rollout status \
             deployment/smart-study-planner-api --timeout=300s
+          kubectl -n "$DEPLOY_NAMESPACE" rollout status \
+            deployment/smart-study-planner-web --timeout=300s
 
       - name: Verify recovered service
         if: inputs.operation != 'status'
@@ -126,8 +136,12 @@ jobs:
           mkdir -p recovery-evidence
           kubectl -n "$DEPLOY_NAMESPACE" get deployment/smart-study-planner-api -o yaml \
             > recovery-evidence/deployment-after.yaml 2>&1 || true
+          kubectl -n "$DEPLOY_NAMESPACE" get deployment/smart-study-planner-web -o yaml \
+            > recovery-evidence/web-deployment-after.yaml 2>&1 || true
           kubectl -n "$DEPLOY_NAMESPACE" rollout history deployment/smart-study-planner-api \
             > recovery-evidence/history-after.txt 2>&1 || true
+          kubectl -n "$DEPLOY_NAMESPACE" rollout history deployment/smart-study-planner-web \
+            > recovery-evidence/web-history-after.txt 2>&1 || true
           kubectl -n "$DEPLOY_NAMESPACE" get pods,service,ingress,hpa,pdb -o wide \
             > recovery-evidence/resources-after.txt 2>&1 || true
           kubectl -n "$DEPLOY_NAMESPACE" get events --sort-by=.lastTimestamp \

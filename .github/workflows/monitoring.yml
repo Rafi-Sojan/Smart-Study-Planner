@@ -43,6 +43,9 @@ jobs:
             "$base/readyz" > monitoring-evidence/readyz.json
           curl --fail --show-error --silent --retry 3 --retry-all-errors \
             -H "x-api-key: $API_KEY" \
+            "$base/v1/models" > monitoring-evidence/models.json
+          curl --fail --show-error --silent --retry 3 --retry-all-errors \
+            -H "x-api-key: $API_KEY" \
             "$base/v1/model-metadata" > monitoring-evidence/model-metadata.json
           python - <<'PY'
           import json
@@ -50,9 +53,15 @@ jobs:
 
           health = json.loads(Path("monitoring-evidence/healthz.json").read_text())
           ready = json.loads(Path("monitoring-evidence/readyz.json").read_text())
+          catalog = json.loads(Path("monitoring-evidence/models.json").read_text())
           model = json.loads(Path("monitoring-evidence/model-metadata.json").read_text())
           assert health == {"status": "ok"}
           assert ready == {"status": "ready"}
+          assert catalog["models"]
+          assert catalog["default_model_id"] in {
+              item["model_id"] for item in catalog["models"]
+          }
+          assert model["model_id"] == catalog["default_model_id"]
           assert 0 < float(model["threshold"]) < 1
           assert int(model["feature_count"]) > 0
           assert len(model["feature_contract_sha256"]) == 64

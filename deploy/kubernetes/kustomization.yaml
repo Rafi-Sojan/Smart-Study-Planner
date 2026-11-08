@@ -10,8 +10,16 @@ resources:
   - poddisruptionbudget.yaml
   - horizontalpodautoscaler.yaml
   - networkpolicy.yaml
+  - web-serviceaccount.yaml
+  - web-deployment.yaml
+  - web-service.yaml
+  - web-poddisruptionbudget.yaml
+  - web-networkpolicy.yaml
 
 images:
   - name: smart-study-planner-api
     newName: ghcr.io/example/smart-study-planner
+    newTag: latest
+  - name: smart-study-planner-web
+    newName: ghcr.io/example/smart-study-planner-web
     newTag: latest

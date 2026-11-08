@@ -33,6 +33,24 @@ def test_kubernetes_deployment_requires_private_image_and_release_secret() -> No
     assert any(item["name"] == "APP_ENV" and item["value"] == "production" for item in container["env"])
     kustomization = _yaml("deploy/kubernetes/kustomization.yaml")
     assert "namespace.yaml" not in kustomization["resources"]
+    assert "web-deployment.yaml" in kustomization["resources"]
+    assert {image["name"] for image in kustomization["images"]} == {
+        "smart-study-planner-api",
+        "smart-study-planner-web",
+    }
+
+
+def test_web_gateway_is_non_root_and_is_the_public_ingress_backend() -> None:
+    deployment = _yaml("deploy/kubernetes/web-deployment.yaml")
+    pod = deployment["spec"]["template"]["spec"]
+    container = pod["containers"][0]
+    assert pod["imagePullSecrets"] == [{"name": "ghcr-pull-secret"}]
+    assert pod["securityContext"]["runAsNonRoot"] is True
+    assert container["securityContext"]["readOnlyRootFilesystem"] is True
+    assert container["ports"] == [{"name": "http", "containerPort": 8080}]
+    ingress = _yaml("deploy/kubernetes/ingress.yaml")
+    backend = ingress["spec"]["rules"][0]["http"]["paths"][0]["backend"]["service"]
+    assert backend["name"] == "smart-study-planner-web"
 
 
 def test_ingress_and_alerting_require_tls_and_critical_api_alerts() -> None:
@@ -58,7 +76,12 @@ def test_operations_workflows_cover_monitoring_validation_and_recovery() -> None
     workflows = {path.name for path in (ROOT / ".github/workflows").glob("*.yml")}
     assert {"data-validation.yml", "monitoring.yml", "recovery.yml"}.issubset(workflows)
     deployment = (ROOT / ".github/workflows/deploy.yml").read_text(encoding="utf-8")
+    docker = (ROOT / ".github/workflows/docker.yml").read_text(encoding="utf-8")
     assert "pipeline.verify_registered_model" in deployment
+    assert "pipeline.verify_model_catalog" in deployment
+    assert "MODEL_CATALOG_JSON" in deployment
     assert "ghcr-pull-secret" in deployment
     assert 'secret["immutable"]=True' in deployment
     assert "https://${APP_HOST}/readyz" in deployment
+    assert "smart-study-planner-web" in deployment
+    assert "frontend/Dockerfile" in docker

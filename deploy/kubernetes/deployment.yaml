@@ -72,6 +72,25 @@ spec:
                 secretKeyRef:
                   name: APP_SECRET_PLACEHOLDER
                   key: API_KEY
+            - name: WEB_AUTH_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: APP_SECRET_PLACEHOLDER
+                  key: WEB_AUTH_USERNAME
+            - name: WEB_AUTH_PASSWORD_HASH
+              valueFrom:
+                secretKeyRef:
+                  name: APP_SECRET_PLACEHOLDER
+                  key: WEB_AUTH_PASSWORD_HASH
+            - name: SESSION_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: APP_SECRET_PLACEHOLDER
+                  key: SESSION_SECRET
+            - name: SESSION_TTL_SECONDS
+              value: "28800"
+            - name: SESSION_COOKIE_SECURE
+              value: "1"
             - name: MODEL_VERSION
               valueFrom:
                 secretKeyRef:
@@ -82,6 +101,16 @@ spec:
                 secretKeyRef:
                   name: APP_SECRET_PLACEHOLDER
                   key: MODEL_THRESHOLD
+            - name: MODEL_CATALOG_JSON
+              valueFrom:
+                secretKeyRef:
+                  name: APP_SECRET_PLACEHOLDER
+                  key: MODEL_CATALOG_JSON
+            - name: DEFAULT_MODEL_ID
+              valueFrom:
+                secretKeyRef:
+                  name: APP_SECRET_PLACEHOLDER
+                  key: DEFAULT_MODEL_ID
             - name: ALLOWED_HOSTS
               valueFrom:
                 secretKeyRef:

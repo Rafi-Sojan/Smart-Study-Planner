@@ -142,6 +142,40 @@ The numeric value is configuration syntax, not an approved project threshold.
 Local pickle loading remains available for research only and is rejected when
 `APP_ENV=production`.
 
+### Approved user-selectable models
+
+A deployment may expose more than one reviewed model through
+`MODEL_CATALOG_JSON`. Each catalog entry assigns a stable, non-sensitive
+`model_id` and user-facing explanation to one immutable numeric MLflow model
+version. `DEFAULT_MODEL_ID` identifies the recommended option. For example,
+an institution may expose the approved 30-, 60-, and 90-day OULAD
+early-warning versions so that a reviewer can compare evidence windows.
+
+The browser first retrieves `GET /v1/models`, then submits only the selected
+`model_id`. It cannot submit a model path, registry URI, alias, or threshold.
+The API resolves the identifier against the bounded server-side allowlist and
+uses that model's own feature contract and approved operating threshold. An
+unknown identifier is rejected with HTTP 422; omitting the identifier retains
+backward compatibility by selecting the configured default.
+
+Before production rollout, `pipeline.verify_model_catalog` applies the same
+immutability, quality, deployment-eligibility, fairness, threshold,
+feature-contract, and forbidden-feature checks to every catalog entry. If any
+entry fails, the release fails as a whole. The selector therefore changes
+which already approved model serves a request; it is not a mechanism for
+loading arbitrary artifacts.
+
+Copy `configs/model-catalog.example.json` to a private local configuration,
+replace each placeholder with its real numeric registry version, and load it
+without committing credentials or environment-specific version choices:
+
+```powershell
+$env:MODEL_PATH = ""
+$env:MODEL_URI = ""
+$env:MODEL_CATALOG_JSON = Get-Content -Raw configs/model-catalog.local.json
+$env:DEFAULT_MODEL_ID = "oulad-day-30"
+```
+
 ## 7. Rollback and de-registration
 
 Rollback must select a previously reviewed model version or deployment image.

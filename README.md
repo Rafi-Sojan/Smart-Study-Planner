@@ -44,6 +44,14 @@ Holm-adjusted distribution tests and real-world comparisons, is documented in
 The FastAPI inference service, model-registry loading, Docker Compose setup,
 Kubernetes template, and deployment rollback procedure are documented in
 [docs/deployment.md](docs/deployment.md).
+The React/Vite application now defaults to a student-friendly intake and derives
+the fitted feature vector in FastAPI. Raw model-contract entry, allowlisted model
+selection, and registry metadata are confined to an explicit administrator testing
+view. The interface, same-origin gateway, evidence boundary, and browser-session security model are documented in
+[docs/frontend.md](docs/frontend.md).
+The formal division between student input, university/LMS records, backend
+feature derivation, internal risk scoring, and scheduling is documented in
+[docs/student-input-and-feature-derivation.md](docs/student-input-and-feature-derivation.md).
 The formal model-risk and quality specification is documented in
 [docs/model-risk-quality.md](docs/model-risk-quality.md). The model lifecycle
 and registration policy are documented in
@@ -111,6 +119,17 @@ dependencies from the repository root:
 
 ```powershell
 python -m pip install -r requirements.txt
+```
+
+The web application additionally requires Node.js 24 and the committed npm
+lockfile:
+
+```powershell
+cd frontend
+npm ci
+npm run check
+npm test
+npm run build
 ```
 
 The OULAD CSV release must be obtained from the official Open University
@@ -394,6 +413,13 @@ Start the stack with Docker Desktop running:
 ```powershell
 docker compose up -d
 ```
+
+The integrated React/Nginx application is available at
+`http://localhost:8080`, and the API remains available directly at
+`http://localhost:8000` for local diagnostics. Browser API requests use the
+same-origin `/api` gateway, so the service API key is not embedded in the
+frontend. The protected-login and production-secret procedure is documented in
+[docs/deployment.md](docs/deployment.md).
 
 Open Grafana at `http://localhost:3000`; Prometheus and Alertmanager are at
 `http://localhost:9090` and `http://localhost:9093`. The Prometheus data source and the

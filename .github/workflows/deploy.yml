@@ -1,4 +1,4 @@
-name: Deploy inference service
+name: Deploy Smart Study Planner
 
 on:
   workflow_dispatch:
@@ -20,6 +20,8 @@ env:
   DEPLOY_NAMESPACE: smart-study-planner
   MODEL_URI: ${{ vars.MODEL_URI }}
   MODEL_THRESHOLD: ${{ vars.MODEL_THRESHOLD }}
+  MODEL_CATALOG_JSON: ${{ vars.MODEL_CATALOG_JSON }}
+  DEFAULT_MODEL_ID: ${{ vars.DEFAULT_MODEL_ID }}
   APP_HOST: ${{ vars.APP_HOST }}
   INGRESS_CLASS_NAME: ${{ vars.INGRESS_CLASS_NAME }}
   CERT_MANAGER_CLUSTER_ISSUER: ${{ vars.CERT_MANAGER_CLUSTER_ISSUER }}
@@ -28,6 +30,9 @@ env:
   MLFLOW_TRACKING_USERNAME: ${{ secrets.MLFLOW_TRACKING_USERNAME }}
   MLFLOW_TRACKING_PASSWORD: ${{ secrets.MLFLOW_TRACKING_PASSWORD }}
   API_KEY: ${{ secrets.API_KEY }}
+  WEB_AUTH_USERNAME: ${{ secrets.WEB_AUTH_USERNAME }}
+  WEB_AUTH_PASSWORD_HASH: ${{ secrets.WEB_AUTH_PASSWORD_HASH }}
+  SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
   GHCR_USERNAME: ${{ secrets.GHCR_USERNAME }}
   GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
 
@@ -52,24 +57,46 @@ jobs:
             echo "image_tag must be the full lowercase 40-character commit SHA" >&2
             exit 1
           }
-          for name in KUBE_CONFIG_DATA MODEL_URI MODEL_THRESHOLD APP_HOST TLS_SECRET_NAME \
+          for name in KUBE_CONFIG_DATA APP_HOST TLS_SECRET_NAME \
             MLFLOW_TRACKING_URI MLFLOW_TRACKING_USERNAME MLFLOW_TRACKING_PASSWORD \
-            API_KEY GHCR_USERNAME GHCR_TOKEN; do
+            API_KEY WEB_AUTH_USERNAME WEB_AUTH_PASSWORD_HASH SESSION_SECRET \
+            GHCR_USERNAME GHCR_TOKEN; do
             if [[ -z "${!name:-}" ]]; then
               echo "Required production value is missing: $name" >&2
               exit 1
             fi
           done
-          [[ "$MODEL_URI" =~ ^models:/[^/@]+/[0-9]+$ ]] || {
-            echo "MODEL_URI must pin an immutable numeric registry version" >&2
-            exit 1
-          }
+          if [[ -n "$MODEL_CATALOG_JSON" ]]; then
+            test -n "$DEFAULT_MODEL_ID" || {
+              echo "DEFAULT_MODEL_ID is required with MODEL_CATALOG_JSON" >&2
+              exit 1
+            }
+          else
+            for name in MODEL_URI MODEL_THRESHOLD; do
+              if [[ -z "${!name:-}" ]]; then
+                echo "Required single-model value is missing: $name" >&2
+                exit 1
+              fi
+            done
+            [[ "$MODEL_URI" =~ ^models:/[^/@]+/[0-9]+$ ]] || {
+              echo "MODEL_URI must pin an immutable numeric registry version" >&2
+              exit 1
+            }
+          fi
           [[ "$APP_HOST" =~ ^[A-Za-z0-9.-]+$ ]] || {
             echo "APP_HOST is not a valid DNS hostname" >&2
             exit 1
           }
           [[ "$TLS_SECRET_NAME" =~ ^[a-z0-9]([-a-z0-9.]*[a-z0-9])?$ ]] || {
             echo "TLS_SECRET_NAME is not a valid Kubernetes name" >&2
+            exit 1
+          }
+          [[ ${#SESSION_SECRET} -ge 32 ]] || {
+            echo "SESSION_SECRET must contain at least 32 characters" >&2
+            exit 1
+          }
+          [[ "$WEB_AUTH_PASSWORD_HASH" =~ ^pbkdf2_sha256:[0-9]+:[A-Za-z0-9_-]+:[A-Za-z0-9_-]+$ ]] || {
+            echo "WEB_AUTH_PASSWORD_HASH is not a supported PBKDF2 verifier" >&2
             exit 1
           }
           ingress_class="${INGRESS_CLASS_NAME:-nginx}"
@@ -84,6 +111,7 @@ jobs:
           echo "INGRESS_CLASS_NAME=$ingress_class" >> "$GITHUB_ENV"
           echo "CERT_MANAGER_CLUSTER_ISSUER=$cluster_issuer" >> "$GITHUB_ENV"
           echo "IMAGE_REPOSITORY=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_ENV"
+          echo "WEB_IMAGE_REPOSITORY=ghcr.io/${GITHUB_REPOSITORY,,}-web" >> "$GITHUB_ENV"
           echo "APP_SECRET_NAME=smart-study-planner-release-${IMAGE_TAG:0:12}" >> "$GITHUB_ENV"
 
       - name: Set up Python
@@ -100,12 +128,21 @@ jobs:
       - name: Verify registered model and artifact
         run: |
           mkdir -p deployment-evidence
-          python -m pipeline.verify_registered_model \
-            --model-uri "$MODEL_URI" \
-            --expected-threshold "$MODEL_THRESHOLD" \
-            --output deployment-evidence/registry-verification.json
-          resolved_version="$(python -c 'import json; r=json.load(open("deployment-evidence/registry-verification.json", encoding="utf-8")); print(r["name"] + "/" + str(r["version"]))')"
+          if [[ -n "$MODEL_CATALOG_JSON" ]]; then
+            python -m pipeline.verify_model_catalog \
+              --output deployment-evidence/registry-verification.json
+            resolved_version="$(python -c 'import json; r=json.load(open("deployment-evidence/registry-verification.json", encoding="utf-8")); d=next(m for m in r["models"] if m["model_id"] == r["default_model_id"])["verification"]; print(d["name"] + "/" + str(d["version"]))')"
+            resolved_threshold="$(python -c 'import json; r=json.load(open("deployment-evidence/registry-verification.json", encoding="utf-8")); d=next(m for m in r["models"] if m["model_id"] == r["default_model_id"])["verification"]; print(d["operating_threshold"])')"
+          else
+            python -m pipeline.verify_registered_model \
+              --model-uri "$MODEL_URI" \
+              --expected-threshold "$MODEL_THRESHOLD" \
+              --output deployment-evidence/registry-verification.json
+            resolved_version="$(python -c 'import json; r=json.load(open("deployment-evidence/registry-verification.json", encoding="utf-8")); print(r["name"] + "/" + str(r["version"]))')"
+            resolved_threshold="$MODEL_THRESHOLD"
+          fi
           echo "RESOLVED_MODEL_VERSION=$resolved_version" >> "$GITHUB_ENV"
+          echo "RESOLVED_MODEL_THRESHOLD=$resolved_threshold" >> "$GITHUB_ENV"
 
       - name: Set up kubectl
         uses: azure/setup-kubectl@v4
@@ -147,10 +184,15 @@ jobs:
             --from-literal=MODEL_URI="$MODEL_URI" \
             --from-literal=MODEL_THRESHOLD="$MODEL_THRESHOLD" \
             --from-literal=MODEL_VERSION="$RESOLVED_MODEL_VERSION" \
+            --from-literal=MODEL_CATALOG_JSON="$MODEL_CATALOG_JSON" \
+            --from-literal=DEFAULT_MODEL_ID="$DEFAULT_MODEL_ID" \
             --from-literal=MLFLOW_TRACKING_URI="$MLFLOW_TRACKING_URI" \
             --from-literal=MLFLOW_TRACKING_USERNAME="$MLFLOW_TRACKING_USERNAME" \
             --from-literal=MLFLOW_TRACKING_PASSWORD="$MLFLOW_TRACKING_PASSWORD" \
             --from-literal=API_KEY="$API_KEY" \
+            --from-literal=WEB_AUTH_USERNAME="$WEB_AUTH_USERNAME" \
+            --from-literal=WEB_AUTH_PASSWORD_HASH="$WEB_AUTH_PASSWORD_HASH" \
+            --from-literal=SESSION_SECRET="$SESSION_SECRET" \
             --from-literal=ALLOWED_HOSTS="$APP_HOST" \
             --dry-run=client -o json \
             | python -c 'import json,sys; secret=json.load(sys.stdin); secret["immutable"]=True; json.dump(secret,sys.stdout)' \
@@ -166,6 +208,7 @@ jobs:
           kubectl kustomize deploy/kubernetes \
             | sed \
                 -e "s#ghcr.io/example/smart-study-planner:latest#${IMAGE_REPOSITORY}:${IMAGE_TAG}#g" \
+                -e "s#ghcr.io/example/smart-study-planner-web:latest#${WEB_IMAGE_REPOSITORY}:${IMAGE_TAG}#g" \
                 -e "s#planner.example.edu#${APP_HOST}#g" \
                 -e "s#TLS_SECRET_PLACEHOLDER#${TLS_SECRET_NAME}#g" \
                 -e "s#INGRESS_CLASS_PLACEHOLDER#${INGRESS_CLASS_NAME}#g" \
@@ -175,11 +218,16 @@ jobs:
           kubectl apply -f "$rendered_manifest"
           kubectl -n "$DEPLOY_NAMESPACE" annotate deployment/smart-study-planner-api \
             deployment.smart-study-planner/model-version="$RESOLVED_MODEL_VERSION" \
-            deployment.smart-study-planner/model-threshold="$MODEL_THRESHOLD" \
+            deployment.smart-study-planner/model-threshold="$RESOLVED_MODEL_THRESHOLD" \
+            deployment.smart-study-planner/image-tag="$IMAGE_TAG" \
+            --overwrite
+          kubectl -n "$DEPLOY_NAMESPACE" annotate deployment/smart-study-planner-web \
             deployment.smart-study-planner/image-tag="$IMAGE_TAG" \
             --overwrite
           kubectl -n "$DEPLOY_NAMESPACE" rollout status \
             deployment/smart-study-planner-api --timeout=300s
+          kubectl -n "$DEPLOY_NAMESPACE" rollout status \
+            deployment/smart-study-planner-web --timeout=300s
 
       - name: Verify TLS and public readiness
         shell: bash
@@ -209,8 +257,10 @@ jobs:
             -o wide > deployment-evidence/resource-status.txt 2>&1 || true
           kubectl -n "$DEPLOY_NAMESPACE" rollout history deployment/smart-study-planner-api \
             > deployment-evidence/rollout-history.txt 2>&1 || true
+          kubectl -n "$DEPLOY_NAMESPACE" rollout history deployment/smart-study-planner-web \
+            > deployment-evidence/web-rollout-history.txt 2>&1 || true
           kubectl -n "$DEPLOY_NAMESPACE" get pods \
-            -l app.kubernetes.io/name=smart-study-planner-api \
+            -l 'app.kubernetes.io/name in (smart-study-planner-api,smart-study-planner-web)' \
             -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.status.containerStatuses[0].imageID}{"\n"}{end}' \
             > deployment-evidence/image-digests.txt 2>&1 || true
 

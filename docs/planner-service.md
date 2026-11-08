@@ -2,16 +2,25 @@
 
 ## Scope
 
-`POST /v1/study-plan` combines the loaded risk model with deterministic task
-prioritization and capacity-constrained scheduling. It returns a proposed plan
-for learner or adviser review. It must not be used to impose academic,
-disciplinary, admissions, attendance, or financial-aid decisions.
+`POST /v1/student-study-plan` is the normal learner-facing path. It derives the
+default model's fitted contract from a small structured intake, then combines
+the internal risk signal with deterministic task prioritization and
+capacity-constrained scheduling. `POST /v1/study-plan` retains the exact raw
+feature contract for controlled operator and integration testing. Both return a
+proposed plan for learner or adviser review and must not be used to impose
+academic, disciplinary, admissions, attendance, or financial-aid decisions.
 
-The endpoint accepts the exact model feature contract, one or more tasks, and
-timezone-aware availability windows. Task identifiers must be unique;
+The student endpoint accepts the documented intake, one or more tasks, and
+timezone-aware availability windows; the raw endpoint accepts the exact model
+contract instead. Task identifiers must be unique;
 availability windows must not overlap; and completed work cannot exceed the
 estimated work. The same API-key and model-readiness controls used by the risk
 endpoint apply to the planner endpoint.
+
+The student response does not expose the numerical risk score or model
+metadata. It returns a support level and evidence summary. Formal derivation
+rules and the institutional-data boundary are specified in
+`docs/student-input-and-feature-derivation.md`.
 
 ## Priority calculation
 

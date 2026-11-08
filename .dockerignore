@@ -25,3 +25,6 @@ monitoring/grafana
 *.sqlite
 *.db
 .env*
+configs/*.local.json
+frontend/node_modules
+frontend/dist

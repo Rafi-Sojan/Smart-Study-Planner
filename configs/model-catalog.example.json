@@ -1,0 +1,29 @@
+{
+  "default_model_id": "oulad-day-30",
+  "models": [
+    {
+      "id": "oulad-day-30",
+      "label": "OULAD 30-day early warning",
+      "description": "Uses the earliest approved observation window to support timely review.",
+      "dataset": "OULAD",
+      "cutoff_days": 30,
+      "model_uri": "models:/smart-study-planner-oulad-early-warning-day-30/REPLACE_WITH_NUMERIC_VERSION"
+    },
+    {
+      "id": "oulad-day-60",
+      "label": "OULAD 60-day early warning",
+      "description": "Uses additional mid-course evidence while retaining an actionable support window.",
+      "dataset": "OULAD",
+      "cutoff_days": 60,
+      "model_uri": "models:/smart-study-planner-oulad-early-warning-day-60/REPLACE_WITH_NUMERIC_VERSION"
+    },
+    {
+      "id": "oulad-day-90",
+      "label": "OULAD 90-day early warning",
+      "description": "Uses the latest configured observation window for comparison and reviewed intervention.",
+      "dataset": "OULAD",
+      "cutoff_days": 90,
+      "model_uri": "models:/smart-study-planner-oulad-early-warning-day-90/REPLACE_WITH_NUMERIC_VERSION"
+    }
+  ]
+}

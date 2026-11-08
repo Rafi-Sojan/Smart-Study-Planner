@@ -3,7 +3,12 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from src.models.predict import FeatureContractError, feature_contract, validate_feature_payload
+from src.models.predict import (
+    FeatureContractError,
+    feature_contract,
+    validate_feature_payload,
+    validate_model_feature_contract,
+)
 from src.tracking.model_registry import parse_registered_model_uri, verify_registered_model
 
 
@@ -44,6 +49,13 @@ def test_feature_payload_rejects_identifiers_and_contract_mismatches() -> None:
         validate_feature_payload({"student_id": "S1"})
     with pytest.raises(FeatureContractError, match="missing"):
         validate_feature_payload({"activity_count": 2}, ["activity_count", "assessment_mean"])
+
+
+def test_serving_contract_rejects_post_outcome_model_features() -> None:
+    model = SimpleNamespace(feature_names_in_=np.array(["activity_count", "date_unregistration"]))
+
+    with pytest.raises(FeatureContractError, match="cannot be served"):
+        validate_model_feature_contract(model)
 
 
 def test_registry_verification_requires_pinned_governed_version() -> None:

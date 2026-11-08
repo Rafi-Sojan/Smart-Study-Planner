@@ -1,7 +1,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: smart-study-planner-api
+  name: smart-study-planner
   annotations:
     cert-manager.io/cluster-issuer: CLUSTER_ISSUER_PLACEHOLDER
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
@@ -23,6 +23,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: smart-study-planner-api
+                name: smart-study-planner-web
                 port:
                   name: http

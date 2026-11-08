@@ -102,13 +102,38 @@ def feature_contract(model: Any) -> dict[str, Any]:
     """Build a stable, non-secret contract for a fitted model's raw inputs."""
 
     features = expected_model_features(model)
+    feature_kinds = {name: "unknown" for name in features}
+    preprocess = getattr(model, "named_steps", {}).get("preprocess")
+    for transformer_name, _transformer, columns in getattr(preprocess, "transformers_", ()):
+        if transformer_name == "remainder" or isinstance(columns, slice):
+            continue
+        kind = "number" if transformer_name == "numeric" else "string"
+        for column in columns:
+            column_name = str(column)
+            if column_name in feature_kinds:
+                feature_kinds[column_name] = kind
     canonical = json.dumps(list(features), separators=(",", ":"), ensure_ascii=True)
     return {
         "feature_names": list(features),
+        "feature_fields": [
+            {"name": name, "kind": feature_kinds[name], "required": True}
+            for name in features
+        ],
         "feature_count": len(features),
         "sha256": hashlib.sha256(canonical.encode("utf-8")).hexdigest(),
         "source": "sklearn_feature_names_in" if features else "unavailable",
     }
+
+
+def validate_model_feature_contract(model: Any) -> None:
+    """Reject a serving model that depends on forbidden inference fields."""
+
+    blocked = sorted(set(expected_model_features(model)).intersection(BLOCKED_INFERENCE_FEATURES))
+    if blocked:
+        raise FeatureContractError(
+            "Loaded model requires identifiers, outcomes, or post-outcome fields that "
+            f"cannot be served: {blocked}"
+        )
 
 
 def validate_threshold(threshold: float) -> float:

@@ -17,9 +17,19 @@ env:
 
 jobs:
   build:
-    name: Build Docker Image
+    name: Build ${{ matrix.component }} image
     if: github.event_name != 'push'
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - component: api
+            dockerfile: Dockerfile
+            image_suffix: ""
+          - component: web
+            dockerfile: frontend/Dockerfile
+            image_suffix: -web
 
     permissions:
       contents: read
@@ -35,7 +45,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}${{ matrix.image_suffix }}
           tags: |
             type=raw,value=latest
             type=sha
@@ -45,6 +55,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
+          file: ${{ matrix.dockerfile }}
           push: false
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -52,9 +63,19 @@ jobs:
           cache-to: type=gha,mode=max
 
   publish:
-    name: Publish Docker Image
+    name: Publish ${{ matrix.component }} image
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - component: api
+            dockerfile: Dockerfile
+            image_suffix: ""
+          - component: web
+            dockerfile: frontend/Dockerfile
+            image_suffix: -web
 
     permissions:
       contents: read
@@ -78,7 +99,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}${{ matrix.image_suffix }}
           tags: |
             type=raw,value=latest
             type=sha
@@ -88,6 +109,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
+          file: ${{ matrix.dockerfile }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

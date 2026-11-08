@@ -30,6 +30,11 @@ ENV/
 env.bak/
 venv.bak/
 
+# Frontend dependencies and generated bundles
+node_modules/
+frontend/node_modules/
+frontend/dist/
+
 .pytest_cache/
 .coverage
 .coverage.*
@@ -145,5 +150,6 @@ ehthumbs_vista.db
 
 config.local.*
 configs/local.*
+configs/*.local.json
 
 !data/raw/.gitignore

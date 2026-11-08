@@ -8,7 +8,7 @@ import os
 from pathlib import Path
 from typing import Any
 
-from src.models.predict import feature_contract
+from src.models.predict import feature_contract, validate_model_feature_contract
 from src.tracking.model_registry import verify_registered_model
 
 
@@ -40,6 +40,7 @@ def run_verification(
     )
     if load_model:
         model = mlflow.sklearn.load_model(report["resolved_uri"])
+        validate_model_feature_contract(model)
         contract = feature_contract(model)
         contract_matches = contract["sha256"] == report["feature_contract_sha256"]
         feature_count_matches = contract["feature_count"] == report["feature_count"]

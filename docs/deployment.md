@@ -21,11 +21,52 @@ $env:ALLOW_TRUSTED_PICKLE_MODEL = "1"
 docker compose up --build
 ```
 
-Compose starts the API, Prometheus, Pushgateway, Alertmanager, and Grafana on
+Open the integrated React application at `http://localhost:8080`. Compose also
+starts the API, Prometheus, Pushgateway, Alertmanager, and Grafana on
 localhost-only ports 8000, 9090, 9091, 9093, and 3000. Local pickle loading is
-disabled when `APP_ENV=production`. The serving container uses a read-only root
-filesystem and redirects runtime home/cache writes to its temporary `/tmp`
-mount, which is size-limited in Kubernetes.
+disabled when `APP_ENV=production`. Both application containers use read-only
+root filesystems and temporary `/tmp` mounts.
+
+Browser authentication is optional only for an isolated local research run.
+To test the protected path, generate a verifier interactively and copy the
+single printed value:
+
+```powershell
+python -m src.api.auth
+$env:WEB_AUTH_USERNAME = "planner-admin"
+$env:WEB_AUTH_PASSWORD_HASH = "<printed-pbkdf2-verifier>"
+$env:SESSION_SECRET = "<at-least-32-random-characters>"
+docker compose up --build
+```
+
+The browser receives an HttpOnly session cookie. It never receives `API_KEY`.
+The Nginx gateway serves the Vite bundle and proxies `/api/*` to FastAPI while
+retaining the established `/healthz`, `/readyz`, and `/v1/*` service paths.
+
+### Configuring selectable models
+
+The legacy `MODEL_PATH` or `MODEL_URI` configuration remains valid and appears
+as one selectable option. For multiple options, leave both values empty and set
+`MODEL_CATALOG_JSON` to a completed private copy of
+`configs/model-catalog.example.json`. Set `DEFAULT_MODEL_ID` to the recommended
+option. The catalog accepts at most 12 unique, allowlisted models.
+
+For a local PowerShell session:
+
+```powershell
+$env:MODEL_PATH = ""
+$env:MODEL_URI = ""
+$env:MODEL_CATALOG_JSON = Get-Content -Raw configs/model-catalog.local.json
+$env:DEFAULT_MODEL_ID = "oulad-day-30"
+docker compose up --build
+```
+
+Local catalog entries may use trusted paths under `/model-store`, which is a
+read-only mount of the repository's `models/` directory. Production rejects
+every `model_path`: each entry must use an immutable numeric MLflow
+`models:/<name>/<version>` URI. The release workflow downloads and verifies the
+governance tags, artifact feature contract, approved threshold, and forbidden
+feature policy for every catalog entry before rollout.
 
 ## Production prerequisites
 
@@ -36,6 +77,8 @@ Configure these environment variables:
 |---|---|
 | `MODEL_URI` | Immutable `models:/<name>/<numeric-version>` URI |
 | `MODEL_THRESHOLD` | Must exactly match the registry `operating_threshold` tag |
+| `MODEL_CATALOG_JSON` | Optional allowlist of selectable immutable model versions; replaces `MODEL_URI` and `MODEL_THRESHOLD` |
+| `DEFAULT_MODEL_ID` | Required when a catalog is configured; identifies the recommended default |
 | `APP_HOST` | DNS hostname served through HTTPS |
 | `PRODUCTION_BASE_URL` | HTTPS origin used by scheduled monitoring |
 | `TLS_SECRET_NAME` | Kubernetes TLS secret/cert-manager certificate name |
@@ -53,6 +96,9 @@ Configure these protected secrets:
 | `API_KEY` | Long random API credential |
 | `GHCR_USERNAME` | Account allowed to read the private image |
 | `GHCR_TOKEN` | Fine-grained or classic token with `read:packages` |
+| `WEB_AUTH_USERNAME` | Protected operator login name |
+| `WEB_AUTH_PASSWORD_HASH` | Verifier printed by `python -m src.api.auth`; never plaintext |
+| `SESSION_SECRET` | Random value of at least 32 characters used to sign sessions |
 
 The cluster must have an ingress controller, a metrics server for the HPA,
 cert-manager or a pre-provisioned TLS secret, and a network-policy provider.
@@ -66,21 +112,22 @@ to create or modify cluster-scoped namespaces.
 ## Controlled deployment
 
 1. Push the reviewed commit and wait for CI and the Docker workflow.
-2. Confirm GHCR contains the full 40-character commit-SHA tag.
-3. Confirm the numeric model version has all required registry tags.
+2. Confirm GHCR contains the full 40-character commit-SHA tag for both the API
+   image and the `-web` image.
+3. Confirm every numeric model version in the catalog has all required registry tags.
 4. Open **Actions > Deploy inference service** and enter the full lowercase
    commit SHA.
 
 The workflow then:
 
 1. validates every required protected value;
-2. downloads the registered model and verifies quality, deployment,
-   fairness, threshold, and feature-contract metadata;
+2. downloads every configured registered model and verifies quality,
+   deployment, fairness, threshold, feature-contract, and serving-policy metadata;
 3. validates cluster permissions;
 4. creates or rotates the GHCR pull secret;
 5. creates an immutable release-specific application secret;
-6. renders and applies TLS, workload, availability, and network manifests;
-7. waits for rollout and certificate readiness;
+6. renders and applies TLS, API, React/Nginx, availability, and network manifests;
+7. waits for both application rollouts and certificate readiness;
 8. verifies public HTTPS readiness; and
 9. uploads registry, manifest, image-digest, and rollout evidence.
 
@@ -93,13 +140,24 @@ newer model configuration.
 ```powershell
 kubectl -n smart-study-planner get deployment,pod,service,ingress,hpa,pdb
 kubectl -n smart-study-planner rollout status deployment/smart-study-planner-api
+kubectl -n smart-study-planner rollout status deployment/smart-study-planner-web
+curl.exe https://<production-host>/
 curl.exe https://<production-host>/healthz
 curl.exe https://<production-host>/readyz
+curl.exe -H "x-api-key: <api-key>" https://<production-host>/v1/models
 curl.exe -H "x-api-key: <api-key>" https://<production-host>/v1/model-metadata
 ```
 
-The metadata response must show the approved model version, registry threshold,
-non-zero feature count, and 64-character contract hash.
+The catalog must contain the configured default. Metadata for that default must
+show the approved model version, registry threshold, non-zero feature count,
+and 64-character contract hash. Query a non-default option with
+`/v1/model-metadata?model_id=<allowlisted-id>`.
+
+TLS terminates at the Kubernetes ingress. Public traffic reaches the Nginx web
+gateway, which applies browser security headers and forwards API calls over the
+cluster network. The API is not assigned a public service. The production
+session cookie is Secure, HttpOnly, SameSite=Strict, time-limited, and accepted
+for state-changing requests only when the Origin check passes.
 
 ## Recovery
 
