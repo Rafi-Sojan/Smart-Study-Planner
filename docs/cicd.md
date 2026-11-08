@@ -49,7 +49,10 @@ been obtained.
 React/Nginx image on pull requests and pushes to `main`. Pull requests build
 without publishing. A push to `main` publishes `latest`, short-SHA, and full
 commit-SHA tags for the repository image and its `-web` companion in GitHub
-Container Registry.
+Container Registry. A single two-component matrix performs both behaviors, so
+GitHub reports concrete `Build api/web` checks for reviews and `Publish
+api/web` checks for approved pushes without a deliberately skipped placeholder
+job.
 
 The deployment should use the immutable commit-SHA tag or an image digest,
 not `latest`. The Dockerfile runs as a non-root user and does not copy raw
@@ -59,13 +62,15 @@ through the registry or a read-only mounted artifact.
 ## 4. Manual deployment
 
 `.github/workflows/deploy.yml` is triggered manually with the full 40-character
-commit SHA. It verifies and downloads the immutable numeric MLflow version,
-or every version in `MODEL_CATALOG_JSON`, checks deployment, fairness,
-threshold, feature-contract, and serving-policy controls, creates
-private-GHCR and release-specific application/session secrets, applies the TLS
-ingress and both workload controls, verifies public readiness through the web
-gateway, and retains deployment evidence. Required protected values are listed
-in `docs/deployment.md`.
+commit SHA. It requires that commit to be reachable from `main`, verifies both
+full-SHA GHCR tags, resolves their content digests, and deploys the digest-pinned
+API and web images. It then verifies and downloads the immutable numeric MLflow
+version, or every version in `MODEL_CATALOG_JSON`, checks deployment, fairness,
+threshold, feature-contract, and serving-policy controls, creates private-GHCR
+and release-specific application/session secrets, applies the TLS ingress and
+both workload controls, verifies public readiness through the web gateway, and
+retains deployment evidence. Required protected values are listed in
+`docs/deployment.md`.
 
 ## 5. Required release evidence
 

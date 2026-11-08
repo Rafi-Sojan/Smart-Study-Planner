@@ -84,4 +84,14 @@ def test_operations_workflows_cover_monitoring_validation_and_recovery() -> None
     assert 'secret["immutable"]=True' in deployment
     assert "https://${APP_HOST}/readyz" in deployment
     assert "smart-study-planner-web" in deployment
+    assert 'git merge-base --is-ancestor "$IMAGE_TAG" origin/main' in deployment
+    assert "Resolve immutable release image digests" in deployment
+    assert "API_IMAGE_REFERENCE" in deployment
+    assert "WEB_IMAGE_REFERENCE" in deployment
+    assert "image-digest" in deployment
     assert "frontend/Dockerfile" in docker
+    assert "if: github.event_name != 'push'" not in docker
+    docker_config = _yaml(".github/workflows/docker.yml")
+    assert set(docker_config["jobs"]) == {"images"}
+    matrix = docker_config["jobs"]["images"]["strategy"]["matrix"]["include"]
+    assert {item["component"] for item in matrix} == {"api", "web"}

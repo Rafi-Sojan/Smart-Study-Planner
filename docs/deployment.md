@@ -115,21 +115,24 @@ to create or modify cluster-scoped namespaces.
 2. Confirm GHCR contains the full 40-character commit-SHA tag for both the API
    image and the `-web` image.
 3. Confirm every numeric model version in the catalog has all required registry tags.
-4. Open **Actions > Deploy inference service** and enter the full lowercase
+4. Open **Actions > Deploy Smart Study Planner** and enter the full lowercase
    commit SHA.
 
 The workflow then:
 
-1. validates every required protected value;
-2. downloads every configured registered model and verifies quality,
+1. validates every required protected value and confirms that the requested
+   commit is reachable from `main`;
+2. verifies both full-SHA GHCR tags, resolves their SHA-256 content digests,
+   and uses those immutable digest references for the rollout;
+3. downloads every configured registered model and verifies quality,
    deployment, fairness, threshold, feature-contract, and serving-policy metadata;
-3. validates cluster permissions;
-4. creates or rotates the GHCR pull secret;
-5. creates an immutable release-specific application secret;
-6. renders and applies TLS, API, React/Nginx, availability, and network manifests;
-7. waits for both application rollouts and certificate readiness;
-8. verifies public HTTPS readiness; and
-9. uploads registry, manifest, image-digest, and rollout evidence.
+4. validates cluster permissions;
+5. creates or rotates the GHCR pull secret;
+6. creates an immutable release-specific application secret;
+7. renders and applies TLS, API, React/Nginx, availability, and network manifests;
+8. waits for both application rollouts and certificate readiness;
+9. verifies public HTTPS readiness; and
+10. uploads registry, manifest, image-digest, and rollout evidence.
 
 The release-specific secret binds model URI and threshold to the Kubernetes
 deployment revision. This prevents an image rollback from silently retaining a
