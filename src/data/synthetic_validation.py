@@ -160,7 +160,7 @@ def main() -> None:
     parser.add_argument(
         "--output",
         type=Path,
-        default=Path("models/validation/synthetic_data_validation.json"),
+        default=Path("artifacts/validation/synthetic_data_validation.json"),
     )
     args = parser.parse_args()
     report = write_validation_report(args.data_dir, args.output)

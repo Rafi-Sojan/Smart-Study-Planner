@@ -8,12 +8,12 @@ stages:
     outs:
       - data/raw/synthetic
   synthetic_validate:
-    cmd: python -m src.data.synthetic_validation --data-dir data/raw/synthetic --output models/validation/synthetic_data_validation.json
+    cmd: python -m src.data.synthetic_validation --data-dir data/raw/synthetic --output artifacts/validation/synthetic_data_validation.json
     deps:
       - data/raw/synthetic
       - src/data/synthetic_validation.py
     outs:
-      - models/validation/synthetic_data_validation.json
+      - artifacts/validation/synthetic_data_validation.json
   clean:
     cmd: python -m src.data.cleaner --input-dir data/raw/oulad --output-dir data/processed/oulad
     deps:
@@ -23,7 +23,7 @@ stages:
     outs:
       - data/processed/oulad
   train:
-    cmd: python -m pipeline.training_pipeline --data-dir data/processed/oulad --metrics-output models/metrics/metrics.json --model-output models/baseline.pkl
+    cmd: python -m pipeline.training_pipeline --data-dir data/processed/oulad --metrics-output artifacts/metrics/metrics.json --model-output artifacts/models/baseline.pkl
     deps:
       - data/processed/oulad
       - pipeline/training_pipeline.py
@@ -34,9 +34,11 @@ stages:
       - src/risk/model_risk.py
       - src/tracking/mlflow_tracking.py
     outs:
-      - models/baseline.pkl
+      - artifacts/models/baseline.pkl
+    metrics:
+      - artifacts/metrics/metrics.json
   early_warning:
-    cmd: python -m pipeline.early_warning_pipeline --data-dir data/processed/oulad --metrics-output models/metrics/early_warning_metrics.json --cutoffs-days 30 60 90
+    cmd: python -m pipeline.early_warning_pipeline --data-dir data/processed/oulad --metrics-output artifacts/metrics/early_warning_metrics.json --cutoffs-days 30 60 90
     deps:
       - data/processed/oulad
       - pipeline/early_warning_pipeline.py
@@ -46,8 +48,10 @@ stages:
       - src/models/policy.py
       - src/risk/model_risk.py
       - src/tracking/mlflow_tracking.py
+    metrics:
+      - artifacts/metrics/early_warning_metrics.json
   kuleuven_external_validation:
-    cmd: python -m pipeline.kuleuven_external_validation --data-path data/raw/external/kuleuven/dataset.zip --metrics-output models/metrics/kuleuven_external_metrics.json --cutoffs-days 30 60 90
+    cmd: python -m pipeline.kuleuven_external_validation --data-path data/raw/external/kuleuven/dataset.zip --metrics-output artifacts/metrics/kuleuven_external_metrics.json --cutoffs-days 30 60 90
     deps:
       - data/raw/external/kuleuven/dataset.zip
       - pipeline/kuleuven_external_validation.py
@@ -56,9 +60,9 @@ stages:
       - src/models/evaluate.py
       - src/models/policy.py
     outs:
-      - models/metrics/kuleuven_external_metrics.json
+      - artifacts/metrics/kuleuven_external_metrics.json
   cross_dataset_transfer:
-    cmd: python -m pipeline.cross_dataset_transfer --kuleuven-path data/raw/external/kuleuven/dataset.zip --synthetic-path data/raw/synthetic --metrics-output models/metrics/cross_dataset_transfer_metrics.json --cutoffs-days 30 60 90
+    cmd: python -m pipeline.cross_dataset_transfer --kuleuven-path data/raw/external/kuleuven/dataset.zip --synthetic-path data/raw/synthetic --metrics-output artifacts/metrics/cross_dataset_transfer_metrics.json --cutoffs-days 30 60 90
     deps:
       - data/raw/external/kuleuven/dataset.zip
       - data/raw/synthetic
@@ -70,9 +74,9 @@ stages:
       - src/models/evaluate.py
       - src/models/policy.py
     outs:
-      - models/metrics/cross_dataset_transfer_metrics.json
+      - artifacts/metrics/cross_dataset_transfer_metrics.json
   synthetic_baseline:
-    cmd: python -m pipeline.synthetic_baseline_pipeline --data-dir data/raw/synthetic --metrics-output models/metrics/synthetic_baseline_metrics.json --model-dir models/synthetic_baseline --cutoffs-days 30 60 90
+    cmd: python -m pipeline.synthetic_baseline_pipeline --data-dir data/raw/synthetic --metrics-output artifacts/metrics/synthetic_baseline_metrics.json --model-dir artifacts/models/synthetic_baseline --cutoffs-days 30 60 90
     deps:
       - data/raw/synthetic
       - pipeline/synthetic_baseline_pipeline.py
@@ -83,16 +87,16 @@ stages:
       - src/tracking/mlflow_tracking.py
       - src/risk/model_risk.py
     outs:
-      - models/synthetic_baseline
+      - artifacts/models/synthetic_baseline
     metrics:
-      - models/metrics/synthetic_baseline_metrics.json
+      - artifacts/metrics/synthetic_baseline_metrics.json
   oulad_statistical_validation:
-    cmd: python -m pipeline.statistical_validation oulad --data-dir data/processed/oulad --kuleuven-path data/raw/external/kuleuven/dataset.zip --early-warning-metrics models/metrics/early_warning_metrics.json --kuleuven-metrics models/metrics/kuleuven_external_metrics.json --output artifacts/validation/oulad_statistical_validation.json --cutoffs 30 60 90
+    cmd: python -m pipeline.statistical_validation oulad --data-dir data/processed/oulad --kuleuven-path data/raw/external/kuleuven/dataset.zip --early-warning-metrics artifacts/metrics/early_warning_metrics.json --kuleuven-metrics artifacts/metrics/kuleuven_external_metrics.json --output artifacts/validation/oulad_statistical_validation.json --cutoffs 30 60 90
     deps:
       - data/processed/oulad
       - data/raw/external/kuleuven/dataset.zip
-      - models/metrics/early_warning_metrics.json
-      - models/metrics/kuleuven_external_metrics.json
+      - artifacts/metrics/early_warning_metrics.json
+      - artifacts/metrics/kuleuven_external_metrics.json
       - pipeline/statistical_validation.py
       - src/data/kuleuven.py
       - src/features/feature_engineering.py
@@ -100,14 +104,14 @@ stages:
     outs:
       - artifacts/validation/oulad_statistical_validation.json
   synthetic_statistical_validation:
-    cmd: python -m pipeline.statistical_validation synthetic --data-dir data/raw/synthetic --oulad-dir data/processed/oulad --kuleuven-path data/raw/external/kuleuven/dataset.zip --synthetic-metrics models/metrics/synthetic_baseline_metrics.json --oulad-metrics models/metrics/early_warning_metrics.json --kuleuven-metrics models/metrics/kuleuven_external_metrics.json --output artifacts/validation/synthetic_statistical_validation.json --cutoffs 30 60 90
+    cmd: python -m pipeline.statistical_validation synthetic --data-dir data/raw/synthetic --oulad-dir data/processed/oulad --kuleuven-path data/raw/external/kuleuven/dataset.zip --synthetic-metrics artifacts/metrics/synthetic_baseline_metrics.json --oulad-metrics artifacts/metrics/early_warning_metrics.json --kuleuven-metrics artifacts/metrics/kuleuven_external_metrics.json --output artifacts/validation/synthetic_statistical_validation.json --cutoffs 30 60 90
     deps:
       - data/raw/synthetic
       - data/processed/oulad
       - data/raw/external/kuleuven/dataset.zip
-      - models/metrics/synthetic_baseline_metrics.json
-      - models/metrics/early_warning_metrics.json
-      - models/metrics/kuleuven_external_metrics.json
+      - artifacts/metrics/synthetic_baseline_metrics.json
+      - artifacts/metrics/early_warning_metrics.json
+      - artifacts/metrics/kuleuven_external_metrics.json
       - pipeline/statistical_validation.py
       - src/data/kuleuven.py
       - src/data/synthetic_validation.py

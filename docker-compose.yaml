@@ -32,8 +32,8 @@ services:
       MLFLOW_TRACKING_USERNAME: ${MLFLOW_TRACKING_USERNAME:-}
       MLFLOW_TRACKING_PASSWORD: ${MLFLOW_TRACKING_PASSWORD:-}
     volumes:
-      - ./models/pretrained:/models:ro
-      - ./models:/model-store:ro
+      - ./artifacts/models/pretrained:/models:ro
+      - ./artifacts/models:/model-store:ro
     ports:
       - "127.0.0.1:8000:8000"
     read_only: true

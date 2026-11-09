@@ -183,6 +183,10 @@ def test_student_plan_derives_features_and_hides_model_internals(monkeypatch) ->
             "attendance_percent": 80,
             "recent_score_percent": 70,
             "submission_rate_percent": 75,
+            "sleep_hours": 7,
+            "stress_level": 5,
+            "fatigue_level": 4,
+            "concentration_level": 7,
         },
         "planning_time": "2026-01-10T12:00:00+00:00",
         "tasks": [
@@ -217,6 +221,21 @@ def test_student_plan_derives_features_and_hides_model_internals(monkeypatch) ->
     assert "model_version" not in body
     assert "feature_contract_sha256" not in body
     assert body["sessions"][0]["task_id"] == "assignment-1"
+
+    missing_wellbeing = {
+        **payload,
+        "intake": {
+            key: value
+            for key, value in payload["intake"].items()
+            if key != "sleep_hours"
+        },
+    }
+    invalid_response = client.post("/v1/student-study-plan", json=missing_wellbeing)
+    assert invalid_response.status_code == 422
+    assert any(
+        error["loc"][-1] == "sleep_hours"
+        for error in invalid_response.json()["detail"]
+    )
 
 
 def test_user_can_list_and_select_an_allowlisted_model(monkeypatch) -> None:

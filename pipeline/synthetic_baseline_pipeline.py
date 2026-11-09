@@ -23,8 +23,8 @@ def _configure_console() -> None:
 
 def run_synthetic_baseline_pipeline(
     data_dir: str | Path = "data/raw/synthetic",
-    metrics_output: str | Path | None = "models/metrics/synthetic_baseline_metrics.json",
-    model_dir: str | Path | None = "models/synthetic_baseline",
+    metrics_output: str | Path | None = "artifacts/metrics/synthetic_baseline_metrics.json",
+    model_dir: str | Path | None = "artifacts/models/synthetic_baseline",
     cutoffs_days: Iterable[int] = (30, 60, 90),
     random_state: int = 42,
     mlflow_enabled: bool = False,
@@ -84,8 +84,12 @@ def main() -> None:
     _configure_console()
     parser = argparse.ArgumentParser(description="Run synthetic planner baseline experiments")
     parser.add_argument("--data-dir", type=Path, default=Path("data/raw/synthetic"))
-    parser.add_argument("--metrics-output", type=Path, default=Path("models/metrics/synthetic_baseline_metrics.json"))
-    parser.add_argument("--model-dir", type=Path, default=Path("models/synthetic_baseline"))
+    parser.add_argument(
+        "--metrics-output",
+        type=Path,
+        default=Path("artifacts/metrics/synthetic_baseline_metrics.json"),
+    )
+    parser.add_argument("--model-dir", type=Path, default=Path("artifacts/models/synthetic_baseline"))
     parser.add_argument("--cutoffs-days", type=int, nargs="+", default=[30, 60, 90])
     parser.add_argument("--random-state", type=int, default=42)
     parser.add_argument("--mlflow", action="store_true", help="Log the run to MLflow/DagsHub")

@@ -131,6 +131,10 @@ it("uses a student-friendly intake without loading model metadata by default", a
   expect(await screen.findByRole("heading", { name: /build a plan around your week/i })).toBeVisible();
   expect(screen.getByRole("heading", { name: /tell us what you are planning/i })).toBeVisible();
   expect(screen.getByRole("textbox", { name: /^subjects/i })).toBeVisible();
+  expect(screen.getByRole("spinbutton", { name: /typical sleep/i })).toBeRequired();
+  expect(screen.getByRole("spinbutton", { name: /^stress/i })).toBeRequired();
+  expect(screen.getByRole("spinbutton", { name: /^fatigue/i })).toBeRequired();
+  expect(screen.getByRole("spinbutton", { name: /^concentration/i })).toBeRequired();
   expect(screen.getByRole("button", { name: /generate my study plan/i })).toBeVisible();
   expect(screen.queryByText(/contract name:/i)).not.toBeInTheDocument();
   expect(fetchMock).toHaveBeenCalledTimes(1);

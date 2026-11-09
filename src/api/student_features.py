@@ -103,7 +103,7 @@ def _source_labels(
     if availability:
         labels.append("Availability preferences")
     if any(intake.get(name) is not None for name in wellbeing_fields):
-        labels.append("Optional wellbeing context")
+        labels.append("Self-reported wellbeing context")
     return tuple(labels)
 
 

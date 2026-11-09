@@ -144,9 +144,9 @@ def _oulad_feature_frames(
 def run_oulad_statistical_validation(
     data_dir: str | Path = "data/processed/oulad",
     kuleuven_path: str | Path = "data/raw/external/kuleuven/dataset.zip",
-    early_warning_metrics: str | Path = "models/metrics/early_warning_metrics.json",
-    kuleuven_metrics: str | Path = "models/metrics/kuleuven_external_metrics.json",
-    output: str | Path | None = "models/validation/oulad_statistical_validation.json",
+    early_warning_metrics: str | Path = "artifacts/metrics/early_warning_metrics.json",
+    kuleuven_metrics: str | Path = "artifacts/metrics/kuleuven_external_metrics.json",
+    output: str | Path | None = "artifacts/validation/oulad_statistical_validation.json",
     cutoffs: Iterable[int] = (30, 60, 90),
 ) -> dict[str, Any]:
     """Validate OULAD internally and compare it with KU Leuven."""
@@ -285,10 +285,10 @@ def run_synthetic_statistical_validation(
     data_dir: str | Path = "data/raw/synthetic",
     oulad_dir: str | Path = "data/processed/oulad",
     kuleuven_path: str | Path = "data/raw/external/kuleuven/dataset.zip",
-    synthetic_metrics: str | Path = "models/metrics/synthetic_baseline_metrics.json",
-    oulad_metrics: str | Path = "models/metrics/early_warning_metrics.json",
-    kuleuven_metrics: str | Path = "models/metrics/kuleuven_external_metrics.json",
-    output: str | Path | None = "models/validation/synthetic_statistical_validation.json",
+    synthetic_metrics: str | Path = "artifacts/metrics/synthetic_baseline_metrics.json",
+    oulad_metrics: str | Path = "artifacts/metrics/early_warning_metrics.json",
+    kuleuven_metrics: str | Path = "artifacts/metrics/kuleuven_external_metrics.json",
+    output: str | Path | None = "artifacts/validation/synthetic_statistical_validation.json",
     cutoffs: Iterable[int] = (30, 60, 90),
 ) -> dict[str, Any]:
     """Validate synthetic planner distributions and compare them with real data."""
@@ -458,18 +458,46 @@ def main() -> None:
     oulad = subparsers.add_parser("oulad")
     oulad.add_argument("--data-dir", type=Path, default=Path("data/processed/oulad"))
     oulad.add_argument("--kuleuven-path", type=Path, default=Path("data/raw/external/kuleuven/dataset.zip"))
-    oulad.add_argument("--early-warning-metrics", type=Path, default=Path("models/metrics/early_warning_metrics.json"))
-    oulad.add_argument("--kuleuven-metrics", type=Path, default=Path("models/metrics/kuleuven_external_metrics.json"))
-    oulad.add_argument("--output", type=Path, default=Path("models/validation/oulad_statistical_validation.json"))
+    oulad.add_argument(
+        "--early-warning-metrics",
+        type=Path,
+        default=Path("artifacts/metrics/early_warning_metrics.json"),
+    )
+    oulad.add_argument(
+        "--kuleuven-metrics",
+        type=Path,
+        default=Path("artifacts/metrics/kuleuven_external_metrics.json"),
+    )
+    oulad.add_argument(
+        "--output",
+        type=Path,
+        default=Path("artifacts/validation/oulad_statistical_validation.json"),
+    )
     oulad.add_argument("--cutoffs", type=int, nargs="+", default=[30, 60, 90])
     synthetic = subparsers.add_parser("synthetic")
     synthetic.add_argument("--data-dir", type=Path, default=Path("data/raw/synthetic"))
     synthetic.add_argument("--oulad-dir", type=Path, default=Path("data/processed/oulad"))
     synthetic.add_argument("--kuleuven-path", type=Path, default=Path("data/raw/external/kuleuven/dataset.zip"))
-    synthetic.add_argument("--synthetic-metrics", type=Path, default=Path("models/metrics/synthetic_baseline_metrics.json"))
-    synthetic.add_argument("--oulad-metrics", type=Path, default=Path("models/metrics/early_warning_metrics.json"))
-    synthetic.add_argument("--kuleuven-metrics", type=Path, default=Path("models/metrics/kuleuven_external_metrics.json"))
-    synthetic.add_argument("--output", type=Path, default=Path("models/validation/synthetic_statistical_validation.json"))
+    synthetic.add_argument(
+        "--synthetic-metrics",
+        type=Path,
+        default=Path("artifacts/metrics/synthetic_baseline_metrics.json"),
+    )
+    synthetic.add_argument(
+        "--oulad-metrics",
+        type=Path,
+        default=Path("artifacts/metrics/early_warning_metrics.json"),
+    )
+    synthetic.add_argument(
+        "--kuleuven-metrics",
+        type=Path,
+        default=Path("artifacts/metrics/kuleuven_external_metrics.json"),
+    )
+    synthetic.add_argument(
+        "--output",
+        type=Path,
+        default=Path("artifacts/validation/synthetic_statistical_validation.json"),
+    )
     synthetic.add_argument("--cutoffs", type=int, nargs="+", default=[30, 60, 90])
     args = parser.parse_args()
     if args.dataset == "oulad":

@@ -54,7 +54,7 @@ jobs:
       - name: Validate formal fairness report integrity
         run: |
           python -m pipeline.model_quality \
-            --metrics models/metrics/early_warning_metrics.json \
+            --metrics artifacts/metrics/early_warning_metrics.json \
             --output artifacts/validation/oulad_fairness_quality.json \
             --require-fairness \
             --min-fairness-group-size 30 \
@@ -62,7 +62,7 @@ jobs:
             --max-false-positive-rate-gap 1.0 \
             --max-selection-rate-gap 1.0
           python -m pipeline.model_quality \
-            --metrics models/metrics/synthetic_baseline_metrics.json \
+            --metrics artifacts/metrics/synthetic_baseline_metrics.json \
             --output artifacts/validation/synthetic_fairness_quality.json \
             --require-fairness \
             --min-fairness-group-size 30 \
@@ -80,7 +80,7 @@ jobs:
           name: scheduled-validation-${{ github.run_id }}
           path: |
             artifacts/validation/
-            models/metrics/early_warning_metrics.json
-            models/metrics/synthetic_baseline_metrics.json
+            artifacts/metrics/early_warning_metrics.json
+            artifacts/metrics/synthetic_baseline_metrics.json
           if-no-files-found: error
           retention-days: 90

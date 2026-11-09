@@ -6,7 +6,7 @@ The React application in `frontend/` separates the student planning experience
 from the operator model-testing experience. The default student view requests
 only understandable planning information: a goal, subjects, tasks, deadlines,
 availability, focus-cycle preferences, a small optional academic snapshot, and
-optional numeric wellbeing context. It does not request names, student
+required bounded numeric wellbeing context. It does not request names, student
 identifiers, credentials, diagnoses, or free-text wellbeing records. A generated
 plan remains decision support and requires human review.
 
@@ -15,8 +15,9 @@ plan remains decision support and requires human review.
 The interface provides two deliberately separated workflows:
 
 1. **Student planner (default).** The student enters a structured goal, subjects,
-   optional self-reported academic estimates, tasks, deadlines, availability,
-   preferred session length, and break length. The browser sends these values to
+   optional self-reported academic estimates, required sleep, stress, fatigue,
+   and concentration ratings, tasks, deadlines, availability, preferred session
+   length, and break length. The browser sends these values to
    `/v1/student-study-plan`. The API selects the deployment default model,
    constructs its exact fitted feature vector, runs risk scoring internally, and
    combines the signal with task priority and real capacity. The response exposes

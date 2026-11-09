@@ -67,7 +67,7 @@ Run the integrity report with:
 ```powershell
 python -m src.data.synthetic_validation `
   --data-dir data/raw/synthetic `
-  --output models/validation/synthetic_data_validation.json
+  --output artifacts/validation/synthetic_data_validation.json
 ```
 
 The report checks manifest row counts, primary-key uniqueness, and selected

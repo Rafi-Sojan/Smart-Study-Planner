@@ -62,7 +62,7 @@ docker compose up --build
 ```
 
 Local catalog entries may use trusted paths under `/model-store`, which is a
-read-only mount of the repository's `models/` directory. Production rejects
+read-only mount of the repository's `artifacts/models/` directory. Production rejects
 every `model_path`: each entry must use an immutable numeric MLflow
 `models:/<name>/<version>` URI. The release workflow downloads and verifies the
 governance tags, artifact feature contract, approved threshold, and forbidden

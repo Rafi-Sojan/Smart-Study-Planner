@@ -54,7 +54,7 @@ set limits from legal, ethical, educational, and population-specific analysis.
 
 ```powershell
 python -m pipeline.model_quality `
-  --metrics models/metrics/early_warning_metrics.json `
+  --metrics artifacts/metrics/early_warning_metrics.json `
   --output artifacts/validation/fairness-quality.json `
   --require-fairness `
   --min-fairness-group-size 30 `

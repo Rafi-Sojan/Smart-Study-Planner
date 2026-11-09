@@ -9,7 +9,7 @@ __pycache__
 *.ipynb
 data
 notebooks
-models
+artifacts
 mlruns
 logs
 .ci-data

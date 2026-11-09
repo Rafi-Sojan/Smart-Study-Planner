@@ -75,7 +75,7 @@ project results.
 - course style and current term;
 - optional self-reported CGPA, recent score, attendance, submission rate,
   weekly study time, credit load, and confidence;
-- optional numeric sleep, stress, fatigue, and concentration context;
+- required numeric sleep, stress, fatigue, and concentration context;
 - structured tasks and deadlines;
 - availability windows; and
 - preferred study-session and break lengths.

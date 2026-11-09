@@ -102,7 +102,7 @@ Notebooks 11 and 12 add the statistical-validation layer. Notebook 11 audits
 temporal stability within OULAD and compares OULAD with KU Leuven. Notebook 12
 audits synthetic integrity, simulated feature associations, student-disjoint
 composition, and synthetic-to-real measurement differences. Their saved JSON
-reports are under `models/validation/`; they do not turn synthetic results into
+reports are under `artifacts/validation/`; they do not turn synthetic results into
 real-student evidence.
 
 The controlled cross-dataset transfer stress test is documented in
@@ -267,7 +267,7 @@ Run it with:
 ```powershell
 python -m pipeline.kuleuven_external_validation `
   --data-path data/raw/external/kuleuven/dataset.zip `
-  --metrics-output models/metrics/kuleuven_external_metrics.json `
+  --metrics-output artifacts/metrics/kuleuven_external_metrics.json `
   --cutoffs-days 30 60 90
 ```
 
@@ -277,11 +277,16 @@ Run the controlled transfer stress test:
 python -m pipeline.cross_dataset_transfer `
   --kuleuven-path data/raw/external/kuleuven/dataset.zip `
   --synthetic-path data/raw/synthetic `
-  --metrics-output models/metrics/cross_dataset_transfer_metrics.json `
+  --metrics-output artifacts/metrics/cross_dataset_transfer_metrics.json `
   --cutoffs-days 30 60 90
 ```
 
 ## Reproducible commands
+
+Generated models, metrics, and validation reports use the canonical
+`artifacts/` layout documented in [artifacts/README.md](artifacts/README.md).
+Git tracks the pipeline definitions and `dvc.lock`; DVC stores the generated
+artifact bytes.
 
 Clean the available OULAD tables:
 
@@ -297,7 +302,7 @@ python -m pipeline.training_pipeline --data-dir data/raw/oulad
 
 The comparison includes logistic regression, random forest, extra trees, and
 histogram gradient boosting. The selected model and measured metrics are
-written to `models/metrics/metrics.json`. The baseline notebook also displays
+written to `artifacts/metrics/metrics.json`. The baseline notebook also displays
 confusion matrices before cutoff application.
 
 Reproduce the data-to-model stages with DVC after configuring the DagsHub
@@ -327,12 +332,12 @@ Evaluate the four models using only observations available by course day 30,
 ```powershell
 python -m pipeline.early_warning_pipeline `
   --data-dir data/processed/oulad `
-  --metrics-output models/metrics/early_warning_metrics.json `
+  --metrics-output artifacts/metrics/early_warning_metrics.json `
   --cutoffs-days 30 60 90
 ```
 
 The early-warning metrics are versioned in
-`models/metrics/early_warning_metrics.json`. The `early_warning` stage is also
+`artifacts/metrics/early_warning_metrics.json`. The `early_warning` stage is also
 defined in `dvc.yaml`; therefore, `dvc repro early_warning` reruns the command
 when its data or code dependencies change.
 
@@ -362,15 +367,15 @@ Run the synthetic baseline pipeline locally:
 ```powershell
 python -m pipeline.synthetic_baseline_pipeline `
   --data-dir data/raw/synthetic `
-  --metrics-output models/metrics/synthetic_baseline_metrics.json `
-  --model-dir models/synthetic_baseline `
+  --metrics-output artifacts/metrics/synthetic_baseline_metrics.json `
+  --model-dir artifacts/models/synthetic_baseline `
   --cutoffs-days 30 60 90
 ```
 
 The pipeline trains all four baseline models using the student-disjoint
 cutoff protocol, writes the measured comparison to
-`models/metrics/synthetic_baseline_metrics.json`, and saves the selected model
-for each cutoff under `models/synthetic_baseline/`. The local run does not
+`artifacts/metrics/synthetic_baseline_metrics.json`, and saves the selected model
+for each cutoff under `artifacts/models/synthetic_baseline/`. The local run does not
 contact DagsHub unless `--mlflow` or `--register-models` is supplied.
 
 The metrics file also stores fixed-threshold diagnostics and formal subgroup

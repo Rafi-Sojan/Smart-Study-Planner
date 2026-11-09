@@ -254,7 +254,7 @@ overall synthetic release consequently fails the fairness gate. Even the two
 cutoff summaries that pass cannot establish real-world fairness because the
 protected attributes and outcomes are simulated. Exact reports, confidence
 intervals, eligibility rules, and excluded small groups are retained in
-`models/metrics/synthetic_baseline_metrics.json` and documented in
+`artifacts/metrics/synthetic_baseline_metrics.json` and documented in
 [`docs/fairness-validation.md`](fairness-validation.md).
 
 ## 8. Confusion matrices and operational interpretation

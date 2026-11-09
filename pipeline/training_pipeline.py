@@ -97,8 +97,8 @@ def run_training(
 def main() -> None:
     parser = argparse.ArgumentParser(description="Train the OULAD baseline model")
     parser.add_argument("--data-dir", type=Path, default=Path("data/raw/oulad"))
-    parser.add_argument("--metrics-output", type=Path, default=Path("models/metrics/metrics.json"))
-    parser.add_argument("--model-output", type=Path, default=Path("models/baseline.pkl"))
+    parser.add_argument("--metrics-output", type=Path, default=Path("artifacts/metrics/metrics.json"))
+    parser.add_argument("--model-output", type=Path, default=Path("artifacts/models/baseline.pkl"))
     parser.add_argument(
         "--mlflow",
         action="store_true",

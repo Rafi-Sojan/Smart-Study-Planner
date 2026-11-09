@@ -61,8 +61,8 @@ The validator accepts explicit thresholds for a particular task:
 
 ```powershell
 python -m pipeline.model_quality `
-  --metrics models/metrics/metrics.json `
-  --output models/metrics/model_quality.json `
+  --metrics artifacts/metrics/metrics.json `
+  --output artifacts/metrics/model_quality.json `
   --min-pr-auc 0.20 `
   --min-balanced-accuracy 0.60 `
   --min-operating-point-recall 0.10 `
@@ -88,7 +88,7 @@ The gate can also require the formal subgroup report:
 
 ```powershell
 python -m pipeline.model_quality `
-  --metrics models/metrics/early_warning_metrics.json `
+  --metrics artifacts/metrics/early_warning_metrics.json `
   --require-fairness `
   --min-fairness-group-size 30 `
   --max-equal-opportunity-gap 0.20 `

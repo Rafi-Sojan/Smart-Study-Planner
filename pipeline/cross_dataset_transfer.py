@@ -73,7 +73,11 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--kuleuven-path", type=Path, default=Path("data/raw/external/kuleuven/dataset.zip"))
     parser.add_argument("--synthetic-path", type=Path, default=Path("data/raw/synthetic"))
-    parser.add_argument("--metrics-output", type=Path, default=Path("models/metrics/cross_dataset_transfer_metrics.json"))
+    parser.add_argument(
+        "--metrics-output",
+        type=Path,
+        default=Path("artifacts/metrics/cross_dataset_transfer_metrics.json"),
+    )
     parser.add_argument("--cutoffs-days", type=int, nargs="+", default=[30, 60, 90])
     args = parser.parse_args()
     metrics = run_cross_dataset_transfer(args.kuleuven_path, args.synthetic_path, tuple(args.cutoffs_days))

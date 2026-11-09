@@ -222,10 +222,10 @@ class StudentIntake(BaseModel):
     submission_rate_percent: float | None = Field(default=None, ge=0, le=100)
     weekly_study_hours: float | None = Field(default=None, ge=0, le=100)
     confidence_level: int | None = Field(default=None, ge=1, le=5)
-    sleep_hours: float | None = Field(default=None, ge=0, le=24)
-    stress_level: int | None = Field(default=None, ge=0, le=10)
-    fatigue_level: int | None = Field(default=None, ge=0, le=10)
-    concentration_level: int | None = Field(default=None, ge=0, le=10)
+    sleep_hours: float = Field(..., ge=0, le=24)
+    stress_level: int = Field(..., ge=0, le=10)
+    fatigue_level: int = Field(..., ge=0, le=10)
+    concentration_level: int = Field(..., ge=0, le=10)
 
     @field_validator("subjects")
     @classmethod

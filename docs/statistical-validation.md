@@ -118,13 +118,13 @@ features.
 \.venv\Scripts\python.exe -m pipeline.statistical_validation oulad `
   --data-dir data/processed/oulad `
   --kuleuven-path data/raw/external/kuleuven/dataset.zip `
-  --output models/validation/oulad_statistical_validation.json
+  --output artifacts/validation/oulad_statistical_validation.json
 
 \.venv\Scripts\python.exe -m pipeline.statistical_validation synthetic `
   --data-dir data/raw/synthetic `
   --oulad-dir data/processed/oulad `
   --kuleuven-path data/raw/external/kuleuven/dataset.zip `
-  --output models/validation/synthetic_statistical_validation.json
+  --output artifacts/validation/synthetic_statistical_validation.json
 ```
 
 The reports are generated from local data and are not fabricated. They must be
@@ -133,9 +133,9 @@ library version, or cutoffs.
 
 The same commands are registered as the DVC stages
 `oulad_statistical_validation` and `synthetic_statistical_validation`. Their
-DVC-owned outputs are written under `artifacts/validation/`; the formally
-reviewed notebook snapshots under `models/validation/` remain Git-tracked
-documentation artifacts.
+DVC-owned outputs are written under `artifacts/validation/`. Their producing
+commands and content hashes are recorded in `dvc.lock`, while executed notebook
+outputs retain the reviewed plots and formal interpretation.
 
 ```powershell
 dvc repro oulad_statistical_validation synthetic_statistical_validation

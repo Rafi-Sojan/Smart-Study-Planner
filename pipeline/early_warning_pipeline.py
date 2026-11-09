@@ -115,7 +115,7 @@ def main() -> None:
     parser.add_argument(
         "--metrics-output",
         type=Path,
-        default=Path("models/metrics/early_warning_metrics.json"),
+        default=Path("artifacts/metrics/early_warning_metrics.json"),
     )
     parser.add_argument("--cutoffs-days", type=int, nargs="+", default=list(DEFAULT_CUTOFFS))
     parser.add_argument("--test-presentations", nargs="+", default=None)

@@ -154,10 +154,10 @@ export interface StudentIntakePayload {
   submission_rate_percent: number | null;
   weekly_study_hours: number | null;
   confidence_level: number | null;
-  sleep_hours: number | null;
-  stress_level: number | null;
-  fatigue_level: number | null;
-  concentration_level: number | null;
+  sleep_hours: number;
+  stress_level: number;
+  fatigue_level: number;
+  concentration_level: number;
 }
 
 export interface EvidenceSummary {

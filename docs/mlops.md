@@ -72,9 +72,9 @@ dvc status
 ```
 
 `dvc add` creates the small Git-tracked pointer
-`data/raw/oulad.dvc`; the CSV content remains in DVC storage. The generated
-metrics JSON remains a small Git-tracked report, while DVC versions the raw
-and processed data plus the model artifact. `dvc repro`
+`data/raw/oulad.dvc`; the CSV content remains in DVC storage. Generated models,
+metrics, and validation reports are consolidated under `artifacts/` and
+versioned by DVC through `dvc.lock`. `dvc repro`
 runs the stages in `dvc.yaml`:
 
 1. `clean` creates `data/processed/oulad/` from the raw tables.
@@ -82,7 +82,7 @@ runs the stages in `dvc.yaml`:
    metrics.
 3. `early_warning` evaluates the same four baselines at course-relative days
    30, 60, and 90 using the time-aware presentation holdout, and writes
-   `models/metrics/early_warning_metrics.json`.
+   `artifacts/metrics/early_warning_metrics.json`.
 
 Push the DVC cache only after the DagsHub remote credentials have been
 configured:
@@ -94,7 +94,7 @@ dvc push -r origin
 Commit and push the pointer and configuration files through Git:
 
 ```powershell
-git add .dvc .gitignore dvc.yaml dvc.lock data/raw/oulad.dvc models/metrics/metrics.json models/metrics/early_warning_metrics.json
+git add .dvc .gitignore dvc.yaml dvc.lock data/raw/oulad.dvc artifacts/README.md
 git commit -m "Set up DVC data pipeline"
 git push origin main
 ```
@@ -124,8 +124,8 @@ Then run the pipeline with tracking explicitly enabled:
 ```powershell
 python -m pipeline.training_pipeline `
   --data-dir data/processed/oulad `
-  --metrics-output models/metrics/metrics.json `
-  --model-output models/baseline.pkl `
+  --metrics-output artifacts/metrics/metrics.json `
+  --model-output artifacts/models/baseline.pkl `
   --mlflow `
   --experiment-name smart-study-planner-oulad `
   --register-models
@@ -144,7 +144,7 @@ For the leakage-safe early-warning pipeline, use:
 ```powershell
 python -m pipeline.early_warning_pipeline `
   --data-dir data/processed/oulad `
-  --metrics-output models/metrics/early_warning_metrics.json `
+  --metrics-output artifacts/metrics/early_warning_metrics.json `
   --cutoffs-days 30 60 90 `
   --mlflow `
   --register-models
@@ -160,8 +160,8 @@ For the synthetic planner baseline pipeline, use the following local command:
 ```powershell
 python -m pipeline.synthetic_baseline_pipeline `
   --data-dir data/raw/synthetic `
-  --metrics-output models/metrics/synthetic_baseline_metrics.json `
-  --model-dir models/synthetic_baseline `
+  --metrics-output artifacts/metrics/synthetic_baseline_metrics.json `
+  --model-dir artifacts/models/synthetic_baseline `
   --cutoffs-days 30 60 90
 ```
 

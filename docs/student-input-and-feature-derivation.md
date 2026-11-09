@@ -17,7 +17,7 @@ an OULAD early-warning model is valid for the current institution.
 
 | Actor | Information or operation |
 |---|---|
-| Student | Goal, subjects, tasks, deadlines, available study windows, preferred session and break lengths, optional academic estimates, and optional bounded wellbeing ratings |
+| Student | Goal, subjects, tasks, deadlines, available study windows, preferred session and break lengths, optional academic estimates, and required bounded wellbeing ratings |
 | University/LMS | Enrolment, verified attendance, assessment history, prior results, registration context, and digital engagement activity |
 | FastAPI backend | Contract-ordered feature construction, compatible aggregation, missing-value preservation, model invocation, evidence summary, task ranking, and scheduling |
 | Risk model | Support-risk score used internally by the planner |
@@ -36,6 +36,8 @@ Required student fields are:
 - one or more subject names;
 - course style;
 - current semester or term;
+- typical sleep hours;
+- bounded stress, fatigue, and concentration ratings;
 - at least one task with title, subject, deadline, estimated effort,
   difficulty, and importance;
 - at least one timezone-aware availability window; and
@@ -50,9 +52,14 @@ stand-ins until an institution supplies verified records:
 - assignment-submission rate;
 - independent study hours per week;
 - current credit load;
-- confidence rating;
-- typical sleep hours; and
-- stress, fatigue, and concentration ratings.
+- confidence rating.
+
+The four wellbeing values are mandatory for this standalone planner workflow
+because it produces wellbeing-aware scheduling recommendations. They remain
+self-reported planning context, not clinical measurements or diagnostic data.
+An institutional deployment must establish an appropriate lawful basis,
+explain the purpose and retention period, restrict access, and review whether
+an alternative or opt-out is required by local governance.
 
 Names, registration numbers, email addresses, credentials, diagnoses, and
 free-text wellbeing information are neither required nor accepted by this

@@ -68,7 +68,6 @@ data/simulated/*
 # Track DVC pointer files, not the datasets themselves
 !data/raw/*.dvc
 !data/processed/*.dvc
-!models/**/*.dvc
 
 *.csv
 *.tsv
@@ -79,19 +78,16 @@ data/simulated/*
 *.sqlite
 *.db
 
-# Ignore trained model artifacts
-models/**/*.pkl
-models/**/*.joblib
-models/**/*.pickle
-models/**/*.pt
-models/**/*.pth
-models/**/*.onnx
-models/**/*.h5
-
-# Keep directories
-!models/pretrained/.gitkeep
-!models/drifted/.gitkeep
-!models/metrics/.gitkeep
+# Generated ML artifacts are versioned by DVC, not Git.
+/artifacts/models/*
+!/artifacts/models/pretrained/
+/artifacts/models/pretrained/*
+!/artifacts/models/pretrained/.gitkeep
+!/artifacts/models/drifted/
+/artifacts/models/drifted/*
+!/artifacts/models/drifted/.gitkeep
+/artifacts/metrics/
+/artifacts/validation/
 
 # Logs
 logs/*
@@ -102,9 +98,6 @@ logs/*
 # CI smoke-test artifacts
 .ci-data/
 .ci-output/
-
-# DVC-owned validation reports (tracked through dvc.lock, not Git)
-/artifacts/validation/
 
 # Local MLflow tracking store
 mlruns/

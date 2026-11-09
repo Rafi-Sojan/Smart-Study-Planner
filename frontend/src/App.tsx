@@ -74,6 +74,11 @@ function optionalNumber(value: OptionalNumberDraft): number | null {
   return value === "" ? null : value;
 }
 
+function requiredNumber(value: OptionalNumberDraft, label: string): number {
+  if (value === "") throw new Error(`Enter ${label}.`);
+  return value;
+}
+
 function studentIntakePayload(intake: StudentIntakeDraft): StudentIntakePayload {
   const subjects = intake.subjects
     .split(",")
@@ -92,10 +97,10 @@ function studentIntakePayload(intake: StudentIntakeDraft): StudentIntakePayload 
     submission_rate_percent: optionalNumber(intake.submission_rate_percent),
     weekly_study_hours: optionalNumber(intake.weekly_study_hours),
     confidence_level: optionalNumber(intake.confidence_level),
-    sleep_hours: optionalNumber(intake.sleep_hours),
-    stress_level: optionalNumber(intake.stress_level),
-    fatigue_level: optionalNumber(intake.fatigue_level),
-    concentration_level: optionalNumber(intake.concentration_level),
+    sleep_hours: requiredNumber(intake.sleep_hours, "typical sleep hours"),
+    stress_level: requiredNumber(intake.stress_level, "a stress rating"),
+    fatigue_level: requiredNumber(intake.fatigue_level, "a fatigue rating"),
+    concentration_level: requiredNumber(intake.concentration_level, "a concentration rating"),
   };
 }
 
@@ -287,14 +292,14 @@ function StudentIntakeForm({ intake, onChange }: StudentIntakeFormProps) {
       </div>
 
       <div className="subsection-heading">
-        <div><h3>Optional wellbeing context</h3><p>Use simple ratings only; no medical or free-text information is requested.</p></div>
-        <span>Optional</span>
+        <div><h3>Wellbeing context</h3><p>Required for wellbeing-aware scheduling. Use simple ratings only; no medical or free-text information is requested.</p></div>
+        <span>Required</span>
       </div>
       <div className="field-grid four">
-        <label className="field"><span>Typical sleep (hours)</span><input type="number" min="0" max="24" step="0.5" value={intake.sleep_hours} onChange={(event) => onChange({ sleep_hours: numberDraft(event.target.value) })} placeholder="7" /></label>
-        <label className="field"><span>Stress (0–10)</span><input type="number" min="0" max="10" value={intake.stress_level} onChange={(event) => onChange({ stress_level: numberDraft(event.target.value) })} placeholder="5" /></label>
-        <label className="field"><span>Fatigue (0–10)</span><input type="number" min="0" max="10" value={intake.fatigue_level} onChange={(event) => onChange({ fatigue_level: numberDraft(event.target.value) })} placeholder="4" /></label>
-        <label className="field"><span>Concentration (0–10)</span><input type="number" min="0" max="10" value={intake.concentration_level} onChange={(event) => onChange({ concentration_level: numberDraft(event.target.value) })} placeholder="7" /></label>
+        <label className="field"><span>Typical sleep (hours)</span><input type="number" min="0" max="24" step="0.5" value={intake.sleep_hours} onChange={(event) => onChange({ sleep_hours: numberDraft(event.target.value) })} placeholder="7" required /></label>
+        <label className="field"><span>Stress (0–10)</span><input type="number" min="0" max="10" value={intake.stress_level} onChange={(event) => onChange({ stress_level: numberDraft(event.target.value) })} placeholder="5" required /></label>
+        <label className="field"><span>Fatigue (0–10)</span><input type="number" min="0" max="10" value={intake.fatigue_level} onChange={(event) => onChange({ fatigue_level: numberDraft(event.target.value) })} placeholder="4" required /></label>
+        <label className="field"><span>Concentration (0–10)</span><input type="number" min="0" max="10" value={intake.concentration_level} onChange={(event) => onChange({ concentration_level: numberDraft(event.target.value) })} placeholder="7" required /></label>
       </div>
     </section>
   );
@@ -720,7 +725,7 @@ export default function App() {
             </div>
 
             <section className="evidence-flow" aria-label="How information is used">
-              <div><span>1</span><strong>You provide</strong><p>Goals, tasks, deadlines, and preferences</p></div>
+              <div><span>1</span><strong>You provide</strong><p>Goals, tasks, deadlines, wellbeing, and preferences</p></div>
               <div><span>2</span><strong>University provides</strong><p>Verified records when an LMS is connected</p></div>
               <div><span>3</span><strong>Backend derives</strong><p>The exact approved model inputs</p></div>
               <div><span>4</span><strong>Planner returns</strong><p>A reviewable, capacity-aware schedule</p></div>

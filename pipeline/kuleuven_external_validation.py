@@ -179,7 +179,11 @@ def run_external_validation(
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--data-path", type=Path, default=Path("data/raw/external/kuleuven/dataset.zip"))
-    parser.add_argument("--metrics-output", type=Path, default=Path("models/metrics/kuleuven_external_metrics.json"))
+    parser.add_argument(
+        "--metrics-output",
+        type=Path,
+        default=Path("artifacts/metrics/kuleuven_external_metrics.json"),
+    )
     parser.add_argument("--cutoffs-days", type=int, nargs="+", default=[30, 60, 90])
     args = parser.parse_args()
     metrics, _ = run_external_validation(args.data_path, tuple(args.cutoffs_days))

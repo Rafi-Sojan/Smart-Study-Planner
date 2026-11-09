@@ -1,7 +1,7 @@
 schema: '2.0'
 stages:
   clean:
-    cmd: python -m src.data.cleaner --input-dir data/raw/oulad --output-dir 
+    cmd: python -m src.data.cleaner --input-dir data/raw/oulad --output-dir
       data/processed/oulad
     deps:
     - path: data/raw/oulad
@@ -24,9 +24,9 @@ stages:
       size: 334016008
       nfiles: 8
   train:
-    cmd: python -m pipeline.training_pipeline --data-dir data/processed/oulad 
-      --metrics-output models/metrics/metrics.json --model-output 
-      models/baseline.pkl
+    cmd: python -m pipeline.training_pipeline --data-dir data/processed/oulad
+      --metrics-output artifacts/metrics/metrics.json --model-output
+      artifacts/models/baseline.pkl
     deps:
     - path: data/processed/oulad
       hash: md5
@@ -35,8 +35,8 @@ stages:
       nfiles: 8
     - path: pipeline/training_pipeline.py
       hash: md5
-      md5: 2df3fdc34a41217e418b8d4984f863ed
-      size: 5830
+      md5: e471cc1bb34fc0a09839eb7eab0c2719
+      size: 5843
     - path: src/features/feature_engineering.py
       hash: md5
       md5: d21dcc5b3ec5825f470bd448d5bf0476
@@ -62,14 +62,18 @@ stages:
       md5: bf620fa3b8914badd11535765c6a677a
       size: 16041
     outs:
-    - path: models/baseline.pkl
+    - path: artifacts/metrics/metrics.json
+      hash: md5
+      md5: c09caaf4f04fe8794bf9a5c9b578b854
+      size: 379107
+    - path: artifacts/models/baseline.pkl
       hash: md5
       md5: 6878bf5f99a90cc972dcc0272b6bb4d9
       size: 737657
   early_warning:
-    cmd: python -m pipeline.early_warning_pipeline --data-dir 
-      data/processed/oulad --metrics-output 
-      models/metrics/early_warning_metrics.json --cutoffs-days 30 60 90
+    cmd: python -m pipeline.early_warning_pipeline --data-dir
+      data/processed/oulad --metrics-output
+      artifacts/metrics/early_warning_metrics.json --cutoffs-days 30 60 90
     deps:
     - path: data/processed/oulad
       hash: md5
@@ -78,8 +82,8 @@ stages:
       nfiles: 8
     - path: pipeline/early_warning_pipeline.py
       hash: md5
-      md5: 096a8af762c3e3b511aa2083d642ce71
-      size: 6727
+      md5: 0d4e0df31e7550ddc191f957a9b85128
+      size: 6730
     - path: src/features/feature_engineering.py
       hash: md5
       md5: d21dcc5b3ec5825f470bd448d5bf0476
@@ -104,8 +108,13 @@ stages:
       hash: md5
       md5: bf620fa3b8914badd11535765c6a677a
       size: 16041
+    outs:
+    - path: artifacts/metrics/early_warning_metrics.json
+      hash: md5
+      md5: 4456ae20179ee320bb76fe36748939c0
+      size: 1257685
   simulate:
-    cmd: python -m src.simulation.simulator --config configs/simulation.yaml 
+    cmd: python -m src.simulation.simulator --config configs/simulation.yaml
       --overwrite
     deps:
     - path: configs/simulation.yaml
@@ -127,10 +136,10 @@ stages:
       size: 173772971
       nfiles: 37
   synthetic_baseline:
-    cmd: python -m pipeline.synthetic_baseline_pipeline --data-dir 
-      data/raw/synthetic --metrics-output 
-      models/metrics/synthetic_baseline_metrics.json --model-dir 
-      models/synthetic_baseline --cutoffs-days 30 60 90
+    cmd: python -m pipeline.synthetic_baseline_pipeline --data-dir
+      data/raw/synthetic --metrics-output
+      artifacts/metrics/synthetic_baseline_metrics.json --model-dir
+      artifacts/models/synthetic_baseline --cutoffs-days 30 60 90
     deps:
     - path: data/raw/synthetic
       hash: md5
@@ -139,8 +148,8 @@ stages:
       nfiles: 37
     - path: pipeline/synthetic_baseline_pipeline.py
       hash: md5
-      md5: 969da67f1a01e4dce47ac5d62d0a9ccc
-      size: 5127
+      md5: 74ef07b4a256529ac3924fc8927d4991
+      size: 5184
     - path: src/features/synthetic_features.py
       hash: md5
       md5: 41b9876d71268dad3e8171875b430995
@@ -166,18 +175,18 @@ stages:
       md5: bf620fa3b8914badd11535765c6a677a
       size: 16041
     outs:
-    - path: models/metrics/synthetic_baseline_metrics.json
+    - path: artifacts/metrics/synthetic_baseline_metrics.json
       hash: md5
       md5: f9f96a221f770dba46c04a9b2b111cee
       size: 475455
-    - path: models/synthetic_baseline
+    - path: artifacts/models/synthetic_baseline
       hash: md5
       md5: 55737e24bdea83a2f834a8820d76a73d.dir
       size: 24285968
       nfiles: 3
   synthetic_validate:
     cmd: python -m src.data.synthetic_validation --data-dir data/raw/synthetic
-      --output models/validation/synthetic_data_validation.json
+      --output artifacts/validation/synthetic_data_validation.json
     deps:
     - path: data/raw/synthetic
       hash: md5
@@ -186,17 +195,17 @@ stages:
       nfiles: 37
     - path: src/data/synthetic_validation.py
       hash: md5
-      md5: 663ee979aea6942411aa1654c35d4db4
-      size: 6434
+      md5: 7af8beba334cdcd2e910e7da456004ef
+      size: 6437
     outs:
-    - path: models/validation/synthetic_data_validation.json
+    - path: artifacts/validation/synthetic_data_validation.json
       hash: md5
       md5: f8d4bba40152da41f86d2788c113f7be
       size: 10569
   kuleuven_external_validation:
     cmd: python -m pipeline.kuleuven_external_validation --data-path
       data/raw/external/kuleuven/dataset.zip --metrics-output
-      models/metrics/kuleuven_external_metrics.json --cutoffs-days 30 60 90
+      artifacts/metrics/kuleuven_external_metrics.json --cutoffs-days 30 60 90
     deps:
     - path: data/raw/external/kuleuven/dataset.zip
       hash: md5
@@ -204,8 +213,8 @@ stages:
       size: 78409206
     - path: pipeline/kuleuven_external_validation.py
       hash: md5
-      md5: 5b8c88b35a4eab13ef2d0a785cf6e21a
-      size: 8651
+      md5: bf8a11c3718777a638e6cde9f3dab7dd
+      size: 8685
     - path: src/data/kuleuven.py
       hash: md5
       md5: 3125bda76d2b0fc136fde9ef0e5c0102
@@ -223,14 +232,14 @@ stages:
       md5: a00d90f1f5785f8c7204510fa1d023b1
       size: 4099
     outs:
-    - path: models/metrics/kuleuven_external_metrics.json
+    - path: artifacts/metrics/kuleuven_external_metrics.json
       hash: md5
       md5: dcd2f082b905cab5d5c6bb642622bf8b
       size: 134290
   cross_dataset_transfer:
     cmd: python -m pipeline.cross_dataset_transfer --kuleuven-path
       data/raw/external/kuleuven/dataset.zip --synthetic-path data/raw/synthetic
-      --metrics-output models/metrics/cross_dataset_transfer_metrics.json
+      --metrics-output artifacts/metrics/cross_dataset_transfer_metrics.json
       --cutoffs-days 30 60 90
     deps:
     - path: data/raw/external/kuleuven/dataset.zip
@@ -244,12 +253,12 @@ stages:
       nfiles: 37
     - path: pipeline/cross_dataset_transfer.py
       hash: md5
-      md5: 7f703f5809c4d404c7c60d9a47dfc4f5
-      size: 4152
+      md5: 23439314db248acf61ea87876fbb0d5f
+      size: 4186
     - path: pipeline/kuleuven_external_validation.py
       hash: md5
-      md5: 5b8c88b35a4eab13ef2d0a785cf6e21a
-      size: 8651
+      md5: bf8a11c3718777a638e6cde9f3dab7dd
+      size: 8685
     - path: src/data/kuleuven.py
       hash: md5
       md5: 3125bda76d2b0fc136fde9ef0e5c0102
@@ -271,7 +280,7 @@ stages:
       md5: a00d90f1f5785f8c7204510fa1d023b1
       size: 4099
     outs:
-    - path: models/metrics/cross_dataset_transfer_metrics.json
+    - path: artifacts/metrics/cross_dataset_transfer_metrics.json
       hash: md5
       md5: 43e18aa216901dd218cf5891a317e59d
       size: 19497
@@ -279,10 +288,18 @@ stages:
     cmd: python -m pipeline.statistical_validation oulad --data-dir
       data/processed/oulad --kuleuven-path
       data/raw/external/kuleuven/dataset.zip --early-warning-metrics
-      models/metrics/early_warning_metrics.json --kuleuven-metrics
-      models/metrics/kuleuven_external_metrics.json --output
+      artifacts/metrics/early_warning_metrics.json --kuleuven-metrics
+      artifacts/metrics/kuleuven_external_metrics.json --output
       artifacts/validation/oulad_statistical_validation.json --cutoffs 30 60 90
     deps:
+    - path: artifacts/metrics/early_warning_metrics.json
+      hash: md5
+      md5: 4456ae20179ee320bb76fe36748939c0
+      size: 1257685
+    - path: artifacts/metrics/kuleuven_external_metrics.json
+      hash: md5
+      md5: dcd2f082b905cab5d5c6bb642622bf8b
+      size: 134290
     - path: data/processed/oulad
       hash: md5
       md5: 6ca7ed713177da595e0e3a6e534e8d4a.dir
@@ -292,18 +309,10 @@ stages:
       hash: md5
       md5: 9f559e96d91f6a4c447ba41a783ff277
       size: 78409206
-    - path: models/metrics/early_warning_metrics.json
-      hash: md5
-      md5: 4456ae20179ee320bb76fe36748939c0
-      size: 1257685
-    - path: models/metrics/kuleuven_external_metrics.json
-      hash: md5
-      md5: dcd2f082b905cab5d5c6bb642622bf8b
-      size: 134290
     - path: pipeline/statistical_validation.py
       hash: md5
-      md5: 76cefac715cf3e1cdac2b926d6f57ebb
-      size: 22427
+      md5: 16b4792972cd1715d92a15eccc92886a
+      size: 22686
     - path: src/data/kuleuven.py
       hash: md5
       md5: 3125bda76d2b0fc136fde9ef0e5c0102
@@ -325,12 +334,24 @@ stages:
     cmd: python -m pipeline.statistical_validation synthetic --data-dir
       data/raw/synthetic --oulad-dir data/processed/oulad --kuleuven-path
       data/raw/external/kuleuven/dataset.zip --synthetic-metrics
-      models/metrics/synthetic_baseline_metrics.json --oulad-metrics
-      models/metrics/early_warning_metrics.json --kuleuven-metrics
-      models/metrics/kuleuven_external_metrics.json --output
+      artifacts/metrics/synthetic_baseline_metrics.json --oulad-metrics
+      artifacts/metrics/early_warning_metrics.json --kuleuven-metrics
+      artifacts/metrics/kuleuven_external_metrics.json --output
       artifacts/validation/synthetic_statistical_validation.json --cutoffs 30 60
       90
     deps:
+    - path: artifacts/metrics/early_warning_metrics.json
+      hash: md5
+      md5: 4456ae20179ee320bb76fe36748939c0
+      size: 1257685
+    - path: artifacts/metrics/kuleuven_external_metrics.json
+      hash: md5
+      md5: dcd2f082b905cab5d5c6bb642622bf8b
+      size: 134290
+    - path: artifacts/metrics/synthetic_baseline_metrics.json
+      hash: md5
+      md5: f9f96a221f770dba46c04a9b2b111cee
+      size: 475455
     - path: data/processed/oulad
       hash: md5
       md5: 6ca7ed713177da595e0e3a6e534e8d4a.dir
@@ -345,30 +366,18 @@ stages:
       md5: 72ef90109863794bc50e6d421cf6d123.dir
       size: 173772971
       nfiles: 37
-    - path: models/metrics/early_warning_metrics.json
-      hash: md5
-      md5: 4456ae20179ee320bb76fe36748939c0
-      size: 1257685
-    - path: models/metrics/kuleuven_external_metrics.json
-      hash: md5
-      md5: dcd2f082b905cab5d5c6bb642622bf8b
-      size: 134290
-    - path: models/metrics/synthetic_baseline_metrics.json
-      hash: md5
-      md5: f9f96a221f770dba46c04a9b2b111cee
-      size: 475455
     - path: pipeline/statistical_validation.py
       hash: md5
-      md5: 76cefac715cf3e1cdac2b926d6f57ebb
-      size: 22427
+      md5: 16b4792972cd1715d92a15eccc92886a
+      size: 22686
     - path: src/data/kuleuven.py
       hash: md5
       md5: 3125bda76d2b0fc136fde9ef0e5c0102
       size: 7432
     - path: src/data/synthetic_validation.py
       hash: md5
-      md5: 663ee979aea6942411aa1654c35d4db4
-      size: 6434
+      md5: 7af8beba334cdcd2e910e7da456004ef
+      size: 6437
     - path: src/data/transfer.py
       hash: md5
       md5: 6e0bb9d4471b91491c728898d6759e0f

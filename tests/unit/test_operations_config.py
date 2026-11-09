@@ -17,6 +17,22 @@ def test_dvc_contains_both_statistical_validation_stages() -> None:
     assert stages["oulad_statistical_validation"]["outs"] == [
         "artifacts/validation/oulad_statistical_validation.json"
     ]
+    assert stages["train"]["outs"] == ["artifacts/models/baseline.pkl"]
+    assert stages["train"]["metrics"] == ["artifacts/metrics/metrics.json"]
+    assert stages["synthetic_baseline"]["outs"] == [
+        "artifacts/models/synthetic_baseline"
+    ]
+    assert stages["synthetic_baseline"]["metrics"] == [
+        "artifacts/metrics/synthetic_baseline_metrics.json"
+    ]
+
+
+def test_local_compose_mounts_the_canonical_model_artifact_tree() -> None:
+    compose = _yaml("docker-compose.yaml")
+    volumes = compose["services"]["api"]["volumes"]
+    assert "./artifacts/models/pretrained:/models:ro" in volumes
+    assert "./artifacts/models:/model-store:ro" in volumes
+    assert all(not volume.startswith("./models") for volume in volumes)
 
 
 def test_kubernetes_deployment_requires_private_image_and_release_secret() -> None:
