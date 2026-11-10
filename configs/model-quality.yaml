@@ -1,0 +1,42 @@
+schema_version: 1
+
+fairness_policy:
+  status: engineering_review_default_not_production_approval
+  min_group_size: 30
+  max_equal_opportunity_gap: 0.20
+  max_false_positive_rate_gap: 0.20
+  max_selection_rate_gap: 0.20
+
+tracks:
+  oulad_full_course:
+    metrics: artifacts/metrics/metrics.json
+    output: oulad_full_course.json
+    expected_evidence_type: retrospective_historical_benchmark
+    performance_thresholds:
+      status: not_approved
+      min_pr_auc: null
+      min_balanced_accuracy: null
+      min_operating_point_recall: null
+      max_expected_calibration_error: null
+
+  oulad_early_warning:
+    metrics: artifacts/metrics/early_warning_metrics.json
+    output: oulad_early_warning.json
+    expected_evidence_type: retrospective_historical_early_warning_benchmark
+    performance_thresholds:
+      status: not_approved
+      min_pr_auc: null
+      min_balanced_accuracy: null
+      min_operating_point_recall: null
+      max_expected_calibration_error: null
+
+  synthetic_planner:
+    metrics: artifacts/metrics/synthetic_baseline_metrics.json
+    output: synthetic_planner.json
+    expected_evidence_type: synthetic_development_only
+    performance_thresholds:
+      status: not_approved
+      min_pr_auc: null
+      min_balanced_accuracy: null
+      min_operating_point_recall: null
+      max_expected_calibration_error: null

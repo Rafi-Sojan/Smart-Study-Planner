@@ -90,6 +90,17 @@ stages:
       - artifacts/models/synthetic_baseline
     metrics:
       - artifacts/metrics/synthetic_baseline_metrics.json
+  model_quality:
+    cmd: python -m pipeline.model_quality_suite --config configs/model-quality.yaml --output-dir artifacts/validation/model_quality
+    deps:
+      - artifacts/metrics/metrics.json
+      - artifacts/metrics/early_warning_metrics.json
+      - artifacts/metrics/synthetic_baseline_metrics.json
+      - configs/model-quality.yaml
+      - pipeline/model_quality_suite.py
+      - src/risk/model_risk.py
+    outs:
+      - artifacts/validation/model_quality
   oulad_statistical_validation:
     cmd: python -m pipeline.statistical_validation oulad --data-dir data/processed/oulad --kuleuven-path data/raw/external/kuleuven/dataset.zip --early-warning-metrics artifacts/metrics/early_warning_metrics.json --kuleuven-metrics artifacts/metrics/kuleuven_external_metrics.json --output artifacts/validation/oulad_statistical_validation.json --cutoffs 30 60 90
     deps:

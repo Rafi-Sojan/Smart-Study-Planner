@@ -131,7 +131,62 @@ Before an artifact can move beyond candidate status, reviewers must confirm:
 These controls are further described in `docs/risk-register.md` and
 `docs/evaluation-and-release-policy.md`.
 
-## 7. Limitations
+## 7. Reproducible formal assessment suite
+
+The canonical policy is `configs/model-quality.yaml`. It deliberately leaves
+task-specific performance thresholds in the `not_approved` state because no
+institutional review has approved universal PR-AUC, balanced-accuracy, recall,
+or calibration limits for these research tracks. Null policy values are not
+silently replaced with convenient values; the missing approval becomes an
+explicit release blocker.
+
+Run the complete assessment with:
+
+```powershell
+python -m pipeline.model_quality_suite `
+  --config configs/model-quality.yaml `
+  --output-dir artifacts/validation/model_quality
+```
+
+The same command is registered as the DVC stage:
+
+```powershell
+dvc repro model_quality
+```
+
+The stage writes deterministic, hash-linked reports:
+
+- `oulad_full_course.json`;
+- `oulad_early_warning.json`;
+- `synthetic_planner.json`; and
+- `summary.json`.
+
+Each track report contains the input metrics SHA-256, structural checks,
+fairness-required checks, configured policy, release blockers, and an explicit
+`approved` or `blocked` decision. The suite normally exits successfully after
+writing valid evidence even when release is blocked. This allows DVC and CI to
+retain a failed gate as evidence. Use `--require-release-ready` only at a true
+promotion boundary; it writes the reports and then exits non-zero unless every
+track is release-ready.
+
+At the current `dvc.lock` revision, all three assessments executed and all
+three passed structural integrity checks. Formal quality did not pass and the
+aggregate release decision is `blocked` because:
+
+1. institutionally approved performance thresholds do not exist;
+2. the current fairness limits are engineering-review defaults rather than an
+   institutionally approved production policy;
+3. the OULAD tracks fail one or more documented research fairness-gap checks;
+4. the synthetic track is development-only and its aggregate fairness gate
+   fails because at least one cutoff fails;
+5. none of the tracks is prospective institutional validation;
+6. no track makes a `prospective_validated` deployment claim; and
+7. no reviewed intervention policy is configured.
+
+This is a completed risk assessment with a negative release decision, not an
+unfinished or silently passing check.
+
+## 8. Limitations
 
 The quality validator cannot detect every form of leakage, sampling bias,
 label error, distribution shift, unfair impact, or harmful intervention. It

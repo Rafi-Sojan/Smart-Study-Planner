@@ -13,6 +13,10 @@ application programming interface now provide a tested, deterministic service
 path, but remain a research candidate rather than an approved student decision
 system.
 
+Repository operating guidance, project context, active plans, and durable
+decisions are consolidated in [context/README.md](context/README.md). Agents and
+contributors should begin there before changing the implementation.
+
 The processing methodology, feature definitions, measured results, and
 limitations are documented in [docs/oulad-baseline.md](docs/oulad-baseline.md).
 The complete raw-table column dictionary and derived-feature map are documented
@@ -65,6 +69,14 @@ monitoring and recovery operations in
 [docs/monitoring-and-recovery.md](docs/monitoring-and-recovery.md), and the
 remaining external production prerequisites in
 [docs/production-readiness.md](docs/production-readiness.md).
+
+The deterministic `model_quality` DVC stage evaluates the full-course OULAD,
+early-warning OULAD, and synthetic planner tracks under the policy in
+`configs/model-quality.yaml`. It writes formal reports and an aggregate release
+decision to `artifacts/validation/model_quality/`. The current locked evidence
+passes structural integrity checks but remains formally blocked from release;
+the reports preserve the fairness, threshold-policy, prospective-validation,
+and intervention-policy blockers instead of converting them into a pass.
 
 ## Analysis notebooks
 

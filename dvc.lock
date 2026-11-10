@@ -395,3 +395,37 @@ stages:
       hash: md5
       md5: 0b36babb3ed94f0ff2cc3ae13f5cc832
       size: 127198
+  model_quality:
+    cmd: python -m pipeline.model_quality_suite --config
+      configs/model-quality.yaml --output-dir artifacts/validation/model_quality
+    deps:
+    - path: artifacts/metrics/early_warning_metrics.json
+      hash: md5
+      md5: 4456ae20179ee320bb76fe36748939c0
+      size: 1257685
+    - path: artifacts/metrics/metrics.json
+      hash: md5
+      md5: c09caaf4f04fe8794bf9a5c9b578b854
+      size: 379107
+    - path: artifacts/metrics/synthetic_baseline_metrics.json
+      hash: md5
+      md5: f9f96a221f770dba46c04a9b2b111cee
+      size: 475455
+    - path: configs/model-quality.yaml
+      hash: md5
+      md5: 3d25a9da4b5d5afd5c7618ad5bede11d
+      size: 1344
+    - path: pipeline/model_quality_suite.py
+      hash: md5
+      md5: f73d0606da07268c7b1c4c7afd5900ca
+      size: 11189
+    - path: src/risk/model_risk.py
+      hash: md5
+      md5: 100bdcec8b57fe044d7f988c61bc1279
+      size: 15111
+    outs:
+    - path: artifacts/validation/model_quality
+      hash: md5
+      md5: 939f7171e9f4ebb70df239eaf8635480.dir
+      size: 65546
+      nfiles: 4

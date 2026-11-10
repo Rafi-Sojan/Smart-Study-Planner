@@ -21,6 +21,7 @@ deployment workflow can complete:
 | Planner | Validated task/availability contract, deterministic priorities, explicit breaks and capacity shortfalls, human review |
 | Student feature adapter | Student-facing requests are converted server-side; unavailable LMS fields remain missing, evidence coverage is disclosed, and model internals are omitted from student responses |
 | Data validation | OULAD and synthetic statistical reports are DVC stages and are reproduced by a credentialed scheduled workflow |
+| Model quality | A DVC-owned three-track assessment records structural, fairness, threshold-policy, evidence, intervention-policy, and release-decision evidence without converting blocked models into approvals |
 
 ## External prerequisites that cannot be created by source code
 

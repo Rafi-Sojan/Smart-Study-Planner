@@ -68,9 +68,10 @@ evaluable attribute, uses a weaker minimum-group rule, or exceeds a supplied
 gap. Pull-request CI tests the report calculations and gate behavior with
 controlled unit fixtures; it does not claim an evaluable fairness result from
 the deliberately small synthetic smoke dataset. The credentialed full-data
-workflow enforces evaluability, while production deployment requires the
-registered version's `fairness_gate_passed=true` tag and prospective deployment
-eligibility.
+workflow runs the `model_quality` DVC stage and preserves the actual blocked or
+approved decision under `artifacts/validation/model_quality/`. Production
+deployment still requires the registered version's
+`fairness_gate_passed=true` tag and prospective deployment eligibility.
 
 ## Interpretation boundary
 

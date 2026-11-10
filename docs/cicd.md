@@ -91,7 +91,11 @@ research or candidate artifact.
 ## 6. Scheduled validation and monitoring
 
 `.github/workflows/data-validation.yml` performs a credentialed weekly DVC
-restore and reproduces OULAD/synthetic statistical evidence. The separate
+restore and reproduces OULAD/synthetic statistical evidence plus the formal
+three-track model-quality assessment. The workflow verifies that the assessment
+executed and uploads the reports even when their truthful release decision is
+`blocked`; it does not reinterpret a blocked research model as a failed workflow
+or an approved release. The separate
 `.github/workflows/monitoring.yml` checks production HTTPS liveness, readiness,
 threshold metadata, and feature-contract metadata every 15 minutes. These
 jobs require protected DagsHub and production configuration; they do not place

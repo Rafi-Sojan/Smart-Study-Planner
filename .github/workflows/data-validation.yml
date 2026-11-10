@@ -49,26 +49,11 @@ jobs:
       - name: Reproduce model and statistical validation stages
         run: |
           dvc repro early_warning synthetic_baseline
-          dvc repro oulad_statistical_validation synthetic_statistical_validation
+          dvc repro model_quality oulad_statistical_validation synthetic_statistical_validation
 
-      - name: Validate formal fairness report integrity
+      - name: Verify formal model-quality assessment completed
         run: |
-          python -m pipeline.model_quality \
-            --metrics artifacts/metrics/early_warning_metrics.json \
-            --output artifacts/validation/oulad_fairness_quality.json \
-            --require-fairness \
-            --min-fairness-group-size 30 \
-            --max-equal-opportunity-gap 1.0 \
-            --max-false-positive-rate-gap 1.0 \
-            --max-selection-rate-gap 1.0
-          python -m pipeline.model_quality \
-            --metrics artifacts/metrics/synthetic_baseline_metrics.json \
-            --output artifacts/validation/synthetic_fairness_quality.json \
-            --require-fairness \
-            --min-fairness-group-size 30 \
-            --max-equal-opportunity-gap 1.0 \
-            --max-false-positive-rate-gap 1.0 \
-            --max-selection-rate-gap 1.0
+          python -c "import json; from pathlib import Path; report=json.loads(Path('artifacts/validation/model_quality/summary.json').read_text()); assert report['assessment_executed'] is True; assert report['track_count'] == 3; assert report['release_decision'] in {'approved', 'blocked'}; assert all(item['assessment_executed'] for item in report['tracks'].values())"
 
       - name: Verify committed DVC metadata is reproducible
         run: git diff --exit-code -- dvc.lock

@@ -25,6 +25,10 @@ def test_dvc_contains_both_statistical_validation_stages() -> None:
     assert stages["synthetic_baseline"]["metrics"] == [
         "artifacts/metrics/synthetic_baseline_metrics.json"
     ]
+    assert stages["model_quality"]["outs"] == [
+        "artifacts/validation/model_quality"
+    ]
+    assert "configs/model-quality.yaml" in stages["model_quality"]["deps"]
 
 
 def test_local_compose_mounts_the_canonical_model_artifact_tree() -> None:
