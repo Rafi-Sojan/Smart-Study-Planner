@@ -29,11 +29,24 @@ if [ "$PORT" -eq "$API_PORT" ]; then
   exit 2
 fi
 
+
 export PORT API_PORT
+
+# Recreate writable Nginx runtime directories
+# before validating the configuration.
+mkdir -p \
+  /tmp/nginx/client_temp \
+  /tmp/nginx/proxy_temp \
+  /tmp/nginx/fastcgi_temp \
+  /tmp/nginx/uwsgi_temp \
+  /tmp/nginx/scgi_temp
+
 envsubst '${PORT} ${API_PORT}' \
   < /app/deploy/render/nginx.conf.template \
   > /tmp/nginx.conf
+
 nginx -t -c /tmp/nginx.conf
+
 
 python -m uvicorn src.api.main:app \
   --host 127.0.0.1 \
