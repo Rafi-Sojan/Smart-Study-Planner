@@ -43,6 +43,15 @@ The browser receives an HttpOnly session cookie. It never receives `API_KEY`.
 The Nginx gateway serves the Vite bundle and proxies `/api/*` to FastAPI while
 retaining the established `/healthz`, `/readyz`, and `/v1/*` service paths.
 
+## Render research demonstration
+
+The repository also includes a one-service Render Blueprint and a dedicated
+combined Docker image. This path serves React and proxies FastAPI through one
+same-origin Nginx gateway. It is explicitly a protected research demonstration,
+not the production deployment described below. Setup, prompted secrets, model
+preflight, health checks, free-plan limitations, and the production boundary are
+documented in [render-deployment.md](render-deployment.md).
+
 ### Configuring selectable models
 
 The legacy `MODEL_PATH` or `MODEL_URI` configuration remains valid and appears

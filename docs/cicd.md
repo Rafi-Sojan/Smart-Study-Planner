@@ -45,19 +45,21 @@ been obtained.
 
 ## 3. Container verification and publication
 
-`.github/workflows/docker.yml` builds both the FastAPI image and the
-React/Nginx image on pull requests and pushes to `main`. Pull requests build
-without publishing. A push to `main` publishes `latest`, short-SHA, and full
-commit-SHA tags for the repository image and its `-web` companion in GitHub
-Container Registry. A single two-component matrix performs both behaviors, so
-GitHub reports concrete `Build api/web` checks for reviews and `Publish
-api/web` checks for approved pushes without a deliberately skipped placeholder
-job.
+`.github/workflows/docker.yml` builds the FastAPI image, the React/Nginx image,
+and the combined Render research-demonstration image on pull requests and pushes
+to `main`. Pull requests build without publishing. A push to `main` publishes
+`latest`, short-SHA, and full commit-SHA tags for the repository image and its
+`-web` and `-render` companions in GitHub Container Registry. A single
+three-component matrix performs both behaviors, so GitHub reports concrete
+`Build api/web/render` checks for reviews and `Publish api/web/render` checks for
+approved pushes without a deliberately skipped placeholder job.
 
 The deployment should use the immutable commit-SHA tag or an image digest,
-not `latest`. The Dockerfile runs as a non-root user and does not copy raw
-datasets or model artifacts into the image. Runtime model loading is configured
-through the registry or a read-only mounted artifact.
+not `latest`. All serving Dockerfiles run as non-root users and do not copy raw
+datasets or model artifacts into an image. Runtime model loading is configured
+through the registry or a read-only mounted artifact. Kubernetes deployment
+consumes the separate API and web images; the Render Blueprint builds
+`Dockerfile.render` as a distinct, demonstration-only path.
 
 ## 4. Manual deployment
 

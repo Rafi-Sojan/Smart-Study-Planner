@@ -83,3 +83,14 @@ registrations, builds, and deployments are reported only after they complete.
 
 **Consequence:** A local implementation result is not represented as an external
 release or deployed service.
+
+## D-010 — Keep the Render path demonstration-only
+
+**Decision:** Render uses one authenticated web service in which Nginx serves
+React and proxies a loopback-only FastAPI process. The Blueprint sets
+`APP_ENV=development` and loads a registered research candidate from MLflow.
+
+**Consequence:** The Render path preserves same-origin browser security without
+silently creating a paid private service. It does not bypass or replace the
+production model gates, Kubernetes topology, prospective evidence, monitoring,
+or institutional approval requirements.

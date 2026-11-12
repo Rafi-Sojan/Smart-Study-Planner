@@ -29,6 +29,9 @@ jobs:
           - component: web
             dockerfile: frontend/Dockerfile
             image_suffix: -web
+          - component: render
+            dockerfile: Dockerfile.render
+            image_suffix: -render
 
     permissions:
       contents: read

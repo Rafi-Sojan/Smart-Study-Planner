@@ -48,6 +48,8 @@ Holm-adjusted distribution tests and real-world comparisons, is documented in
 The FastAPI inference service, model-registry loading, Docker Compose setup,
 Kubernetes template, and deployment rollback procedure are documented in
 [docs/deployment.md](docs/deployment.md).
+The authenticated single-service Render research-demonstration path is
+documented in [docs/render-deployment.md](docs/render-deployment.md).
 The React/Vite application now defaults to a student-friendly intake and derives
 the fitted feature vector in FastAPI. Raw model-contract entry, allowlisted model
 selection, and registry metadata are confined to an explicit administrator testing

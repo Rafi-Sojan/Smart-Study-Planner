@@ -21,6 +21,7 @@ status.
 - [x] MLflow/DagsHub tracking and candidate-registration paths.
 - [x] Student-facing FastAPI and React/Vite planning workflow.
 - [x] Docker, Kubernetes, Prometheus, Grafana, CI/CD, and rollback definitions.
+- [x] Authenticated single-service Render research-demonstration Blueprint.
 - [x] Deterministic three-track model-risk and quality assessment.
 - [x] Consolidated repository context and agent guidance.
 

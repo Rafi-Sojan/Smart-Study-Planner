@@ -1,0 +1,54 @@
+services:
+  - type: web
+    name: smart-study-planner-demo
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerfilePath: ./Dockerfile.render
+    dockerContext: .
+    healthCheckPath: /readyz
+    autoDeployTrigger: checksPass
+    envVars:
+      - key: PORT
+        value: "10000"
+      - key: API_PORT
+        value: "8000"
+      - key: APP_ENV
+        value: development
+      - key: ENABLE_API_DOCS
+        value: "0"
+      - key: ALLOW_TRUSTED_PICKLE_MODEL
+        value: "0"
+      - key: SESSION_COOKIE_SECURE
+        value: "1"
+      - key: SESSION_TTL_SECONDS
+        value: "28800"
+      - key: DEFAULT_MODEL_ID
+        value: default
+      - key: MODEL_LABEL
+        value: Research risk model
+      - key: MODEL_DESCRIPTION
+        value: Research demonstration model; not approved for production decisions.
+      - key: ALLOWED_HOSTS
+        fromService:
+          type: web
+          name: smart-study-planner-demo
+          envVarKey: RENDER_EXTERNAL_HOSTNAME
+      - key: API_KEY
+        generateValue: true
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: WEB_AUTH_USERNAME
+        sync: false
+      - key: WEB_AUTH_PASSWORD_HASH
+        sync: false
+      - key: MODEL_URI
+        sync: false
+      - key: MODEL_THRESHOLD
+        sync: false
+      - key: MLFLOW_TRACKING_URI
+        sync: false
+      - key: MLFLOW_TRACKING_USERNAME
+        sync: false
+      - key: MLFLOW_TRACKING_PASSWORD
+        sync: false

@@ -48,6 +48,8 @@ or day 90 is not automatically valid at day 30.
 - React/Vite student intake and separated administrator testing mode.
 - Docker, Kubernetes, Prometheus, Grafana, CI/CD, monitoring, and rollback
   configuration.
+- A single-service Render Blueprint for an authenticated research demonstration;
+  it is not a production-approval path.
 
 ## Current release posture
 
@@ -74,7 +76,8 @@ fairness, feature-contract, and integrity gates.
 - Formal documentation: `docs/`
 - Data and artifact lineage: `dvc.yaml` and `dvc.lock`
 - Model-quality policy: `configs/model-quality.yaml`
-- Deployment configuration: `deploy/`, `Dockerfile`, `docker-compose.yml`
+- Deployment configuration: `deploy/`, `Dockerfile`, `Dockerfile.render`,
+  `docker-compose.yaml`, and `render.yaml`
 - Monitoring configuration: `monitoring/`
 - CI/CD workflows: `.github/workflows/`
 

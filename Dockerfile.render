@@ -1,0 +1,55 @@
+FROM node:24-alpine AS frontend-build
+
+WORKDIR /app
+COPY frontend/package.json frontend/package-lock.json ./
+RUN npm ci
+
+COPY frontend/ ./
+RUN npm run build
+
+FROM python:3.12.14-slim-bookworm
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    ENABLE_API_DOCS=0 \
+    HOME=/tmp \
+    XDG_CACHE_HOME=/tmp/.cache \
+    PORT=10000 \
+    API_PORT=8000
+
+WORKDIR /app
+
+RUN apt-get update \
+    && apt-get install --no-install-recommends -y gettext-base nginx \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY requirements-api.txt ./
+RUN python -m pip install --no-cache-dir --upgrade pip \
+    && python -m pip install --no-cache-dir -r requirements-api.txt
+
+RUN useradd --uid 10001 --create-home --shell /usr/sbin/nologin appuser \
+    && mkdir -p \
+        /tmp/nginx/client_temp \
+        /tmp/nginx/proxy_temp \
+        /tmp/nginx/fastcgi_temp \
+        /tmp/nginx/uwsgi_temp \
+        /tmp/nginx/scgi_temp \
+    && chown -R appuser:appuser /app /tmp/nginx
+
+COPY --chown=appuser:appuser src ./src
+COPY --chown=appuser:appuser pipeline ./pipeline
+COPY --chown=appuser:appuser configs ./configs
+COPY --from=frontend-build --chown=appuser:appuser /app/dist ./frontend-dist
+COPY --chown=appuser:appuser deploy/render/nginx.conf.template ./deploy/render/nginx.conf.template
+COPY --chown=appuser:appuser deploy/render/entrypoint.sh ./deploy/render/entrypoint.sh
+
+RUN chmod 0555 ./deploy/render/entrypoint.sh
+
+USER appuser
+
+EXPOSE 10000
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=45s --retries=3 \
+    CMD python -c "import os,urllib.request; port=os.getenv('PORT','10000'); host=os.getenv('ALLOWED_HOSTS','localhost').split(',')[0].strip(); request=urllib.request.Request(f'http://127.0.0.1:{port}/readyz',headers={'Host':host}); urllib.request.urlopen(request,timeout=3)"
+
+ENTRYPOINT ["./deploy/render/entrypoint.sh"]

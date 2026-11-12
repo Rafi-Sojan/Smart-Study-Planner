@@ -39,6 +39,49 @@ def test_local_compose_mounts_the_canonical_model_artifact_tree() -> None:
     assert all(not volume.startswith("./models") for volume in volumes)
 
 
+def test_render_blueprint_is_an_authenticated_research_demo() -> None:
+    blueprint = _yaml("render.yaml")
+    assert len(blueprint["services"]) == 1
+    service = blueprint["services"][0]
+    assert service["type"] == "web"
+    assert service["runtime"] == "docker"
+    assert service["plan"] == "free"
+    assert service["dockerfilePath"] == "./Dockerfile.render"
+    assert service["healthCheckPath"] == "/readyz"
+
+    environment = {item["key"]: item for item in service["envVars"]}
+    assert environment["APP_ENV"]["value"] == "development"
+    assert environment["ALLOW_TRUSTED_PICKLE_MODEL"]["value"] == "0"
+    assert environment["SESSION_COOKIE_SECURE"]["value"] == "1"
+    assert environment["ALLOWED_HOSTS"]["fromService"] == {
+        "type": "web",
+        "name": service["name"],
+        "envVarKey": "RENDER_EXTERNAL_HOSTNAME",
+    }
+    for generated_secret in ("API_KEY", "SESSION_SECRET"):
+        assert environment[generated_secret]["generateValue"] is True
+    for prompted_value in (
+        "WEB_AUTH_USERNAME",
+        "WEB_AUTH_PASSWORD_HASH",
+        "MODEL_URI",
+        "MODEL_THRESHOLD",
+        "MLFLOW_TRACKING_URI",
+        "MLFLOW_TRACKING_USERNAME",
+        "MLFLOW_TRACKING_PASSWORD",
+    ):
+        assert environment[prompted_value]["sync"] is False
+
+    dockerfile = (ROOT / "Dockerfile.render").read_text(encoding="utf-8")
+    nginx = (ROOT / "deploy/render/nginx.conf.template").read_text(encoding="utf-8")
+    entrypoint = (ROOT / "deploy/render/entrypoint.sh").read_text(encoding="utf-8")
+    assert "USER appuser" in dockerfile
+    assert "ENTRYPOINT" in dockerfile
+    assert "listen 0.0.0.0:${PORT}" in nginx
+    assert "server 127.0.0.1:${API_PORT}" in nginx
+    assert "smart-study-planner-api" not in nginx
+    assert "envsubst '${PORT} ${API_PORT}'" in entrypoint
+
+
 def test_kubernetes_deployment_requires_private_image_and_release_secret() -> None:
     deployment = _yaml("deploy/kubernetes/deployment.yaml")
     pod = deployment["spec"]["template"]["spec"]
@@ -114,4 +157,4 @@ def test_operations_workflows_cover_monitoring_validation_and_recovery() -> None
     docker_config = _yaml(".github/workflows/docker.yml")
     assert set(docker_config["jobs"]) == {"images"}
     matrix = docker_config["jobs"]["images"]["strategy"]["matrix"]["include"]
-    assert {item["component"] for item in matrix} == {"api", "web"}
+    assert {item["component"] for item in matrix} == {"api", "web", "render"}
