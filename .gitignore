@@ -146,3 +146,6 @@ configs/local.*
 configs/*.local.json
 
 !data/raw/.gitignore
+
+.repro/
+.pytest_tmp/

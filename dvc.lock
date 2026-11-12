@@ -1,7 +1,7 @@
 schema: '2.0'
 stages:
   clean:
-    cmd: python -m src.data.cleaner --input-dir data/raw/oulad --output-dir
+    cmd: python -m src.data.cleaner --input-dir data/raw/oulad --output-dir 
       data/processed/oulad
     deps:
     - path: data/raw/oulad
@@ -24,8 +24,8 @@ stages:
       size: 334016008
       nfiles: 8
   train:
-    cmd: python -m pipeline.training_pipeline --data-dir data/processed/oulad
-      --metrics-output artifacts/metrics/metrics.json --model-output
+    cmd: python -m pipeline.training_pipeline --data-dir data/processed/oulad 
+      --metrics-output artifacts/metrics/metrics.json --model-output 
       artifacts/models/baseline.pkl
     deps:
     - path: data/processed/oulad
@@ -71,8 +71,8 @@ stages:
       md5: 6878bf5f99a90cc972dcc0272b6bb4d9
       size: 737657
   early_warning:
-    cmd: python -m pipeline.early_warning_pipeline --data-dir
-      data/processed/oulad --metrics-output
+    cmd: python -m pipeline.early_warning_pipeline --data-dir 
+      data/processed/oulad --metrics-output 
       artifacts/metrics/early_warning_metrics.json --cutoffs-days 30 60 90
     deps:
     - path: data/processed/oulad
@@ -114,7 +114,7 @@ stages:
       md5: 4456ae20179ee320bb76fe36748939c0
       size: 1257685
   simulate:
-    cmd: python -m src.simulation.simulator --config configs/simulation.yaml
+    cmd: python -m src.simulation.simulator --config configs/simulation.yaml 
       --overwrite
     deps:
     - path: configs/simulation.yaml
@@ -136,9 +136,9 @@ stages:
       size: 173772971
       nfiles: 37
   synthetic_baseline:
-    cmd: python -m pipeline.synthetic_baseline_pipeline --data-dir
-      data/raw/synthetic --metrics-output
-      artifacts/metrics/synthetic_baseline_metrics.json --model-dir
+    cmd: python -m pipeline.synthetic_baseline_pipeline --data-dir 
+      data/raw/synthetic --metrics-output 
+      artifacts/metrics/synthetic_baseline_metrics.json --model-dir 
       artifacts/models/synthetic_baseline --cutoffs-days 30 60 90
     deps:
     - path: data/raw/synthetic
@@ -185,7 +185,7 @@ stages:
       size: 24285968
       nfiles: 3
   synthetic_validate:
-    cmd: python -m src.data.synthetic_validation --data-dir data/raw/synthetic
+    cmd: python -m src.data.synthetic_validation --data-dir data/raw/synthetic 
       --output artifacts/validation/synthetic_data_validation.json
     deps:
     - path: data/raw/synthetic
@@ -203,8 +203,8 @@ stages:
       md5: f8d4bba40152da41f86d2788c113f7be
       size: 10569
   kuleuven_external_validation:
-    cmd: python -m pipeline.kuleuven_external_validation --data-path
-      data/raw/external/kuleuven/dataset.zip --metrics-output
+    cmd: python -m pipeline.kuleuven_external_validation --data-path 
+      data/raw/external/kuleuven/dataset.zip --metrics-output 
       artifacts/metrics/kuleuven_external_metrics.json --cutoffs-days 30 60 90
     deps:
     - path: data/raw/external/kuleuven/dataset.zip
@@ -237,9 +237,9 @@ stages:
       md5: dcd2f082b905cab5d5c6bb642622bf8b
       size: 134290
   cross_dataset_transfer:
-    cmd: python -m pipeline.cross_dataset_transfer --kuleuven-path
+    cmd: python -m pipeline.cross_dataset_transfer --kuleuven-path 
       data/raw/external/kuleuven/dataset.zip --synthetic-path data/raw/synthetic
-      --metrics-output artifacts/metrics/cross_dataset_transfer_metrics.json
+      --metrics-output artifacts/metrics/cross_dataset_transfer_metrics.json 
       --cutoffs-days 30 60 90
     deps:
     - path: data/raw/external/kuleuven/dataset.zip
@@ -285,11 +285,11 @@ stages:
       md5: 43e18aa216901dd218cf5891a317e59d
       size: 19497
   oulad_statistical_validation:
-    cmd: python -m pipeline.statistical_validation oulad --data-dir
-      data/processed/oulad --kuleuven-path
-      data/raw/external/kuleuven/dataset.zip --early-warning-metrics
-      artifacts/metrics/early_warning_metrics.json --kuleuven-metrics
-      artifacts/metrics/kuleuven_external_metrics.json --output
+    cmd: python -m pipeline.statistical_validation oulad --data-dir 
+      data/processed/oulad --kuleuven-path 
+      data/raw/external/kuleuven/dataset.zip --early-warning-metrics 
+      artifacts/metrics/early_warning_metrics.json --kuleuven-metrics 
+      artifacts/metrics/kuleuven_external_metrics.json --output 
       artifacts/validation/oulad_statistical_validation.json --cutoffs 30 60 90
     deps:
     - path: artifacts/metrics/early_warning_metrics.json
@@ -331,12 +331,12 @@ stages:
       md5: 854bb782f1c3417ac9bd583aabe2bbea
       size: 44900
   synthetic_statistical_validation:
-    cmd: python -m pipeline.statistical_validation synthetic --data-dir
-      data/raw/synthetic --oulad-dir data/processed/oulad --kuleuven-path
-      data/raw/external/kuleuven/dataset.zip --synthetic-metrics
-      artifacts/metrics/synthetic_baseline_metrics.json --oulad-metrics
-      artifacts/metrics/early_warning_metrics.json --kuleuven-metrics
-      artifacts/metrics/kuleuven_external_metrics.json --output
+    cmd: python -m pipeline.statistical_validation synthetic --data-dir 
+      data/raw/synthetic --oulad-dir data/processed/oulad --kuleuven-path 
+      data/raw/external/kuleuven/dataset.zip --synthetic-metrics 
+      artifacts/metrics/synthetic_baseline_metrics.json --oulad-metrics 
+      artifacts/metrics/early_warning_metrics.json --kuleuven-metrics 
+      artifacts/metrics/kuleuven_external_metrics.json --output 
       artifacts/validation/synthetic_statistical_validation.json --cutoffs 30 60
       90
     deps:
@@ -396,7 +396,7 @@ stages:
       md5: 0b36babb3ed94f0ff2cc3ae13f5cc832
       size: 127198
   model_quality:
-    cmd: python -m pipeline.model_quality_suite --config
+    cmd: python -m pipeline.model_quality_suite --config 
       configs/model-quality.yaml --output-dir artifacts/validation/model_quality
     deps:
     - path: artifacts/metrics/early_warning_metrics.json

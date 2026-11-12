@@ -169,6 +169,7 @@ def verify_registered_model(
     }
 
 
+
 def register_model_version(
     mlflow: Any,
     model_uri: str,
@@ -177,12 +178,57 @@ def register_model_version(
     tags: dict[str, str] | None = None,
     alias: str | None = "candidate",
 ) -> Any:
-    """Register a model and attach auditable tags and an optional alias."""
+    """Register a model and verify its version metadata."""
+    model_version = mlflow.register_model(
+        model_uri,
+        registered_name,
+    )
 
-    model_version = mlflow.register_model(model_uri, registered_name)
     client = mlflow.MlflowClient()
-    for key, value in (tags or {}).items():
-        client.set_model_version_tag(registered_name, model_version.version, key, str(value))
+    version_number = str(model_version.version)
+
+    expected_tags = {
+        str(key): str(value)
+        for key, value in (tags or {}).items()
+    }
+
+    for key, value in expected_tags.items():
+        client.set_model_version_tag(
+            registered_name,
+            version_number,
+            key,
+            value,
+        )
+
+    # Read back the saved version tags.
+    saved_version = client.get_model_version(
+        registered_name,
+        version_number,
+    )
+    saved_tags = dict(saved_version.tags or {})
+
+    mismatches = {
+        key: {
+            "expected": value,
+            "actual": saved_tags.get(key),
+        }
+        for key, value in expected_tags.items()
+        if saved_tags.get(key) != value
+    }
+
+    if mismatches:
+        raise RuntimeError(
+            f"MLflow registration incomplete for "
+            f"{registered_name}/{version_number}: "
+            f"{mismatches}"
+        )
+
+    # Assign the alias only after tag verification.
     if alias:
-        client.set_registered_model_alias(registered_name, alias, model_version.version)
+        client.set_registered_model_alias(
+            registered_name,
+            alias,
+            version_number,
+        )
+
     return model_version
