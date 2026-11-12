@@ -22,8 +22,9 @@ limitations are documented in [docs/oulad-baseline.md](docs/oulad-baseline.md).
 The complete raw-table column dictionary and derived-feature map are documented
 in [docs/oulad-data-dictionary.md](docs/oulad-data-dictionary.md).
 Data versioning and experiment tracking procedures are documented in
-[docs/mlops.md](docs/mlops.md), including the full-track reproduction script
-and MLflow registry audit.
+[docs/mlops.md](docs/mlops.md). The full model reproduction workflow and its
+MLflow registry audit are documented in
+[docs/full-model-reproduction-and-registry-audit.md](docs/full-model-reproduction-and-registry-audit.md).
 The EdNet exploratory analysis, scope, feature rationale, and limitations are
 documented in [docs/ednet.md](docs/ednet.md).
 The formal synthetic-data methodology, function reference, statistical
