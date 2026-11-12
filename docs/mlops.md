@@ -188,7 +188,43 @@ The code also supports the DagsHub client configuration. Instead of setting
 `MLFLOW_TRACKING_URI`, set `DAGSHUB_REPO_OWNER` and `DAGSHUB_REPO_NAME`; the
 tracking helper then calls `dagshub.init` when `--mlflow` is used.
 
-## 5. Configure Grafana monitoring
+## 5. Reproduce all model tracks and audit registrations
+
+On Windows, `scripts/reproduce_all.ps1` runs the complete credentialed
+reproduction sequence from the repository root. It first reproduces the DVC
+`synthetic_validate` and `model_quality` stages, then trains and registers the
+OULAD full-course, OULAD day-30/60/90 early-warning, and synthetic day-30/60/90
+model candidates. It finishes by auditing the resulting MLflow model versions.
+The script requires the OULAD processed data and synthetic data already be
+available locally, along with `MLFLOW_TRACKING_URI`,
+`MLFLOW_TRACKING_USERNAME`, and `MLFLOW_TRACKING_PASSWORD` in the current
+PowerShell session.
+
+Run it from PowerShell:
+
+```powershell
+./scripts/reproduce_all.ps1
+```
+
+Training reports and model artifacts are written to `.repro/`, which is ignored
+by Git. The sequence expects four full-course OULAD model versions, three
+early-warning versions (one selected candidate per cutoff), and twelve
+synthetic versions (four candidates per cutoff). It uses separate named MLflow
+experiments and runs so each track can be inspected independently. This is a
+reproduction and registry-consistency workflow; it does not promote candidates
+or make them deployment eligible.
+
+`pipeline.audit_registry` reads the three JSON reports and checks the expected
+number of distinct registered names, that each name has exactly one version
+from its recorded MLflow run, and that each version has the required quality,
+fairness, selection, deployment, threshold, feature-contract, and evidence
+tags. It validates boolean gate values, threshold range, positive feature
+count, and SHA-256 format, then exits nonzero if any check fails. Registration
+itself reads model-version tags back from MLflow and assigns the `candidate`
+alias only after the requested tags match; a mismatch raises an error instead
+of silently leaving an incompletely described candidate.
+
+## 6. Configure Grafana monitoring
 
 Grafana is an operational monitoring layer and is intentionally separate from
 DVC and MLflow. DVC versions data and generated artifacts; MLflow records
@@ -249,7 +285,7 @@ institution-approved external Alertmanager receiver before relying on paging;
 the repository default exposes alerts in the local UI only. Operational and
 recovery procedures are specified in `docs/monitoring-and-recovery.md`.
 
-## 6. Initial setup sequence
+## 7. Initial setup sequence
 
 ```powershell
 python -m pip install -r requirements.txt
